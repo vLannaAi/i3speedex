@@ -99,7 +99,7 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
       // Use GSI1 (status index) for efficient querying
       const result = await queryItems<Sale>({
         TableName: TableNames.Sales,
-        IndexName: 'GSI1',
+        IndexName: 'GSI1-QueryByBuyer',
         KeyConditionExpression: 'GSI1PK = :gsi1pk',
         ExpressionAttributeValues: {
           ':gsi1pk': `STATUS#${status}`,
@@ -120,7 +120,7 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
       // Use GSI2 (buyer index)
       const result = await queryItems<Sale>({
         TableName: TableNames.Sales,
-        IndexName: 'GSI2',
+        IndexName: 'GSI2-QueryByProducer',
         KeyConditionExpression: 'GSI2PK = :gsi2pk',
         ExpressionAttributeValues: {
           ':gsi2pk': `BUYER#${buyerId}`,
@@ -141,7 +141,7 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
       // Use GSI3 (producer index)
       const result = await queryItems<Sale>({
         TableName: TableNames.Sales,
-        IndexName: 'GSI3',
+        IndexName: 'GSI3-QueryByStatus',
         KeyConditionExpression: 'GSI3PK = :gsi3pk',
         ExpressionAttributeValues: {
           ':gsi3pk': `PRODUCER#${producerId}`,

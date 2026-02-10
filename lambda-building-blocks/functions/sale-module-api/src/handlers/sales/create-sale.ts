@@ -41,7 +41,7 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
     const { items: recentSales } = await queryItems<Sale>({
       TableName: TableNames.Sales,
-      IndexName: 'GSI4',
+      IndexName: 'GSI4-QueryByDate',
       KeyConditionExpression: 'GSI4PK = :gsi4pk AND GSI4SK BETWEEN :start AND :end',
       ExpressionAttributeValues: {
         ':gsi4pk': 'SALE',

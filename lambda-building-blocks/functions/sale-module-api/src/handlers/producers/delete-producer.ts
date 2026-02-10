@@ -45,7 +45,7 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
     // 5. Check if producer has associated sales
     const { items: associatedSales } = await queryItems<Sale>({
       TableName: TableNames.Sales,
-      IndexName: 'GSI3',
+      IndexName: 'GSI3-QueryByStatus',
       KeyConditionExpression: 'GSI3PK = :gsi3pk',
       ExpressionAttributeValues: {
         ':gsi3pk': `PRODUCER#${producerId}`,

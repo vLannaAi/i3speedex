@@ -33,7 +33,23 @@ export function getUserContext(event: APIGatewayProxyEvent): UserContext {
   // Extract user information from claims
   const username = claims['cognito:username'] || claims.username || claims.sub;
   const email = claims.email;
-  const groups = claims['cognito:groups'] || [];
+  const rawGroups = claims['cognito:groups'] || [];
+
+  // HTTP API v2 JWT authorizer may pass groups as a stringified JSON array
+  // e.g. "[admin]" or "[admin, operator]" instead of ["admin"]
+  let groups: string[];
+  if (Array.isArray(rawGroups)) {
+    groups = rawGroups;
+  } else if (typeof rawGroups === 'string') {
+    const trimmed = rawGroups.trim();
+    if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+      groups = trimmed.slice(1, -1).split(',').map((s: string) => s.trim()).filter(Boolean);
+    } else {
+      groups = [trimmed];
+    }
+  } else {
+    groups = [];
+  }
 
   // Extract custom attributes
   const operatorId = claims['custom:operatorId'];
@@ -46,7 +62,7 @@ export function getUserContext(event: APIGatewayProxyEvent): UserContext {
   return {
     username,
     email,
-    groups: Array.isArray(groups) ? groups : typeof groups === 'string' ? [groups] : [],
+    groups,
     operatorId,
     role,
   };

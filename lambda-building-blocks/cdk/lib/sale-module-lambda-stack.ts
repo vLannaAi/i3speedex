@@ -52,7 +52,6 @@ export class SaleModuleLambdaStack extends cdk.Stack {
       logRetention: isProd ? logs.RetentionDays.ONE_MONTH : logs.RetentionDays.ONE_WEEK,
       environment: {
         NODE_ENV: environment,
-        AWS_REGION: this.region,
         SALES_TABLE_NAME: salesTableName,
         BUYERS_TABLE_NAME: buyersTableName,
         PRODUCERS_TABLE_NAME: producersTableName,
@@ -529,7 +528,8 @@ export class SaleModuleLambdaStack extends cdk.Stack {
     ) => {
       const integration = new integrations.HttpLambdaIntegration(
         `${func.node.id}Integration`,
-        func
+        func,
+        { payloadFormatVersion: apigatewayv2.PayloadFormatVersion.VERSION_1_0 }
       );
 
       httpApi.addRoutes({
