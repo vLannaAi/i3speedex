@@ -1,0 +1,145 @@
+{
+  "template": "invoice",
+  "data": {
+    "sale": {
+      "id": 2219,
+      "number": 187,
+      "year": 2018,
+      "status": "paid",
+      "reg_date": "20180928",
+      "full_id": "2018-187",
+      "currency": "EUR",
+      "amount": 2790.95,
+      "eur_amount": 2790.95,
+      "vat_perc": 22,
+      "vat": 614.01,
+      "tax": 2.00,
+      "total": 3406.96,
+      "to_pay": 3406.96,
+      "pay_load": 3406.96,
+      "buyer_ref": "Vs. ordine 4500031743/2018 del 05.09.2018\nattenzion Sig.ra Alessia Bonuccelli",
+      "bank_id": "unicredit",
+      "payment_date": "20181128",
+      "stamp": 1,
+      "dn_number": "T2018-187",
+      "dn_date": "20180928",
+      "package": "Scatole",
+      "delivery": "Porto assegnato",
+      "sale_note": "Pagamento: Ricevuta Bancaria 60 gg d.f. B.B.",
+      "font_base": 12
+    },
+    "buyer": {
+      "id": 41,
+      "code": "cimolai",
+      "name": "Cimolai S.p.A.",
+      "country": "ITA",
+      "address": "Viale Pasteur 49 - scala C piano 4 int 8",
+      "city": "Roma",
+      "zip": "00144",
+      "prov": "RM",
+      "vat": "IT01507200937",
+      "tel": "+39 02 89121816",
+      "lang": "it",
+      "currency": "EUR"
+    },
+    "sale_lines": [
+      {
+        "id": 2601,
+        "sale_id": 2219,
+        "pos": 1,
+        "code": "DIN912-M10x80-8.8-ZB",
+        "description": "Vite TC DIN 912 M10x80 cl.8.8 zincata bianca",
+        "qty": 50,
+        "price": 2.43,
+        "discount": 0,
+        "vat": 22,
+        "standard": "DIN 912",
+        "strength": "8.8",
+        "finish": "Zincata bianca"
+      },
+      {
+        "id": 2602,
+        "sale_id": 2219,
+        "pos": 2,
+        "code": "DIN934-M10-8-ZB",
+        "description": "Dado DIN 934 M10 cl.8 zincato bianco",
+        "qty": 100,
+        "price": 0.31,
+        "discount": 0,
+        "vat": 22,
+        "standard": "DIN 934",
+        "strength": "8",
+        "finish": "Zincato bianco"
+      },
+      {
+        "id": 2603,
+        "sale_id": 2219,
+        "pos": 3,
+        "code": "DIN125A-10-ST-ZB",
+        "description": "Rondella DIN 125A M10 acciaio zincata bianca",
+        "qty": 200,
+        "price": 0.09,
+        "discount": 0,
+        "vat": 22,
+        "standard": "DIN 125A",
+        "finish": "Zincata bianca"
+      },
+      {
+        "id": 2604,
+        "sale_id": 2219,
+        "pos": 4,
+        "code": "DIN6798A-10-ST",
+        "description": "Rondella dentellata DIN 6798A M10 acciaio",
+        "qty": 200,
+        "price": 0.12,
+        "discount": 0,
+        "vat": 22,
+        "standard": "DIN 6798A"
+      },
+      {
+        "id": 2605,
+        "sale_id": 2219,
+        "pos": 5,
+        "code": "DIN912-M12x90-8.8-ZB",
+        "description": "Vite TC DIN 912 M12x90 cl.8.8 zincata bianca",
+        "qty": 300,
+        "price": 3.89,
+        "discount": 0,
+        "vat": 22,
+        "standard": "DIN 912",
+        "strength": "8.8",
+        "finish": "Zincata bianca"
+      },
+      {
+        "id": 2606,
+        "sale_id": 2219,
+        "pos": 6,
+        "code": "DIN934-M12-8-ZB",
+        "description": "Dado DIN 934 M12 cl.8 zincato bianco",
+        "qty": 600,
+        "price": 0.49,
+        "discount": 0,
+        "vat": 22,
+        "standard": "DIN 934",
+        "strength": "8",
+        "finish": "Zincato bianco"
+      }
+    ],
+    "banks": [
+      {
+        "id": "unicredit",
+        "name": "UniCredit Banca",
+        "branch_address": "Via Spezia 2, Milano",
+        "iban": "IT32G0200801633000103119694",
+        "swift": "UNCRITM1B51"
+      }
+    ],
+    "countries": [
+      {
+        "code": "ITA",
+        "name": "Italy",
+        "it_name": "Italia"
+      }
+    ]
+  }
+}

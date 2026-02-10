@@ -1,0 +1,95 @@
+# SAM Configuration File
+# Copy this to samconfig.toml and customize for your environment
+# Note: samconfig.toml is gitignored to prevent committing credentials
+
+version = 0.1
+
+[default]
+[default.global.parameters]
+stack_name = "sale-module-api"
+
+[default.build.parameters]
+cached = true
+parallel = true
+
+[default.validate.parameters]
+lint = true
+
+[default.deploy.parameters]
+capabilities = "CAPABILITY_IAM"
+confirm_changeset = true
+resolve_s3 = true
+region = "us-east-1"
+image_repositories = []
+
+[default.package.parameters]
+resolve_s3 = true
+
+[default.sync.parameters]
+watch = true
+
+[default.local_start_api.parameters]
+warm_containers = "EAGER"
+
+[default.local_start_lambda.parameters]
+warm_containers = "EAGER"
+
+# Development Environment
+[dev]
+[dev.global.parameters]
+stack_name = "sale-module-api-dev"
+
+[dev.deploy.parameters]
+capabilities = "CAPABILITY_IAM"
+confirm_changeset = false
+resolve_s3 = true
+region = "us-east-1"
+parameter_overrides = [
+    "Environment=dev",
+    "CognitoUserPoolId=us-east-1_xxxxxxxxx",
+    "SalesTableName=SalesTable-dev",
+    "BuyersTableName=BuyersTable-dev",
+    "ProducersTableName=ProducersTable-dev",
+    "AttachmentsBucket=sale-module-attachments-dev",
+    "InvoicesBucket=sale-module-invoices-dev"
+]
+
+# Staging Environment
+[staging]
+[staging.global.parameters]
+stack_name = "sale-module-api-staging"
+
+[staging.deploy.parameters]
+capabilities = "CAPABILITY_IAM"
+confirm_changeset = true
+resolve_s3 = true
+region = "us-east-1"
+parameter_overrides = [
+    "Environment=staging",
+    "CognitoUserPoolId=us-east-1_xxxxxxxxx",
+    "SalesTableName=SalesTable-staging",
+    "BuyersTableName=BuyersTable-staging",
+    "ProducersTableName=ProducersTable-staging",
+    "AttachmentsBucket=sale-module-attachments-staging",
+    "InvoicesBucket=sale-module-invoices-staging"
+]
+
+# Production Environment
+[production]
+[production.global.parameters]
+stack_name = "sale-module-api-production"
+
+[production.deploy.parameters]
+capabilities = "CAPABILITY_IAM"
+confirm_changeset = true
+resolve_s3 = true
+region = "us-east-1"
+parameter_overrides = [
+    "Environment=production",
+    "CognitoUserPoolId=us-east-1_xxxxxxxxx",
+    "SalesTableName=SalesTable-production",
+    "BuyersTableName=BuyersTable-production",
+    "ProducersTableName=ProducersTable-production",
+    "AttachmentsBucket=sale-module-attachments-production",
+    "InvoicesBucket=sale-module-invoices-production"
+]

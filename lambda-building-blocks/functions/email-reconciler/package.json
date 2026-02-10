@@ -1,0 +1,42 @@
+{
+  "name": "email-reconciler-lambda",
+  "version": "1.0.0",
+  "description": "AI-powered email recipient reconciliation agent using Claude API",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "lint": "eslint src --ext .ts",
+    "package": "npm run build && zip -r function.zip dist/ node_modules/"
+  },
+  "keywords": [
+    "aws",
+    "lambda",
+    "email",
+    "reconciliation",
+    "ai",
+    "claude"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.131",
+    "@types/jest": "^29.5.11",
+    "@types/node": "^20.10.6",
+    "@typescript-eslint/eslint-plugin": "^6.18.0",
+    "@typescript-eslint/parser": "^6.18.0",
+    "eslint": "^8.56.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.1",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.1",
+    "dotenv": "^16.3.1",
+    "mysql2": "^3.11.5",
+    "fast-levenshtein": "^3.0.0",
+    "@types/fast-levenshtein": "^0.0.4"
+  }
+}

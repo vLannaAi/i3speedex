@@ -1,0 +1,32 @@
+{
+  "StackName": "sale-module-cloudfront-production",
+  "Parameters": {
+    "Environment": "production",
+    "ApiGatewayDomainName": "gzpkiqmh49.execute-api.us-east-1.amazonaws.com",
+    "ApiGatewayStage": "production",
+    "AttachmentsBucketName": "sale-module-attachments-production",
+    "InvoicesBucketName": "sale-module-invoices-production",
+    "ACMCertificateArn": "arn:aws:acm:us-east-1:827562051115:certificate/9757409f-c0d3-48e9-95a5-225bfd767f4e",
+    "CustomDomainName": "app.speedex.it",
+    "EnableWAF": "true",
+    "PriceClass": "PriceClass_200"
+  },
+  "Tags": [
+    {
+      "Key": "Environment",
+      "Value": "production"
+    },
+    {
+      "Key": "Application",
+      "Value": "SaleModule"
+    },
+    {
+      "Key": "CostCenter",
+      "Value": "Operations"
+    },
+    {
+      "Key": "Compliance",
+      "Value": "Required"
+    }
+  ]
+}

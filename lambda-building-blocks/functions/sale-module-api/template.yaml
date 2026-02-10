@@ -1,0 +1,368 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Sale Module API - Lambda Functions and API Gateway
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    AllowedValues:
+      - dev
+      - staging
+      - production
+    Description: Environment name
+
+  CognitoUserPoolId:
+    Type: String
+    Description: Cognito User Pool ID for authentication
+
+  SalesTableName:
+    Type: String
+    Default: SalesTable
+    Description: DynamoDB table for sales
+
+  BuyersTableName:
+    Type: String
+    Default: BuyersTable
+    Description: DynamoDB table for buyers
+
+  ProducersTableName:
+    Type: String
+    Default: ProducersTable
+    Description: DynamoDB table for producers
+
+  AttachmentsBucket:
+    Type: String
+    Description: S3 bucket for attachments
+
+  InvoicesBucket:
+    Type: String
+    Description: S3 bucket for invoices
+
+  TemplateRendererFunction:
+    Type: String
+    Default: template-renderer
+    Description: Lambda function name for template rendering
+
+  PdfGeneratorFunction:
+    Type: String
+    Default: pdf-generator
+    Description: Lambda function name for PDF generation
+
+  SdiInvoiceGeneratorFunction:
+    Type: String
+    Default: sdi-invoice-generator
+    Description: Lambda function name for SDI invoice generation
+
+Globals:
+  Function:
+    Runtime: nodejs18.x
+    Timeout: 30
+    MemorySize: 512
+    Environment:
+      Variables:
+        ENVIRONMENT: !Ref Environment
+        COGNITO_USER_POOL_ID: !Ref CognitoUserPoolId
+        SALES_TABLE_NAME: !Ref SalesTableName
+        BUYERS_TABLE_NAME: !Ref BuyersTableName
+        PRODUCERS_TABLE_NAME: !Ref ProducersTableName
+        S3_ATTACHMENTS_BUCKET: !Ref AttachmentsBucket
+        S3_INVOICES_BUCKET: !Ref InvoicesBucket
+        TEMPLATE_RENDERER_FUNCTION: !Ref TemplateRendererFunction
+        PDF_GENERATOR_FUNCTION: !Ref PdfGeneratorFunction
+        SDI_INVOICE_GENERATOR_FUNCTION: !Ref SdiInvoiceGeneratorFunction
+    Tags:
+      Environment: !Ref Environment
+      Application: SaleModuleAPI
+
+  Api:
+    Cors:
+      AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+      AllowHeaders: "'Content-Type,Authorization'"
+      AllowOrigin: "'*'"
+    Auth:
+      DefaultAuthorizer: CognitoAuthorizer
+      Authorizers:
+        CognitoAuthorizer:
+          UserPoolArn: !Sub 'arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${CognitoUserPoolId}'
+
+Resources:
+  # API Gateway
+  SaleModuleApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub 'sale-module-api-${Environment}'
+      StageName: !Ref Environment
+      Description: Sale Module API Gateway
+      EndpointConfiguration:
+        Type: REGIONAL
+      Cors:
+        AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+        AllowHeaders: "'Content-Type,Authorization'"
+        AllowOrigin: "'*'"
+      Auth:
+        DefaultAuthorizer: CognitoAuthorizer
+        AddDefaultAuthorizerToCorsPreflight: false
+        Authorizers:
+          CognitoAuthorizer:
+            UserPoolArn: !Sub 'arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${CognitoUserPoolId}'
+
+  # Demo Page Function (No Auth Required)
+  ServeDemoFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub 'sale-module-serve-demo-${Environment}'
+      CodeUri: ./
+      Handler: src/handlers/serve-demo.handler
+      Events:
+        ServeDemo:
+          Type: Api
+          Properties:
+            RestApiId: !Ref SaleModuleApi
+            Path: /
+            Method: GET
+            Auth:
+              Authorizer: NONE
+
+  # Sales Functions
+  CreateSaleFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub 'sale-module-create-sale-${Environment}'
+      CodeUri: ./dist
+      Handler: handlers/sales/create-sale.handler
+      Events:
+        CreateSale:
+          Type: Api
+          Properties:
+            RestApiId: !Ref SaleModuleApi
+            Path: /api/sales
+            Method: POST
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref SalesTableName
+        - DynamoDBCrudPolicy:
+            TableName: !Ref BuyersTableName
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ProducersTableName
+
+  GetSaleFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub 'sale-module-get-sale-${Environment}'
+      CodeUri: ./dist
+      Handler: handlers/sales/get-sale.handler
+      Events:
+        GetSale:
+          Type: Api
+          Properties:
+            RestApiId: !Ref SaleModuleApi
+            Path: /api/sales/{id}
+            Method: GET
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref SalesTableName
+
+  ListSalesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub 'sale-module-list-sales-${Environment}'
+      CodeUri: ./dist
+      Handler: handlers/sales/list-sales.handler
+      Events:
+        ListSales:
+          Type: Api
+          Properties:
+            RestApiId: !Ref SaleModuleApi
+            Path: /api/sales
+            Method: GET
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref SalesTableName
+
+  UpdateSaleFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub 'sale-module-update-sale-${Environment}'
+      CodeUri: ./dist
+      Handler: handlers/sales/update-sale.handler
+      Events:
+        UpdateSale:
+          Type: Api
+          Properties:
+            RestApiId: !Ref SaleModuleApi
+            Path: /api/sales/{id}
+            Method: PUT
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref SalesTableName
+
+  DeleteSaleFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub 'sale-module-delete-sale-${Environment}'
+      CodeUri: ./dist
+      Handler: handlers/sales/delete-sale.handler
+      Events:
+        DeleteSale:
+          Type: Api
+          Properties:
+            RestApiId: !Ref SaleModuleApi
+            Path: /api/sales/{id}
+            Method: DELETE
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref SalesTableName
+
+  ConfirmSaleFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub 'sale-module-confirm-sale-${Environment}'
+      CodeUri: ./dist
+      Handler: handlers/sales/confirm-sale.handler
+      Events:
+        ConfirmSale:
+          Type: Api
+          Properties:
+            RestApiId: !Ref SaleModuleApi
+            Path: /api/sales/{id}/confirm
+            Method: POST
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref SalesTableName
+
+  # Buyers Functions
+  CreateBuyerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub 'sale-module-create-buyer-${Environment}'
+      CodeUri: ./dist
+      Handler: handlers/buyers/create-buyer.handler
+      Events:
+        CreateBuyer:
+          Type: Api
+          Properties:
+            RestApiId: !Ref SaleModuleApi
+            Path: /api/buyers
+            Method: POST
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref BuyersTableName
+
+  GetBuyerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub 'sale-module-get-buyer-${Environment}'
+      CodeUri: ./dist
+      Handler: handlers/buyers/get-buyer.handler
+      Events:
+        GetBuyer:
+          Type: Api
+          Properties:
+            RestApiId: !Ref SaleModuleApi
+            Path: /api/buyers/{id}
+            Method: GET
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref BuyersTableName
+
+  ListBuyersFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub 'sale-module-list-buyers-${Environment}'
+      CodeUri: ./dist
+      Handler: handlers/buyers/list-buyers.handler
+      Events:
+        ListBuyers:
+          Type: Api
+          Properties:
+            RestApiId: !Ref SaleModuleApi
+            Path: /api/buyers
+            Method: GET
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref BuyersTableName
+
+  # Invoices Functions
+  GenerateHtmlInvoiceFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub 'sale-module-generate-html-invoice-${Environment}'
+      CodeUri: ./dist
+      Handler: handlers/invoices/generate-html-invoice.handler
+      Timeout: 60
+      Events:
+        GenerateHtmlInvoice:
+          Type: Api
+          Properties:
+            RestApiId: !Ref SaleModuleApi
+            Path: /api/sales/{id}/invoice/html
+            Method: POST
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref SalesTableName
+        - S3CrudPolicy:
+            BucketName: !Ref InvoicesBucket
+        - LambdaInvokePolicy:
+            FunctionName: !Ref TemplateRendererFunction
+
+  # Dashboard Functions
+  GetDashboardStatsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub 'sale-module-get-dashboard-stats-${Environment}'
+      CodeUri: ./dist
+      Handler: handlers/dashboard/get-dashboard-stats.handler
+      Timeout: 60
+      Events:
+        GetDashboardStats:
+          Type: Api
+          Properties:
+            RestApiId: !Ref SaleModuleApi
+            Path: /api/dashboard/stats
+            Method: GET
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref SalesTableName
+        - DynamoDBReadPolicy:
+            TableName: !Ref BuyersTableName
+        - DynamoDBReadPolicy:
+            TableName: !Ref ProducersTableName
+
+  # Search Functions
+  SearchSalesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub 'sale-module-search-sales-${Environment}'
+      CodeUri: ./dist
+      Handler: handlers/search/search-sales.handler
+      Timeout: 60
+      Events:
+        SearchSales:
+          Type: Api
+          Properties:
+            RestApiId: !Ref SaleModuleApi
+            Path: /api/search/sales
+            Method: GET
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref SalesTableName
+
+Outputs:
+  ApiUrl:
+    Description: API Gateway endpoint URL
+    Value: !Sub 'https://${SaleModuleApi}.execute-api.${AWS::Region}.amazonaws.com/${Environment}'
+    Export:
+      Name: !Sub '${AWS::StackName}-ApiUrl'
+
+  ApiId:
+    Description: API Gateway ID
+    Value: !Ref SaleModuleApi
+    Export:
+      Name: !Sub '${AWS::StackName}-ApiId'
+
+  Region:
+    Description: AWS Region
+    Value: !Ref AWS::Region
+    Export:
+      Name: !Sub '${AWS::StackName}-Region'

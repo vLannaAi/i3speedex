@@ -1,0 +1,108 @@
+{
+  "environment": "staging",
+  "region": "us-east-1",
+  "accountId": "123456789012",
+  "projectName": "sale-module-api",
+
+  "dynamodb": {
+    "salesTable": "SalesTable-staging",
+    "buyersTable": "BuyersTable-staging",
+    "producersTable": "ProducersTable-staging",
+    "billingMode": "PAY_PER_REQUEST",
+    "pointInTimeRecovery": true,
+    "deletionProtection": false
+  },
+
+  "s3": {
+    "attachmentsBucket": "sale-module-attachments-staging",
+    "invoicesBucket": "sale-module-invoices-staging",
+    "versioning": true,
+    "lifecycleRules": {
+      "attachments": {
+        "transitionToIA": 60,
+        "transitionToGlacier": 120,
+        "expiration": 365
+      },
+      "invoices": {
+        "transitionToIA": 30,
+        "transitionToGlacier": 90,
+        "expiration": 2555
+      }
+    }
+  },
+
+  "cognito": {
+    "userPoolName": "SaleModuleUsers-staging",
+    "userPoolClientName": "SaleModuleClient-staging",
+    "mfaConfiguration": "OPTIONAL",
+    "passwordPolicy": {
+      "minimumLength": 10,
+      "requireUppercase": true,
+      "requireLowercase": true,
+      "requireNumbers": true,
+      "requireSymbols": true
+    }
+  },
+
+  "lambda": {
+    "runtime": "nodejs18.x",
+    "timeout": 30,
+    "memorySize": 1024,
+    "environment": {
+      "ENVIRONMENT": "staging",
+      "LOG_LEVEL": "info",
+      "ENABLE_XRAY": "true"
+    }
+  },
+
+  "apiGateway": {
+    "stageName": "staging",
+    "throttling": {
+      "burstLimit": 500,
+      "rateLimit": 250
+    },
+    "logging": {
+      "level": "INFO",
+      "dataTrace": true
+    },
+    "customDomain": {
+      "enabled": true,
+      "domainName": "api-staging.sale-module.i2speedex.com",
+      "certificateArn": "arn:aws:acm:us-east-1:123456789012:certificate/staging-cert-id"
+    }
+  },
+
+  "cloudfront": {
+    "enabled": true,
+    "priceClass": "PriceClass_100",
+    "waf": {
+      "enabled": true,
+      "rateLimit": 10000
+    }
+  },
+
+  "backup": {
+    "enabled": true,
+    "pitr": true,
+    "s3Versioning": true,
+    "retentionDays": 30
+  },
+
+  "monitoring": {
+    "enableDetailedMetrics": true,
+    "alarmEmail": "staging-alerts@i2speedex.com",
+    "alarms": {
+      "lambdaErrors": true,
+      "apiGateway5xx": true,
+      "dynamodbThrottling": true,
+      "cloudfront5xx": true
+    }
+  },
+
+  "tags": {
+    "Environment": "staging",
+    "Project": "SaleModule",
+    "ManagedBy": "CloudFormation",
+    "CostCenter": "Engineering"
+  }
+}

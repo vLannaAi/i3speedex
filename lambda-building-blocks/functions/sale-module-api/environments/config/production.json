@@ -1,0 +1,119 @@
+{
+  "environment": "production",
+  "region": "us-east-1",
+  "accountId": "827562051115",
+  "projectName": "sale-module-api",
+
+  "dynamodb": {
+    "salesTable": "SalesTable-production",
+    "buyersTable": "BuyersTable-production",
+    "producersTable": "ProducersTable-production",
+    "billingMode": "PAY_PER_REQUEST",
+    "pointInTimeRecovery": true,
+    "deletionProtection": true
+  },
+
+  "s3": {
+    "attachmentsBucket": "sale-module-attachments-production",
+    "invoicesBucket": "sale-module-invoices-production",
+    "versioning": true,
+    "lifecycleRules": {
+      "attachments": {
+        "transitionToIA": 30,
+        "transitionToGlacier": 90,
+        "expiration": 2555
+      },
+      "invoices": {
+        "transitionToIA": 30,
+        "transitionToGlacier": 90,
+        "expiration": 2555
+      }
+    }
+  },
+
+  "cognito": {
+    "userPoolName": "SaleModuleUsers-production",
+    "userPoolClientName": "SaleModuleClient-production",
+    "mfaConfiguration": "REQUIRED",
+    "passwordPolicy": {
+      "minimumLength": 12,
+      "requireUppercase": true,
+      "requireLowercase": true,
+      "requireNumbers": true,
+      "requireSymbols": true
+    }
+  },
+
+  "lambda": {
+    "runtime": "nodejs18.x",
+    "timeout": 30,
+    "memorySize": 1024,
+    "reservedConcurrency": 100,
+    "environment": {
+      "ENVIRONMENT": "production",
+      "LOG_LEVEL": "warn",
+      "ENABLE_XRAY": "true"
+    }
+  },
+
+  "apiGateway": {
+    "stageName": "prod",
+    "throttling": {
+      "burstLimit": 2000,
+      "rateLimit": 1000
+    },
+    "logging": {
+      "level": "ERROR",
+      "dataTrace": false
+    },
+    "customDomain": {
+      "enabled": true,
+      "domainName": "api.sale-module.i2speedex.com",
+      "certificateArn": "arn:aws:acm:us-east-1:123456789012:certificate/production-cert-id"
+    }
+  },
+
+  "cloudfront": {
+    "enabled": true,
+    "priceClass": "PriceClass_200",
+    "waf": {
+      "enabled": true,
+      "rateLimit": 2000
+    }
+  },
+
+  "backup": {
+    "enabled": true,
+    "pitr": true,
+    "s3Versioning": true,
+    "retentionDays": 90,
+    "crossRegionReplication": {
+      "enabled": true,
+      "destinationRegion": "us-west-2"
+    }
+  },
+
+  "monitoring": {
+    "enableDetailedMetrics": true,
+    "alarmEmail": "ops@i2speedex.com",
+    "alarms": {
+      "lambdaErrors": true,
+      "apiGateway5xx": true,
+      "dynamodbThrottling": true,
+      "cloudfront5xx": true,
+      "backupFailures": true
+    },
+    "dashboards": {
+      "enabled": true
+    }
+  },
+
+  "tags": {
+    "Environment": "production",
+    "Project": "SaleModule",
+    "ManagedBy": "CloudFormation",
+    "CostCenter": "Operations",
+    "Compliance": "Required",
+    "BackupPolicy": "Daily"
+  }
+}

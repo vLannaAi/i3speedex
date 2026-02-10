@@ -1,0 +1,42 @@
+{
+  "name": "lambda-building-blocks",
+  "version": "1.0.0",
+  "description": "Reusable AWS Lambda functions for i2speedex migration",
+  "private": true,
+  "scripts": {
+    "build": "npm run build:cdk && npm run build:functions",
+    "build:cdk": "cd cdk && npm install && npm run build",
+    "build:functions": "npm run build:html-to-pdf && npm run build:email-reconciler",
+    "build:html-to-pdf": "cd functions/html-to-pdf && npm install && npm run build",
+    "build:email-reconciler": "cd functions/email-reconciler && npm install && npm run build",
+    "test": "npm run test:functions",
+    "test:functions": "npm run test:html-to-pdf && npm run test:email-reconciler",
+    "test:html-to-pdf": "cd functions/html-to-pdf && npm test",
+    "test:email-reconciler": "cd functions/email-reconciler && npm test",
+    "deploy:dev": "cd cdk && npm run deploy:dev",
+    "deploy:prod": "cd cdk && npm run deploy:prod",
+    "destroy:dev": "cd cdk && cdk destroy HtmlToPdfLambda-Dev",
+    "destroy:prod": "cd cdk && cdk destroy HtmlToPdfLambda-Prod",
+    "synth": "cd cdk && npm run synth",
+    "diff:dev": "cd cdk && cdk diff HtmlToPdfLambda-Dev",
+    "diff:prod": "cd cdk && cdk diff HtmlToPdfLambda-Prod",
+    "logs:dev": "aws logs tail /aws/lambda/html-to-pdf-dev --follow",
+    "logs:prod": "aws logs tail /aws/lambda/html-to-pdf-prod --follow",
+    "logs:email-reconciler-dev": "aws logs tail /aws/lambda/email-reconciler-dev --follow",
+    "logs:email-reconciler-prod": "aws logs tail /aws/lambda/email-reconciler-prod --follow",
+    "test-client": "cd functions/html-to-pdf/examples && node test-client.js",
+    "bootstrap": "cd cdk && cdk bootstrap",
+    "clean": "rm -rf cdk/dist cdk/node_modules functions/html-to-pdf/dist functions/html-to-pdf/node_modules functions/email-reconciler/dist functions/email-reconciler/node_modules"
+  },
+  "keywords": [
+    "aws",
+    "lambda",
+    "serverless",
+    "pdf",
+    "email-reconciler",
+    "ai",
+    "cdk"
+  ],
+  "author": "",
+  "license": "MIT"
+}

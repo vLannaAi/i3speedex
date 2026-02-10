@@ -1,0 +1,33 @@
+# Python dependencies for data migration
+
+# Database connectivity
+psycopg2-binary==2.9.9  # PostgreSQL adapter
+pymysql==1.1.0          # MySQL adapter (if needed)
+
+# AWS SDK
+boto3==1.34.34          # AWS SDK for Python
+botocore==1.34.34       # Low-level AWS SDK
+
+# Data processing
+pandas==2.1.4           # Data manipulation
+numpy==1.26.2           # Numerical operations
+
+# JSON handling
+jsonschema==4.20.0      # JSON schema validation
+
+# Progress tracking
+tqdm==4.66.1            # Progress bars
+colorama==0.4.6         # Colored terminal output
+
+# Logging
+python-json-logger==2.0.7  # Structured logging
+
+# Utilities
+python-dateutil==2.8.2  # Date/time utilities
+pytz==2023.3.post1      # Timezone handling
+
+# Validation
+cerberus==1.3.5         # Data validation
+
+# Configuration
+python-dotenv==1.0.0    # Environment variable management

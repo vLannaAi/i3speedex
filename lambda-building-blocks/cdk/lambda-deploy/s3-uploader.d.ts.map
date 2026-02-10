@@ -1,0 +1,1 @@
+{"version":3,"file":"s3-uploader.d.ts","sourceRoot":"","sources":["../src/s3-uploader.ts"],"names":[],"mappings":"AAQA,MAAM,WAAW,cAAc;IAC7B,KAAK,EAAE,MAAM,CAAC;IACd,YAAY,CAAC,EAAE,MAAM,CAAC;CACvB;AAED;;;;;;;GAOG;AACH,wBAAsB,UAAU,CAC9B,MAAM,EAAE,MAAM,EACd,MAAM,EAAE,MAAM,EACd,GAAG,EAAE,MAAM,EACX,oBAAoB,GAAE,OAAe,GACpC,OAAO,CAAC,cAAc,CAAC,CAiDzB"}

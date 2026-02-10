@@ -1,0 +1,28 @@
+{
+  "StackName": "sale-module-cloudfront-dev",
+  "Parameters": {
+    "Environment": "dev",
+    "ApiGatewayDomainName": "abc123def.execute-api.us-east-1.amazonaws.com",
+    "ApiGatewayStage": "dev",
+    "AttachmentsBucketName": "sale-module-attachments-dev",
+    "InvoicesBucketName": "sale-module-invoices-dev",
+    "ACMCertificateArn": "",
+    "CustomDomainName": "",
+    "EnableWAF": "false",
+    "PriceClass": "PriceClass_100"
+  },
+  "Tags": [
+    {
+      "Key": "Environment",
+      "Value": "dev"
+    },
+    {
+      "Key": "Application",
+      "Value": "SaleModule"
+    },
+    {
+      "Key": "CostCenter",
+      "Value": "Engineering"
+    }
+  ]
+}

@@ -1,0 +1,3 @@
+{
+  "body": "{\"html\":\"<!DOCTYPE html><html><head><meta charset='UTF-8'><title>Test PDF</title><style>body { font-family: Arial, sans-serif; padding: 40px; } h1 { color: #2c3e50; } p { line-height: 1.6; }</style></head><body><h1>Hello from HTML to PDF Lambda!</h1><p>This is a simple test document to verify that the Lambda function is working correctly.</p><p>Features tested:</p><ul><li>HTML rendering</li><li>CSS styling</li><li>UTF-8 encoding (àèéìòù €)</li><li>PDF generation</li></ul><p><strong>Generated at:</strong> 2024-01-27</p></body></html>\",\"options\":{\"format\":\"A4\",\"printBackground\":true},\"outputFormat\":\"base64\"}"
+}

@@ -1,0 +1,154 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://i2speedex.com/schemas/producer.json",
+  "title": "Producer",
+  "description": "Producer (Produtor) entity schema for DynamoDB",
+  "type": "object",
+  "required": [
+    "PK",
+    "SK",
+    "EntityType",
+    "ProducerId",
+    "Name",
+    "Document",
+    "Status"
+  ],
+  "properties": {
+    "PK": {
+      "type": "string",
+      "pattern": "^PRODUCER#[A-Z0-9]+$"
+    },
+    "SK": {
+      "type": "string",
+      "const": "#METADATA#producer"
+    },
+    "EntityType": {
+      "type": "string",
+      "const": "Producer"
+    },
+    "ProducerId": {
+      "type": "string",
+      "pattern": "^PRODUCER[0-9]{3,}$"
+    },
+    "Name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "TradeName": {
+      "type": "string",
+      "maxLength": 200
+    },
+    "Document": {
+      "type": "string",
+      "description": "CNPJ or CPF"
+    },
+    "DocumentType": {
+      "type": "string",
+      "enum": ["CNPJ", "CPF"]
+    },
+    "Email": {
+      "type": "string",
+      "format": "email"
+    },
+    "Phone": {
+      "type": "string"
+    },
+    "Mobile": {
+      "type": "string"
+    },
+    "Address": {
+      "type": "object",
+      "required": ["Street", "City", "State", "PostalCode", "Country"],
+      "properties": {
+        "Street": { "type": "string" },
+        "Number": { "type": "string" },
+        "Complement": { "type": "string" },
+        "Neighborhood": { "type": "string" },
+        "City": { "type": "string" },
+        "State": { "type": "string", "pattern": "^[A-Z]{2}$" },
+        "PostalCode": { "type": "string" },
+        "Country": { "type": "string", "pattern": "^[A-Z]{2}$" }
+      }
+    },
+    "Status": {
+      "type": "string",
+      "enum": ["ACTIVE", "INACTIVE", "SUSPENDED"]
+    },
+    "ProductCategories": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "ContactPerson": {
+      "type": "string"
+    },
+    "ContactEmail": {
+      "type": "string",
+      "format": "email"
+    },
+    "ContactPhone": {
+      "type": "string"
+    },
+    "TaxId": {
+      "type": "string"
+    },
+    "StateRegistration": {
+      "type": "string"
+    },
+    "BankAccount": {
+      "type": "object",
+      "properties": {
+        "Bank": { "type": "string" },
+        "BankName": { "type": "string" },
+        "Agency": { "type": "string" },
+        "Account": { "type": "string" },
+        "AccountType": {
+          "type": "string",
+          "enum": ["CHECKING", "SAVINGS"]
+        }
+      }
+    },
+    "Certifications": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["Type", "Number"],
+        "properties": {
+          "Type": { "type": "string" },
+          "Number": { "type": "string" },
+          "Issuer": { "type": "string" },
+          "ValidUntil": { "type": "string", "format": "date" }
+        }
+      }
+    },
+    "Notes": {
+      "type": "string",
+      "maxLength": 1000
+    },
+    "CreatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "CreatedBy": {
+      "type": "string"
+    },
+    "UpdatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "UpdatedBy": {
+      "type": "string"
+    },
+    "GSI1PK": {
+      "type": "string",
+      "const": "PRODUCERS"
+    },
+    "GSI1SK": {
+      "type": "string",
+      "pattern": "^PRODUCER#"
+    }
+  },
+  "additionalProperties": false
+}

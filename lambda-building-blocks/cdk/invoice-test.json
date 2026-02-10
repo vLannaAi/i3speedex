@@ -1,0 +1,14 @@
+{
+  "html": "<!DOCTYPE html><html lang='it'><head><meta charset='UTF-8'><title>Fattura T042/2024</title><style>* { margin: 0; padding: 0; box-sizing: border-box; } body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 10pt; color: #333; } .invoice-container { padding: 20mm; } .header { display: flex; justify-content: space-between; margin-bottom: 30px; border-bottom: 3px solid #2c3e50; padding-bottom: 20px; } .company-info h1 { font-size: 24pt; color: #2c3e50; margin-bottom: 10px; } .invoice-details { text-align: right; } .invoice-details h2 { font-size: 18pt; color: #e74c3c; } .parties { display: flex; justify-content: space-between; margin: 30px 0; } .party-box { width: 48%; padding: 15px; border: 1px solid #ddd; border-radius: 5px; background: #f9f9f9; } table { width: 100%; border-collapse: collapse; margin: 20px 0; } thead { background: #34495e; color: white; } th, td { padding: 10px; text-align: left; } .totals { margin: 20px 0 0 auto; width: 50%; } .totals .grand-total { background: #2c3e50; color: white; font-size: 12pt; }</style></head><body><div class='invoice-container'><div class='header'><div class='company-info'><h1>Your Company S.r.l.</h1><p>P.IVA: 05056450157</p><p>Via Example 123, Milano</p></div><div class='invoice-details'><h2>FATTURA</h2><p>N. T042/2024</p><p>Data: 27/01/2024</p></div></div><div class='parties'><div class='party-box'><h3>Produttore</h3><p>Your Company S.r.l.</p><p>P.IVA: IT05056450157</p></div><div class='party-box'><h3>Acquirente</h3><p>Cliente S.p.A.</p><p>P.IVA: IT12345678901</p></div></div><table><thead><tr><th>#</th><th>Descrizione</th><th>Q.tà</th><th>Prezzo</th><th>Totale</th></tr></thead><tbody><tr><td>1</td><td>Servizio di consulenza</td><td>10</td><td>100,00 €</td><td>1.000,00 €</td></tr><tr><td>2</td><td>Licenza software</td><td>1</td><td>500,00 €</td><td>500,00 €</td></tr></tbody></table><div class='totals'><table><tr><td>Imponibile</td><td>1.500,00 €</td></tr><tr><td>IVA 22%</td><td>330,00 €</td></tr><tr class='grand-total'><td>Totale</td><td>1.830,00 €</td></tr></table></div></div></body></html>",
+  "options": {
+    "format": "A4",
+    "margin": {
+      "top": "15mm",
+      "right": "15mm",
+      "bottom": "15mm",
+      "left": "15mm"
+    },
+    "printBackground": true
+  },
+  "outputFormat": "base64"
+}

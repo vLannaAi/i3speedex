@@ -1,0 +1,35 @@
+{
+  "name": "sdi-invoice-generator",
+  "version": "1.0.0",
+  "description": "AWS Lambda function to generate Italian FatturaPA (SDI) XML invoices",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "prebuild": "npm run clean",
+    "watch": "tsc --watch",
+    "test": "jest",
+    "lint": "eslint . --ext .ts"
+  },
+  "keywords": [
+    "aws",
+    "lambda",
+    "fatturapa",
+    "sdi",
+    "italian-invoice",
+    "xml"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.614.0",
+    "@aws-sdk/s3-request-presigner": "^3.614.0",
+    "@types/aws-lambda": "^8.10.145",
+    "xmlbuilder2": "^3.1.1",
+    "libxmljs2": "^0.33.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.10",
+    "typescript": "^5.5.3"
+  }
+}

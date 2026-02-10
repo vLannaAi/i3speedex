@@ -1,0 +1,99 @@
+{
+  "invoice": {
+    "fatturaElettronicaHeader": {
+      "datiTrasmissione": {
+        "idTrasmittente": {
+          "idPaese": "IT",
+          "idCodice": "05056450157"
+        },
+        "progressivoInvio": "00002",
+        "formatoTrasmissione": "FPR12",
+        "codiceDestinatario": "USAL8PV"
+      },
+      "cedentePrestatore": {
+        "datiAnagrafici": {
+          "idFiscaleIVA": {
+            "idPaese": "IT",
+            "idCodice": "05056450157"
+          },
+          "codiceFiscale": "05056450157",
+          "anagrafica": {
+            "denominazione": "Speedex Srl"
+          },
+          "regimeFiscale": "RF01"
+        },
+        "sede": {
+          "indirizzo": "Via Lago di Nemi, 25",
+          "cap": "20142",
+          "comune": "Milano",
+          "provincia": "MI",
+          "nazione": "IT"
+        },
+        "contatti": {
+          "telefono": "0289121816"
+        }
+      },
+      "cessionarioCommittente": {
+        "datiAnagrafici": {
+          "idFiscaleIVA": {
+            "idPaese": "IT",
+            "idCodice": "01507200937"
+          },
+          "codiceFiscale": "01507200937",
+          "anagrafica": {
+            "denominazione": "Cimolai S.p.A."
+          }
+        },
+        "sede": {
+          "indirizzo": "Viale Pasteur 49 - scala C piano 4 int 8",
+          "cap": "00144",
+          "comune": "Roma",
+          "provincia": "RM",
+          "nazione": "IT"
+        }
+      }
+    },
+    "fatturaElettronicaBody": [
+      {
+        "datiGenerali": {
+          "datiGeneraliDocumento": {
+            "tipoDocumento": "TD01",
+            "divisa": "EUR",
+            "data": "2026-01-28",
+            "numero": "TEST002",
+            "importoTotaleDocumento": "122.00"
+          }
+        },
+        "datiBeniServizi": {
+          "dettaglioLinee": [
+            {
+              "numeroLinea": 1,
+              "descrizione": "Test Service with Attachment",
+              "quantita": "1.00",
+              "unitaMisura": "pz",
+              "prezzoUnitario": "100.00",
+              "prezzoTotale": "100.00",
+              "aliquotaIVA": "22.00"
+            }
+          ],
+          "datiRiepilogo": [
+            {
+              "aliquotaIVA": "22.00",
+              "imponibileImporto": "100.00",
+              "imposta": "22.00",
+              "esigibilitaIVA": "I"
+            }
+          ]
+        },
+        "allegati": [
+          {
+            "nomeAttachment": "TEST002.pdf",
+            "formatoAttachment": "PDF",
+            "descrizioneAttachment": "Invoice PDF",
+            "attachment": "JVBERi0xLjQKJeLjz9MKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSAxIDAgUj4+Pj4vTWVkaWFCb3hbMCAwIDYxMiA3OTJdL0NvbnRlbnRzIDQgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvTGVuZ3RoIDQ0Pj4Kc3RyZWFtCkJUCi9GMSA0OCBUZgoxMCA3MDAgVGQKKFRlc3QgUERGKSBUagpFVAplbmRzdHJlYW0KZW5kb2JqCjEgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjIgMCBvYmoKPDwvVHlwZS9QYWdlcy9LaWRzWzMgMCBSXS9Db3VudCAxPj4KZW5kb2JqCjUgMCBvYmoKPDwvVHlwZS9DYXRhbG9nL1BhZ2VzIDIgMCBSPj4KZW5kb2JqCjYgMCBvYmoKPDwvUHJvZHVjZXIoaVRleHRcdTAwYWUgNS41LjEzLjMgXHUwMGE5MjAwMC0yMDIzIGlUZXh0IEdyb3VwIE5WIFwoQUdQTC12ZXJzaW9uXCkpL01vZERhdGUoRDoyMDI2MDEyODE1NDAwMFopL0NyZWF0aW9uRGF0ZShEOjIwMjYwMTI4MTU0MDAwWik+PgplbmRvYmoKeHJlZgowIDcKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMjMxIDAwMDAwIG4gCjAwMDAwMDAyOTggMDAwMDAgbiAKMDAwMDAwMDAxNSAwMDAwMCBuIAowMDAwMDAwMTI1IDAwMDAwIG4gCjAwMDAwMDAzNDkgMDAwMDAgbiAKMDAwMDAwMDM5OCAwMDAwMCBuIAp0cmFpbGVyCjw8L1NpemUgNy9Sb290IDUgMCBSL0luZm8gNiAwIFI+PgpzdGFydHhyZWYKNTU4CiUlRU9GCg=="
+          }
+        ]
+      }
+    ]
+  }
+}

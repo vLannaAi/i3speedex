@@ -1,0 +1,913 @@
+<cc:http  URI="/msg_home.xhtml"  abs_time="20260128_102619"  context_url="http://i2.speedex.it"  gmt_time="2026-01-28 10:26:19"  method="GET"  path="/msg_home.xhtml"  port="80"  query="i2_xxml"  req_context="https://i2.speedex.it"  req_page="https://i2.speedex.it/msg_home.xhtml"  req_path="/msg_home.xhtml"  req_path_no_ext="/msg_home"  req_scheme="https"  req_url="https://i2.speedex.it/msg_home.xhtml?i2_xxml"  root_url="/msg_home.xhtml?i2_xxml"  scheme="http"  server="i2.speedex.it"  servlet="iorg"  sql_time="2026-01-28 10:26:19"  url="http://i2.speedex.it/msg_home.xhtml">
+<header  Accept-Encoding="gzip"  Authorization="Basic dmljaW86Y25uMDc="  CloudFront-Forwarded-Proto="https"  Connection="keep-alive"  Host="i2.speedex.it"  User-Agent="Amazon CloudFront"  Via="3.0 3296142c1bcb675b4d6c5932a9a811fc.cloudfront.net (CloudFront)"  X-Amz-Cf-Id="eB5HaM3BrWZ9bCuZxYbGRV1RxnoiM3-ZGtCLpE8sum4QsETqOWm82Q=="  X-Forwarded-For="49.228.246.139"  priority="u=0, i"  sec-ch-ua=""Not(A:Brand";v="8", "Chromium";v="144", "Brave";v="144""  sec-ch-ua-mobile="?0"  sec-ch-ua-platform=""macOS""  sec-fetch-dest="document"  sec-fetch-mode="navigate"  sec-fetch-site="none"  sec-fetch-user="?1"  sec-gpc="1"  upgrade-insecure-requests="1"  username="vicio">
+<agent  company="unknown"  family="unknown"  name="unknown"  os="unknown"  os_company="unknown"  os_name="unknown"  type="unknown"  url="unknown"  version="unknown"></agent>
+</header>
+<client  ip_source="49.228.246.139"  remote_address="64.252.103.41"  remote_host="64.252.103.41"></client>
+<server  host_address="2a05:d018:1727:f791:cfbd:682a:4d44:4d0b"  host_name="s9.speedex.it"></server>
+<cookies>
+<cookie  id="JSESSIONID"  maxage="-1"  secure="false">1nu4w0lvml31</cookie>
+<cookie  id="i2_server_elapsed_ms"  maxage="-1"  secure="false">94</cookie>
+<cookie  id="i2_server_xslt_cache"  maxage="-1"  secure="false">true</cookie>
+</cookies>
+</cc:http>
+<cc:mem  load="0"  mem_free="26,688K"  mem_total="185,597K"  req_count="3,713"  uptime="18h 28m 1s"  uptime_ms="66481ms">
+<shared_map>
+<shared_node  class="Element"  name="msgs_count">
+<select  name="msgs_count"  node="msgs_count"  rows_name="msg">select count(*) as msgs_count from v_msg_list where 1=1 and klass in (1) and status in (21) and outbound in (0) and status != 40</select>
+</shared_node>
+<shared_node  class="Element"  name="msgs_query">
+<select  limit="50"  name="msgs_query"  node="msgs"  offset="0"  rows_name="msg"> select id, send_date,rdays, past_days, status, klass, outbound, op_ud, tone, bookmark, first_id, prev_id, files_num, sent_num, subject, abstract, user_isbuyer, user_id, user_code, user_name, user_email, comment from v_msg_list where 1=1 and klass in (1) and status in (21) and outbound in (0) and status != 40 order by id desc</select>
+</shared_node>
+</shared_map>
+</cc:mem>
+<cc:params>
+<i2_xxml></i2_xxml>
+</cc:params>
+<cc:desk  creation_abs_time="20260128_064609"  creation_date="Wed Jan 28 06:46:09 UTC 2026"  creation_sql_time="2026-01-28 06:46:09"  creation_time="1769582769894"  id="1nu4w0lvml31"  ip_source="49.228.246.139"  last_abs_time="20260128_102619"  last_sql_time="2026-01-28 10:26:19"  last_url="http://i2.speedex.it/msg_home.xhtml"  max_inactive="-1"  remote_address="64.252.104.118"  remote_host="64.252.104.118"  use="cookie"  user_agent="Amazon CloudFront"  uuid="f1c4e66f-c4fa-4ae6-b6fa-1aed3d6535c7">
+<msg_search  klass="1"  no_deleted="1"  op_ud=""  outbound="0"  period="ever"  search="yes"  status="21"></msg_search>
+<msgs_list  id="1576438"></msgs_list>
+</cc:desk>
+<cc:conf  page="msg_home"  template="msg_home"  webapp="sp">
+<common>
+<data_source>jdbc/speedex</data_source>
+<skin_name>i2</skin_name>
+</common>
+<tabs>
+<tab  class="group3 "  group="msg"  url="msg_home.xhtml">
+<i  class="fa-regular fa-envelope"></i>
+Messages
+</tab>
+<ktab  class="group3"  group="deals"  url="deals_home.xhtml">
+<i  class="fa-solid fa-list-timeline"></i>
+Deals
+</ktab>
+<tab  class="group1 space"  group="buyer"  url="buyer_home.xhtml">
+<i  class="fa-solid fa-user-tie-hair"></i>
+Buyers
+</tab>
+<tab  class="group1"  group="producer"  url="producer_home.xhtml">
+<i  class="fa-regular fa-industry-windows"></i>
+Producers
+</tab>
+<tab  class="group1"  group="user"  url="user_home.xhtml">
+<i  class="fa-regular fa-address-book"></i>
+Users
+</tab>
+<tab  class="group4 space"  group="invoice"  url="invoice_home.xhtml">
+<i  class="fa-regular fa-file-invoice-dollar"></i>
+Invoices
+</tab>
+<tab  class="group4"  group="commission"  url="commission_home.xhtml">
+<i  class="fa-solid fa-percent"></i>
+Commissions
+</tab>
+<tab  class="group2 space"  group="contract"  url="contract_home.xhtml">
+<i  class="fa-regular fa-file-signature"></i>
+Contracts
+</tab>
+<tab  class="group2 "  group="order"  url="order_home.xhtml">
+<i  class="fa-regular fa-clipboard-list-check"></i>
+Orders
+</tab>
+<tab  class="group5 space"  group="sales"  url="sale_home.xhtml">
+<i  class="fa-regular fa-screwdriver-wrench"></i>
+Sales
+</tab>
+</tabs>
+<i2_search  action="msg_home.xhtml"  reset_target="msg_result"  token="msg_search">
+<field  label="ID"  name="id"  value=""></field>
+<field  label="Deal ID"  name="first_ud"  value=""></field>
+<field  label="Subject"  name="subject"  value=""></field>
+<field  label="Body"  name="fbody"  value=""></field>
+<field  label="Sender/Receiver"  name="sender"  value=""></field>
+<field  label="Send Date/yyyy-mm-dd"  name="send_date"  value=""></field>
+<list  expand="msgs_period"  label="Send Period"  name="period"  value="ever"></list>
+<list  expand="msgs_brands"  kopt="multiple"  label="Brands"  name="brands"  value=""></list>
+<list  expand="msgs_bookmarks"  kopt="multiple"  label="Bookmarks"  name="bookmarks"  value=""></list>
+<list  expand="msgs_outbound"  label="Direction"  name="outbound"  value="0"></list>
+<list  expand="msg_search_class"  label="Class"  name="klass"  opt="multiple"  value="1"></list>
+<list  expand="msg_from_status"  label="Status"  name="status"  opt="multiple"  value="21"></list>
+<list  expand="msg_ops"  label="Operator"  name="op_ud"  opt="multiple"  value=""></list>
+<field  label="Comment"  name="comment"  value=""></field>
+<list  expand="msgs_num"  label="Page length "  layout="right"  name="msgs_num"  value=""></list>
+<list  expand="msgs_sort"  label="Sort by "  layout="right"  name="msgs_sort"  value=""></list>
+<list  expand="msgs_storage"  label="Archive "  layout="right"  name="msgs_storage"  value=""></list>
+</i2_search>
+<ccmd:xml_load  node="expand"  node_ttl="3600">
+abstract/expand
+</ccmd:xml_load>
+<ccmd:sql_query  node="kinds"  node_id="msg_kinds"  node_ttl="3600"  rows_name="kind">
+select * from z_msg_kind order by id
+</ccmd:sql_query>
+<ccmd:sql_query  node="buyers"  node_id="buyers_table"  node_ttl="60"  rows_name="buyer">
+select id, code, name, country from buyers where status = 'online' order by buyers.country, buyers.code
+</ccmd:sql_query>
+<ccmd:sql_query  node="producers"  node_id="producers_table"  node_ttl="60"  rows_name="producer">
+select id, code from producers where status = 'online' order by code
+</ccmd:sql_query>
+<ccmd:sql_query  node="table"  node_id="producers_list"  node_ttl="60"  rows_name="label">
+select id as `key`, code as output from producers where status = 'online' order by `status` desc, `code`
+</ccmd:sql_query>
+<ccmd:sql_query  node="table"  node_id="buyers_list"  node_ttl="60"  rows_name="label">
+select id as `key`, code as output from buyers where status = 'online' order by buyers.code
+</ccmd:sql_query>
+<page  alias="msg_dash"  name="msg_home"  title="Messages"></page>
+<ccmd:load>
+<select  node="msgs_num"  rows_name="msg">select klass, op_ud, status, outbound, count(*) as num from v_msg_list where status in (11, 12, 21, 23, 24) group by klass, op_ud, status, outbound ;</select>
+</ccmd:load>
+<ccmd:load>
+<select  name="msgs_count"  node="msgs_count"  rows_name="msg">select count(*) as msgs_count from v_msg_list where 1=1 and klass in (1) and status in (21) and outbound in (0) and status != 40</select>
+<select  limit="50"  name="msgs_query"  node="msgs"  offset="0"  rows_name="msg"> select id, send_date,rdays, past_days, status, klass, outbound, op_ud, tone, bookmark, first_id, prev_id, files_num, sent_num, subject, abstract, user_isbuyer, user_id, user_code, user_name, user_email, comment from v_msg_list where 1=1 and klass in (1) and status in (21) and outbound in (0) and status != 40 order by id desc</select>
+</ccmd:load>
+<ccmd:assign  dest="//cc:desk/msgs_list"  mode="destroy">
+</ccmd:assign>
+<ccmd:assign  dest="//cc:desk"  dest_path="msgs_list"  mode="concat"  src="//cc:data/msgs/msg/@id">
+</ccmd:assign>
+<ccmd:block  encode="gzip"  transform="msg/home">
+</ccmd:block>
+</cc:conf>
+<cc:auth></cc:auth>
+<cc:data>
+<expand  created="1769595108244"  source="datastore">
+<tables>
+<table  id="buyer_status">
+<label  key="online"  selected="selected">online</label>
+<label  key="offline">offline</label>
+<label  key="reference">reference</label>
+<label  key="deleted">deleted</label>
+<label  key="test">test</label>
+</table>
+<table  id="buyer_vatoff">
+<label  key="split">Split Payment</label>
+<label  key="novat">VAT Exempt</label>
+</table>
+<table  id="sales_vat_off">
+<label  key="split">Split Payment</label>
+<label  key="novat">VAT Exempt</label>
+</table>
+<table  id="buyer_sector">
+<label  key="Distribution">Distribution</label>
+<label  key="C-part Managment">C-part Managment</label>
+<label  key="Manufacturing">Manufacturing</label>
+<label  key="Construction">Construction</label>
+<label  key="OEM">OEM</label>
+</table>
+<table  id="status">
+<label  key="online">online</label>
+<label  key="offline">offline</label>
+<label  key="deleted">deleted</label>
+<label  key="test">test</label>
+</table>
+<table  id="producer_search_status">
+<label  key="online">online</label>
+<label  key="offline">offline</label>
+<label  key="deleted">deleted</label>
+<label  key="%">All records (with deleted)</label>
+</table>
+<table  id="buyer_search_status">
+<label  key="online">online</label>
+<label  key="offline">offline</label>
+<label  key="reference">reference</label>
+<label  key="deleted">deleted</label>
+<label  key="new">new</label>
+<label  key="%">All records (with deleted)</label>
+</table>
+<table  id="invoice_status">
+<label  key="to classify">to classify</label>
+<label  key="to charge">to charge</label>
+<label  key="charging">charging</label>
+<label  key="charged">charged</label>
+<label  key="closed">closed</label>
+<label  key="deleted">deleted</label>
+<label  key="new">new</label>
+</table>
+<table  id="commission_status">
+<label  key="new">new</label>
+<label  key="to verify">to verify</label>
+<label  key="sent">sent</label>
+<label  key="paid">paid</label>
+<label  key="deleted">deleted</label>
+</table>
+<table  id="commissions_invoice">
+<label  key="auto">auto</label>
+<label  key="manual">manual</label>
+</table>
+<table  id="invoices_num">
+<label  key="25">25</label>
+<label  key="50">50</label>
+<label  key="100"  selected="selected">100</label>
+<label  key="250">250</label>
+<label  key="500">500</label>
+<label  key="1000">1000</label>
+<label  key="100000">All</label>
+</table>
+<table  id="producer_num">
+<label  key="25">25 per page</label>
+<label  key="50">50 per page</label>
+<label  key="100000">All</label>
+</table>
+<table  id="invoices_sort">
+<label  key="reg_id desc"  selected="selected">Registration Number</label>
+<label  key="reg_date desc">Registration Date</label>
+<label  key="status">Status</label>
+<label  key="commission_id desc">Commission Invoice</label>
+<label  key="producers.name">Producer</label>
+<label  key="buyers.name">Buyer</label>
+<label  key="inv_id desc">Invoice Number</label>
+<label  key="inv_date desc">Invoice Date</label>
+<label  key="amount">Amount</label>
+<label  key="currency">Currency</label>
+</table>
+<table  id="commissions_num">
+<label  key="25">25</label>
+<label  key="50">50</label>
+<label  key="100"  selected="selected">100</label>
+<label  key="250">250</label>
+<label  key="500">500</label>
+<label  key="1000">1000</label>
+<label  key="100000">All</label>
+</table>
+<table  id="commissions_sort">
+<label  key="commissions.id desc"  selected="selected">ID</label>
+<label  key="commissions.number desc">Registration Number</label>
+<label  key="commissions.reg_date desc">Registration Date</label>
+<label  key="commissions.status">Status</label>
+<label  key="commissions.note">Note</label>
+<label  key="commissions_calc.code">Producer</label>
+<label  key="commissions_calc.currency">Currency</label>
+<label  key="invoices_num desc">Invoices Number</label>
+<label  key="commissions_calc.eur_amount desc">Amount EUR</label>
+<label  key="commissions_calc.eur_commission desc">Commission EUR</label>
+<label  key="commissions_calc.vat desc">VAT EUR</label>
+<label  key="commissions_calc.tax desc">Tax EUR</label>
+<label  key="commissions_calc.pay_load desc">To Pay</label>
+</table>
+<table  id="producers_num">
+<label  key="25">25</label>
+<label  key="50">50</label>
+<label  key="100">100</label>
+<label  key="100000"  selected="selected">All</label>
+</table>
+<table  id="producers_sort">
+<label  key="id">ID</label>
+<label  key="name">Name</label>
+<label  key="code"  selected="selected">Code</label>
+<label  key="status">Status</label>
+<label  key="country">Country</label>
+</table>
+<table  id="buyers_num">
+<label  key="25">25 per page</label>
+<label  key="50">50 per page</label>
+<label  key="100"  selected="selected">100 per page</label>
+<label  key="250">250 per page</label>
+<label  key="500">500 per page </label>
+<label  key="1000">1000 per page</label>
+<label  key="100000">All</label>
+</table>
+<table  id="buyers_sort"  label="Sort"  label_default="">
+<label  key="buyers.id desc"  selected="selected">sort by reverse ID</label>
+<label  key="buyers.name">sort by Name</label>
+<label  key="buyers.code">sort by Code</label>
+<label  key="buyers.status">sort by Status</label>
+<label  key="buyers.country">sort by Country</label>
+</table>
+<table  id="orders_status">
+<label  key="invoiced">invoiced</label>
+<label  key="suspended">suspended</label>
+<label  key="registered">registered</label>
+<label  key="deleted">deleted</label>
+<label  key="new">new</label>
+</table>
+<table  id="sales_status">
+<label  key="new">new</label>
+<label  key="proforma">proforma</label>
+<label  key="to verify">to verify</label>
+<label  key="sent">sent</label>
+<label  key="paid">paid</label>
+<label  key="deleted">deleted</label>
+</table>
+<table  id="sales_payment">
+<label  key="MP05">Bank Transfer</label>
+<label  key="MP05R">Outward Bank Transfer</label>
+<label  key="MP12">Cash Order (RIBA)</label>
+</table>
+<table  id="orders_sort">
+<label  key="reg_date desc, orders.new_date desc"  selected="selected">Reverse Order Date</label>
+<label  key="id desc">ID</label>
+<label  key="reg_id">Order Number</label>
+<label  key="(reg_date)">Order Date</label>
+<label  key="producers.name">Producer</label>
+<label  key="buyers.name">Buyer</label>
+<label  key="eur_amount desc">Amount</label>
+</table>
+<table  id="orders_num">
+<label  key="25">25</label>
+<label  key="50"  selected="selected">50</label>
+<label  key="100">100</label>
+<label  key="100000">All</label>
+</table>
+<table  id="sales_sort">
+<label  key="reg_date desc, id desc"  selected="selected">Reverse Date</label>
+<label  key="id desc">ID</label>
+<label  key="reg_id">Order Number</label>
+<label  key="(reg_date)">Invoice Date</label>
+<label  key="producers.name">Producer</label>
+<label  key="buyers.name">Buyer</label>
+<label  key="eur_amount desc">Amount</label>
+</table>
+<table  id="sales_num">
+<label  key="25">25</label>
+<label  key="50"  selected="selected">50</label>
+<label  key="100">100</label>
+<label  key="100000">All</label>
+</table>
+<table  id="contracts_status">
+<label  key="active">active</label>
+<label  key="suspended">suspended</label>
+<label  key="closed">closed</label>
+<label  key="deleted">deleted</label>
+<label  key="new">new</label>
+</table>
+<table  id="offer_package">
+<label  key="tba">tba</label>
+<label  key="bulk">bulk</label>
+<label  key="ibox">ibox</label>
+<label  key="box">box</label>
+<label  key="bag">bag</label>
+<label  key="poly">poly</label>
+<label  key="klt">klt</label>
+</table>
+<table  id="offer_incoterms">
+<label  key="EXW">EXW</label>
+<label  key="CPT">CPT</label>
+<label  key="CPT MIN 1TON">CPT MIN 1TON</label>
+</table>
+<table  id="offer_payment">
+<label  key="14">14</label>
+<label  key="30">30</label>
+<label  key="60">60</label>
+</table>
+<table  id="contracts_sort">
+<label  key="id desc"  selected="selected">ID</label>
+<label  key="reg_id">Order Number</label>
+<label  key="reg_date">Order Date</label>
+<label  key="reg_date desc, contracts.new_date desc">Reverse Order Date</label>
+<label  key="producers.name">Producer</label>
+<label  key="buyers.name">Buyer</label>
+<label  key="eur_amount desc">Amount</label>
+</table>
+<table  id="contracts_num">
+<label  key="25">25</label>
+<label  key="50"  selected="selected">50</label>
+<label  key="100">100</label>
+<label  key="100000">All</label>
+</table>
+<table  id="users_status">
+<label  key="new">new</label>
+<label  key="online">online</label>
+<label  key="offline">offline</label>
+<label  key="deleted">deleted</label>
+</table>
+<table  id="users_genre">
+<label  key="Mr.">Mr.</label>
+<label  key="Ms.">Ms.</label>
+</table>
+<table  id="users_sort">
+<label  key="id desc">ID</label>
+<label  key="name"  selected="selected">Name</label>
+<label  key="buyer_name">Buyer</label>
+<label  key="producer_name">Producer</label>
+</table>
+<table  id="users_num">
+<label  key="25">25</label>
+<label  key="50">50</label>
+<label  key="100">100</label>
+<label  key="100000"  selected="selected">All</label>
+</table>
+<table  id="msgs_reply">
+<label  key="optional">optional</label>
+<label  key="required">required</label>
+</table>
+<table  id="msgs_num">
+<label  key="25">25</label>
+<label  key="50"  selected="selected">50</label>
+<label  key="100">100</label>
+<label  key="200">200</label>
+<label  key="500">500</label>
+<label  key="1000">1000</label>
+</table>
+<table  id="msgs_status">
+<label  key="1">draft</label>
+<label  key="2"  selected="selected">pending</label>
+<label  key="3">closed</label>
+<label  key="4">deleted</label>
+<label  key="10">new</label>
+</table>
+<table  id="msgs_outbound">
+<label  key="0,1">All directions</label>
+<label  key="0">inbound</label>
+<label  key="1">outbound</label>
+</table>
+<table  id="msgs_brands">
+<label  key="Tone">Tone</label>
+<label  key="-"></label>
+</table>
+<table  id="msgs_bookmarks">
+<label  key="bookmark">Bookmarked</label>
+<label  key="-"></label>
+</table>
+<table  id="msgs_storage">
+<label  key="current"  selected="selected">recent</label>
+<label  key="archive">all</label>
+</table>
+<table  id="msgs_sort">
+<label  key="id desc"  selected="selected">ID</label>
+<label  key="send_date">Date</label>
+<label  key="send_date desc">Reverse Date</label>
+<label  key="klass">Kind</label>
+<label  key="status">Status</label>
+</table>
+<table  id="msgs_period">
+<label  key="today">today</label>
+<label  key="yesterday">yesterday</label>
+<label  key="todayyesterday">today + yesterday</label>
+<label  key="last2">last 2 days</label>
+<label  key="last3">last 3 days</label>
+<label  key="week">past week</label>
+<label  key="month">past month</label>
+<label  key="quarter">past quarter</label>
+<label  key="2025">2026</label>
+<label  key="2025">2025</label>
+<label  key="2024">2024</label>
+<label  key="2023">2023</label>
+<label  key="2022">2022</label>
+<label  key="2021">2021</label>
+<label  key="2020">2020</label>
+<label  key="2019">2019</label>
+<label  key="2018">2018</label>
+<label  key="2017">2017</label>
+<label  key="2015">2016</label>
+<label  key="2015">2015</label>
+<label  key="2014">2014</label>
+<label  key="ever"  selected="selected">All times</label>
+</table>
+<table  id="inbox_sort">
+<label  key="id desc"  selected="selected">ID</label>
+<label  key="sender">Sender</label>
+<label  key="receive_date desc">Last Received</label>
+<label  key="receive_date">First Received</label>
+</table>
+<table  id="inbox_num">
+<label  key="25">25</label>
+<label  key="50"  selected="selected">50</label>
+<label  key="100">100</label>
+<label  key="1000">1000</label>
+</table>
+<table  id="operator_status">
+<label  key="new"  selected="selected">new</label>
+<label  key="online">online</label>
+<label  key="offline">offline</label>
+<label  key="deleted">deleted</label>
+</table>
+<table  id="user_status">
+<label  key="new"  selected="selected">new</label>
+<label  key="online">online</label>
+<label  key="offline">offline</label>
+<label  key="deleted">deleted</label>
+</table>
+<table  id="quality_assurance">
+<label  key="ISO 9001">ISO 9001</label>
+<label  key="ISO TS 16949">ISO TS 16949</label>
+</table>
+<table  id="production_area">
+<label  key="Cold forging">Cold forging</label>
+<label  key="Hot forging">Hot forging</label>
+<label  key="Turning">Turning</label>
+</table>
+<table  id="production_market">
+<label  key="automotive">automotive</label>
+<label  key="general industry">general industry</label>
+</table>
+<table  id="production_sector">
+<label  key="carbon steel">carbon steel</label>
+<label  key="stainless">stainless</label>
+<label  key="special alloys">special alloys</label>
+</table>
+<table  id="production_quantity">
+<label  key="">any</label>
+<label  key="5000">> 5000 pieces</label>
+<label  key="50000">> 50000 pieces</label>
+</table>
+<table  id="msg_class"  lan="it">
+<label  key="1"  short="classify">Da Classificare</label>
+<label  key="2"  short="msg">Messaggio</label>
+<label  key="3"  short="enquiry">Richiesta offerta</label>
+<label  key="4"  short="rfq">Richiesta quotazione</label>
+<label  key="5"  short="quote">Quotazione</label>
+<label  key="6"  short="offer">Offerta</label>
+<label  key="7"  short="order">Ordine</label>
+<label  key="10"  short="confirm">Conferma d'ordine dal fornitore</label>
+<label  key="12"  short="inv">Fattura</label>
+<label  key="14"  short="service">Servizio</label>
+</table>
+<table  id="msg_class"  lan="en">
+<label  key="1"  short="classify">To Classify</label>
+<label  key="2"  short="msg">Message</label>
+<label  key="3"  short="enquiry">Enquiry</label>
+<label  key="4"  short="rfq">Request for Quotation</label>
+<label  key="5"  short="quote">Quotation</label>
+<label  key="6"  short="offer">Offer</label>
+<label  key="7"  short="purchase">Purchase</label>
+<label  key="8"  short="decline">Decline</label>
+<label  key="9"  short="order">Order</label>
+<label  key="10"  short="confirm">Purchase confirm</label>
+<label  key="12"  short="inv">Invoice</label>
+<label  key="14"  short="service">Service</label>
+<label  key="16"  short="declined">Declined</label>
+</table>
+<table  id="msg_search_class">
+<label  key="1"  short="classify">01. To Classify</label>
+<label  key="2"  short="msg">02. Message</label>
+<label  key="3"  short="enquiry">03. Enquiry</label>
+<label  key="4"  short="rfq">04. Request for Quotation</label>
+<label  key="5"  short="quote">05. Quotation</label>
+<label  key="6"  short="offer">06. Offer</label>
+<label  key="7"  short="purchase">07. Purchase</label>
+<label  key="8"  short="decline">08. Decline</label>
+<label  key="9"  short="order">09. Order</label>
+<label  key="10"  short="confirm">10. Purchase confirm</label>
+<label  key="12"  short="inv">12. Invoice</label>
+<label  key="14"  short="service">14. Service</label>
+<label  key="16"  short="declined">16. Declined</label>
+</table>
+<table  id="msg_to_classify">
+<label  key="1"  short="classify">To Classify++</label>
+<label  key="2"  short="msg">Message</label>
+<label  key="3"  short="enquiry">Enquiry</label>
+<label  key="5"  short="quote">Quotation</label>
+<label  key="7"  short="purchase">Purchase</label>
+<label  key="16"  short="declined">Declined</label>
+<label  key="12"  short="inv">Invoice</label>
+<label  key="14"  short="service">Service</label>
+<label  key=""  short=""></label>
+<label  key="4"  short="rfq">Request for Quotation > </label>
+<label  key="6"  short="offer">Offer > </label>
+<label  key="9"  short="order">Order > </label>
+<label  key="10"  short="confirm">Purchase confirm > </label>
+</table>
+<table  id="msg_class"  lan="de">
+<label  key="1"  short="classify"></label>
+<label  key="2"  short="msg">Nachricht</label>
+<label  key="3"  short="enquiry">Anfrage</label>
+<label  key="4"  short="rfq">Anfrage</label>
+<label  key="5"  short="quote">Angebot</label>
+<label  key="6"  short="offer">Angebot</label>
+<label  key="7"  short="purchase">Bestellung</label>
+<label  key="8"  short="decline">Decline</label>
+<label  key="9"  short="order">Order</label>
+<label  key="10"  short="confirm">Auftragsbestaetigung</label>
+<label  key="12"  short="inv">Rechnung</label>
+<label  key="14"  short="service">Service</label>
+<label  key="16"  short="declined">Declined</label>
+</table>
+<table  id="msg_from_status">
+<label  key="11"  short="draft">draft</label>
+<label  key="21"  short="pending">pending</label>
+<label  key="23"  short="waiting">waiting</label>
+<label  key="24"  short="ondeck">on deck</label>
+<label  key="22,31"  short="closed">closed</label>
+<label  key="40"  short="deleted">deleted</label>
+<label  key="41"  short="spam">spam</label>
+</table>
+<table  id="msg_selection_status">
+<label  key="21"  short="pending">pending</label>
+<label  key="23"  short="waiting/on deck">waiting</label>
+<label  key="22"  short="closed">closed</label>
+<label  key="40"  short="deleted">deleted</label>
+<label  key="41"  short="spam">spam</label>
+</table>
+<table  id="msg_status_label">
+<label  key="11"  short="draft">draft</label>
+<label  key="12"  short="draft">draft</label>
+<label  key="21"  selected="selected"  short="pending">pending</label>
+<label  key="22"  short="closed">closed</label>
+<label  key="23"  short="waiting">waiting</label>
+<label  key="24"  short="ondeck">on deck</label>
+<label  key="31"  short="closed">closed</label>
+<label  key="32"  short="closed">closed</label>
+<label  key="40"  short="deleted">deleted</label>
+<label  key="41"  short="spam">spam</label>
+</table>
+<table  id="classify_status">
+<label  key="21"  selected="selected"  short="pending">pending</label>
+<label  key="23"  short="waiting">waiting</label>
+<label  key="24"  short="ondeck">on deck</label>
+<label  key="22"  short="closed">closed</label>
+<label  key="40"  short="deleted">deleted</label>
+<label  key="41"  short="spam">spam</label>
+</table>
+<table  id="msg_ops">
+<label  key="10">gigi</label>
+<label  key="21">stefy</label>
+<klabel  key="22">nicole</klabel>
+<label  key="23">gaia</label>
+<label  key="24">tools</label>
+<klabel  key="25">vicio</klabel>
+</table>
+<table  id="ops">
+<label  key="10"  output="gigi - Luigi Telmon"  short="gigi">gigi</label>
+<label  key="21"  output="stefy - Stefania Meneghello"  short="stefy">stefy</label>
+<klabel  key="22"  output="nicole - Nicole Gawehns"  short="nicole">nicole</klabel>
+<label  key="23"  output="gaia - Gaia Meneghello"  short="gaia">gaia</label>
+<label  key="24"  output="Speedex Tools"  short="tools">tools</label>
+<klabel  key="25"  output="vicio - Vincenzo Giglio"  short="vicio">vicio</klabel>
+</table>
+<table  id="operators">
+<label  email="Luigi Telmon <luigi.telmon@speedex.it>"  key="10"  output="gigi - Luigi Telmon"  short="gigi"></label>
+<label  email="Stefania Meneghello <stefania.meneghello@speedex.it>"  key="21"  output="stefy - Stefania Meneghello"  short="stefy"></label>
+<klabel  email="Nicole Gawehns <nicole.gawehns@speedex.it>"  key="22"  output="nicole - Nicole Gawehns"  short="nicole"></klabel>
+<label  email="Gaia Meneghello <gaia.meneghello@speedex.it>"  key="23"  output="gaia - Gaia Meneghello"  short="gaia"></label>
+<label  email="Speedex Tools <tools@speedex.it>"  key="24"  output="tools - Speedex Tools "  short="tools"></label>
+<klabel  email="info@speedex.it"  key="25"  output="vicio - Vicio Giglio"  short="vicio"></klabel>
+</table>
+<table  id="msg_reply">
+<label  key="1">Required - Necessaria</label>
+<label  key="2">Optional - Facoltativa</label>
+<label  key="3">Unwanted - Non richiesta</label>
+</table>
+</tables>
+</expand>
+<kinds  col_num="12"  count="18"  created="1769595108247"  id="msg_kinds"  query="select * from z_msg_kind order by id"  source="datastore">
+<kind  dir="-1"  dir_label="In"  id="10"  iorg_klass="1"  iorg_label="Da Classificare"  label="ToClassify"  name="in"  outbound="0"  reply="optional"></kind>
+<kind  dir="-1"  dir_label="In"  id="11"  iorg_klass="3"  iorg_label="Richiesta offerta"  label="Enquiry"  name="in_request"  outbound="0"  reply="required"  to="Buyer"></kind>
+<kind  action_new="1"  dir="-1"  dir_label="In"  id="12"  iorg_klass="5"  iorg_label="Quotazione"  label="Quote"  name="in_quote"  outbound="0"  reply="optional"  to="Producer"></kind>
+<kind  dir="-1"  dir_label="In"  id="13"  iorg_klass="7"  iorg_label="Ordine"  label="Purchase"  name="in_purchase"  outbound="0"  reply="required"  to="Buyer"></kind>
+<kind  dir="-1"  dir_label="In"  id="14"  iorg_klass="10"  iorg_label="Conferma d'ordine dal fornitore"  label="Purchase confirm"  name="in_confirm"  outbound="0"  reply="optional"  to="Buyer"></kind>
+<kind  dir="-1"  dir_label="In"  id="15"  iorg_klass="12"  iorg_label="Fattura"  label="Invoice"  name="in_invoice"  outbound="0"  reply="optional"  to="Producer"></kind>
+<kind  dir="-1"  dir_label="In"  first="1"  id="16"  label="Call in"  name="in_call"  outbound="0"  reply="required"></kind>
+<kind  dir="-1"  dir_label="In"  id="17"  iorg_klass="16"  iorg_label="Richiesta Declinata"  label="Declined"  name="in_declined"  outbound="0"  reply="optional"  to="Buyer"></kind>
+<kind  dir="0"  dir_label="All"  id="18"  iorg_klass="14"  iorg_label="Servizio"  label="Service"  name="service"  reply="optional"></kind>
+<kind  dir="0"  dir_label="In"  id="19"  iorg_klass="15"  iorg_label="Test"  label="Test"  name="in_test"  reply="required"></kind>
+<kind  action_new="1"  dir="1"  dir_label="All"  id="20"  iorg_klass="2"  iorg_label="Messaggio"  label="Message"  name="msg"  outbound="1"  reply="optional"></kind>
+<kind  action_new="1"  dir="1"  dir_label="Out"  first="1"  id="21"  iorg_klass="4"  iorg_label="Richiesta quotazione"  label="Request for quotation"  name="out_rfq"  outbound="1"  reply="required"  to="Producer"></kind>
+<kind  action_new="1"  dir="1"  dir_label="Out"  first="1"  id="22"  iorg_klass="6"  iorg_label="Offerta"  label="Offer"  name="out_offer"  outbound="1"  reply="optional"  to="Buyer"></kind>
+<kind  action_new="1"  dir="1"  dir_label="Out"  first="1"  id="23"  iorg_klass="9"  iorg_label="Conferma acquisto al fornitore"  label="Order"  name="out_order"  outbound="1"  reply="optional"  to="Producer"></kind>
+<kind  dir="1"  dir_label="Out"  first="1"  id="24"  iorg_klass="11"  iorg_label="Conferma al cliente"  label="Order confirmation"  name="out_order_confirm"  outbound="1"  reply="optional"  to="Buyer"></kind>
+<kind  dir="1"  dir_label="Out"  first="1"  id="25"  label="Request Out"  name="out_request"  outbound="1"  reply="required"></kind>
+<kind  dir="1"  dir_label="Out"  first="1"  id="26"  iorg_klass="8"  iorg_label="Declina"  label="Decline"  name="out_decline"  outbound="1"  reply="optional"  to="Buyer"></kind>
+<kind  dir="0"  dir_label="Internal"  first="1"  id="30"  label="Internal Note"  name="note"  reply="optional"></kind>
+</kinds>
+<buyers  col_num="4"  count="95"  created="1769595971314"  id="buyers_table"  query="select id, code, name, country from buyers where status = 'online' order by buyers.country, buyers.code"  source="datastore">
+<buyer  code="kunz"  country="AUT"  id="472"  name="Kellner & Kunz AG"></buyer>
+<buyer  code="berrang trading"  country="CHN"  id="561"  name="Berrang Trading Shanghai Co. Ltd."></buyer>
+<buyer  code="bollhoff cec"  country="CZE"  id="241"  name="Böllhoff Sro"></buyer>
+<buyer  code="bufab cz"  country="CZE"  id="531"  name="Bufaz CZ s.r.o."></buyer>
+<buyer  code="alcom"  country="DEU"  id="287"  name="SMT Alcom Group Gmbh"></buyer>
+<buyer  code="berrang f"  country="DEU"  id="207"  name="Berrang SE"></buyer>
+<buyer  code="berrang H"  country="DEU"  id="6"  name="Berrang SE"></buyer>
+<buyer  code="berrang In"  country="DEU"  id="133"  name="Berrang SE"></buyer>
+<buyer  code="berrang l"  country="DEU"  id="204"  name="Berrang SE"></buyer>
+<buyer  code="berrang lang"  country="DEU"  id="199"  name="Berrang SE"></buyer>
+<buyer  code="berrang m"  country="DEU"  id="5"  name="Berrang SE"></buyer>
+<buyer  code="berrang malt"  country="DEU"  id="200"  name="Berrang SE"></buyer>
+<buyer  code="bollhoff b"  country="DEU"  id="266"  name="Böllhoff GmbH"></buyer>
+<buyer  code="bollhoff O"  country="DEU"  id="534"  name="Boellhoff Logistik Gmbh Logistikzentrum Europa 1"></buyer>
+<buyer  code="bossard d"  country="DEU"  id="14"  name="Bossard Deutschland GmbH"></buyer>
+<buyer  code="bossard kvt"  country="DEU"  id="497"  name="Bossard Deutschland GmbH"></buyer>
+<buyer  code="brol"  country="DEU"  id="562"  name="Hans Brolhorst"></buyer>
+<buyer  code="daniel"  country="DEU"  id="565"  name="Daniel Gruppe GMBH"></buyer>
+<buyer  code="dresselhaus"  country="DEU"  id="19"  name="Joseph Dresselhaus GmbH & Co. KG"></buyer>
+<buyer  code="Dresselhaus Lemgo"  country="DEU"  id="592"  name="Joseph Dresselhaus GMBH & Co KG Lemgo"></buyer>
+<buyer  code="engel"  country="DEU"  id="290"  name="Verbindungselemente Engel GmbH"></buyer>
+<buyer  code="gross"  country="DEU"  id="271"  name="Ferdinand Gross GmbH & Co. KG"></buyer>
+<buyer  code="hebe"  country="DEU"  id="25"  name="Norm + Dreh Verbindungst. GmbH"></buyer>
+<buyer  code="IHI"  country="DEU"  id="575"  name="IHI CHARGING SYSTEMS INT GMH"></buyer>
+<buyer  code="IMS"  country="DEU"  id="589"  name="IMS Verbindungstechnik GmbH & Co KG"></buyer>
+<buyer  code="industrie"  country="DEU"  id="281"  name="Industrie Logistik GmbH"></buyer>
+<buyer  code="Jung Service"  country="DEU"  id="590"  name="Jungheinrich Service & Parts"></buyer>
+<buyer  code="kaiser"  country="DEU"  id="574"  name="KAISER SPEZIALARTIKEL GmbH"></buyer>
+<buyer  code="keller"  country="DEU"  id="419"  name="Keller & Kalmbach GmbH"></buyer>
+<buyer  code="max"  country="DEU"  id="154"  name="Max Mothes GmbH"></buyer>
+<buyer  code="msh m"  country="DEU"  id="20"  name="Dresselhaus Msh"></buyer>
+<buyer  code="msh s"  country="DEU"  id="194"  name="Dresselhaus Msh"></buyer>
+<buyer  code="Quelle"  country="DEU"  id="519"  name="Quelle Schrauben Gmbh"></buyer>
+<buyer  code="reyher"  country="DEU"  id="95"  name="F. Reyher Nchfg"></buyer>
+<buyer  code="roth"  country="DEU"  id="270"  name="Otto Roth GmbH & Co. KG"></buyer>
+<buyer  code="ssh"  country="DEU"  id="58"  name="Dresselhaus Stuttgarter"></buyer>
+<buyer  code="wurth adolf kunz"  country="DEU"  id="489"  name="Adolf Wurth GMBH & CO KG"></buyer>
+<buyer  code="wurth ind"  country="DEU"  id="255"  name="Würth Industrie Service GmbH & Co. KG"></buyer>
+<buyer  code="Condotte Algeria"  country="DZA"  id="576"  name="Società Italiana per Condotte d'Acqua 1880 S.p.A."></buyer>
+<buyer  code="tr esp"  country="ESP"  id="563"  name="TR Fastening Espana"></buyer>
+<buyer  code="bufab fin"  country="FIN"  id="208"  name="Bufab Finland Oy"></buyer>
+<buyer  code="etra"  country="FIN"  id="88"  name="Etra Oy"></buyer>
+<buyer  code="ferromet"  country="FIN"  id="111"  name="Ferrometal Oy"></buyer>
+<buyer  code="hahle"  country="FIN"  id="216"  name="Hahle Oy"></buyer>
+<buyer  code="wurth fin"  country="FIN"  id="140"  name="Würth Oy"></buyer>
+<buyer  code="berrang france"  country="FRA"  id="224"  name="Berrang France Sàrl"></buyer>
+<buyer  code="volvis"  country="FRA"  id="47"  name="Volvis"></buyer>
+<buyer  code="wurth ind france"  country="FRA"  id="479"  name="Würth Industrie France SAS"></buyer>
+<buyer  code="speedexuk"  country="GBR"  id="313"  name="Speedex Uk"></buyer>
+<buyer  code="tr fast"  country="GBR"  id="103"  name="TR Fastenings Ltd"></buyer>
+<buyer  code="bollhoff ung"  country="HUN"  id="220"  name="Böllhoff Kft"></buyer>
+<buyer  code="gep"  country="HUN"  id="523"  name="GEP COOP KFT"></buyer>
+<buyer  code="iranpitch"  country="IRN"  id="507"  name="Iran Pitch Co"></buyer>
+<buyer  code="Alstom"  country="ITA"  id="556"  name="Alstom Ferroviaria S.p.A."></buyer>
+<buyer  code="Candex"  country="ITA"  id="593"  name="Candex Italy S.R.L"></buyer>
+<buyer  code="cbl"  country="ITA"  id="480"  name="C.B.L. S.r.l."></buyer>
+<buyer  code="cesarini"  country="ITA"  id="529"  name="Cesarini Carpenterie Metalliche S.r.l."></buyer>
+<buyer  code="cimolai"  country="ITA"  id="115"  name="Cimolai S.p.A."></buyer>
+<buyer  code="consorzio"  country="ITA"  id="506"  name="Consorzio Association Temporaire d'Entreprises Giugliano Costruzioni, Campolo Et Stabia Yachting S.r.l."></buyer>
+<buyer  code="Cosmo"  country="ITA"  id="591"  name="Cosmo srl"></buyer>
+<buyer  code="Fincantieri"  country="ITA"  id="573"  name="Fincantieri Infrastructure S.p.A."></buyer>
+<buyer  code="Formut"  country="ITA"  id="594"  name="FORMUT SRL"></buyer>
+<buyer  code="general"  country="ITA"  id="542"  name="General Montaggi di Polacchi Giampiero"></buyer>
+<buyer  code="giugliano"  country="ITA"  id="487"  name="Giugliano Costruzioni Metalliche S.r.l."></buyer>
+<buyer  code="Hoffmann"  country="ITA"  id="532"  name="Hoffmann Italia S.p.A."></buyer>
+<buyer  code="lgm"  country="ITA"  id="559"  name="LGM S.r.l."></buyer>
+<buyer  code="Maeg"  country="ITA"  id="585"  name="Maeg Costruzioni S.p.A."></buyer>
+<buyer  code="Plarad"  country="ITA"  id="521"  name="Plarad Italy S.r.l."></buyer>
+<buyer  code="procom"  country="ITA"  id="486"  name="Procom S.r.l."></buyer>
+<buyer  code="Rocade"  country="ITA"  id="543"  name="Rocade S.c.r.l."></buyer>
+<buyer  code="Sacim"  country="ITA"  id="558"  name="Sacim Systems S.r.l."></buyer>
+<buyer  code="simi"  country="ITA"  id="518"  name="SIMI S.r.l."></buyer>
+<buyer  code="spic"  country="ITA"  id="553"  name="Spic S.r.l."></buyer>
+<buyer  code="Trescal"  country="ITA"  id="557"  name="Trescal S.r.l."></buyer>
+<buyer  code="Utensilmac"  country="ITA"  id="577"  name="Utensilmac S.r.l."></buyer>
+<buyer  code="bollhoff mex"  country="MEX"  id="544"  name="Bollhoff Mexico"></buyer>
+<buyer  code="borstlap"  country="NLD"  id="12"  name="Fabory Nederland BV"></buyer>
+<buyer  code="tr holland"  country="NLD"  id="244"  name="TR Holland"></buyer>
+<buyer  code="zimex"  country="NLD"  id="185"  name="Zimex International BV"></buyer>
+<buyer  code="bollhoff pol"  country="POL"  id="280"  name="Böllhoff Technika"></buyer>
+<buyer  code="PHU"  country="POL"  id="578"  name="P.H.U. VECTOR SP. zo .o."></buyer>
+<buyer  code="bollhoff rom"  country="ROM"  id="285"  name="Böllhoff Srl"></buyer>
+<buyer  code="bollhoff sro"  country="SVK"  id="282"  name="Böllhoff S.R.O."></buyer>
+<buyer  code="bufab"  country="SWE"  id="15"  name="Bufab Sweden AB"></buyer>
+<buyer  code="ECP"  country="SWE"  id="584"  name="ECP Airtech AB"></buyer>
+<buyer  code="fameco"  country="SWE"  id="132"  name="Fameco AB"></buyer>
+<buyer  code="mattssons"  country="SWE"  id="138"  name="Mattssons AB"></buyer>
+<buyer  code="swebolt"  country="SWE"  id="292"  name="Swebolt AB"></buyer>
+<buyer  code="techno"  country="SWE"  id="59"  name="Techno Skruv I Varnamo AB"></buyer>
+<buyer  code="tr fast 1"  country="SWE"  id="265"  name="TR Sweden AB"></buyer>
+<buyer  code="tr fast 2"  country="SWE"  id="198"  name="TR Fastenings AB"></buyer>
+<buyer  code="wurth nordiska"  country="SWE"  id="236"  name="Wurth Industri Nordiska Ab"></buyer>
+<buyer  code="Bossard AG"  country="SWZ"  id="588"  name="Bossard AG"></buyer>
+<buyer  code="dresselhaus turchia"  country="TUR"  id="474"  name="Dresselhaus Cetin Civata"></buyer>
+<buyer  code="berrang USA"  country="USA"  id="530"  name="Berrang Inc"></buyer>
+</buyers>
+<producers  col_num="2"  count="14"  created="1769595971317"  id="producers_table"  query="select id, code from producers where status = 'online' order by code"  source="datastore">
+<producer  code="colombo"  id="46"></producer>
+<producer  code="CSF"  id="74"></producer>
+<producer  code="ghezzi"  id="42"></producer>
+<producer  code="korea"  id="22"></producer>
+<producer  code="metalvit"  id="32"></producer>
+<producer  code="mg3"  id="76"></producer>
+<producer  code="nicoletti"  id="47"></producer>
+<producer  code="omci"  id="50"></producer>
+<producer  code="osrasp"  id="73"></producer>
+<producer  code="quali"  id="75"></producer>
+<producer  code="rosval"  id="35"></producer>
+<producer  code="usorini"  id="26"></producer>
+<producer  code="vimi"  id="41"></producer>
+<producer  code="webapp"  id="68"></producer>
+</producers>
+<table  col_num="2"  count="14"  created="1769595971320"  id="producers_list"  query="select id as `key`, code as output from producers where status = 'online' order by `status` desc, `code`"  source="datastore">
+<label  key="46"  output="colombo"></label>
+<label  key="74"  output="CSF"></label>
+<label  key="42"  output="ghezzi"></label>
+<label  key="22"  output="korea"></label>
+<label  key="32"  output="metalvit"></label>
+<label  key="76"  output="mg3"></label>
+<label  key="47"  output="nicoletti"></label>
+<label  key="50"  output="omci"></label>
+<label  key="73"  output="osrasp"></label>
+<label  key="75"  output="quali"></label>
+<label  key="35"  output="rosval"></label>
+<label  key="26"  output="usorini"></label>
+<label  key="41"  output="vimi"></label>
+<label  key="68"  output="webapp"></label>
+</table>
+<table  col_num="2"  count="95"  created="1769595971323"  id="buyers_list"  query="select id as `key`, code as output from buyers where status = 'online' order by buyers.code"  source="datastore">
+<label  key="287"  output="alcom"></label>
+<label  key="556"  output="Alstom"></label>
+<label  key="207"  output="berrang f"></label>
+<label  key="224"  output="berrang france"></label>
+<label  key="6"  output="berrang H"></label>
+<label  key="133"  output="berrang In"></label>
+<label  key="204"  output="berrang l"></label>
+<label  key="199"  output="berrang lang"></label>
+<label  key="5"  output="berrang m"></label>
+<label  key="200"  output="berrang malt"></label>
+<label  key="561"  output="berrang trading"></label>
+<label  key="530"  output="berrang USA"></label>
+<label  key="266"  output="bollhoff b"></label>
+<label  key="241"  output="bollhoff cec"></label>
+<label  key="544"  output="bollhoff mex"></label>
+<label  key="534"  output="bollhoff O"></label>
+<label  key="280"  output="bollhoff pol"></label>
+<label  key="285"  output="bollhoff rom"></label>
+<label  key="282"  output="bollhoff sro"></label>
+<label  key="220"  output="bollhoff ung"></label>
+<label  key="12"  output="borstlap"></label>
+<label  key="588"  output="Bossard AG"></label>
+<label  key="14"  output="bossard d"></label>
+<label  key="497"  output="bossard kvt"></label>
+<label  key="562"  output="brol"></label>
+<label  key="15"  output="bufab"></label>
+<label  key="531"  output="bufab cz"></label>
+<label  key="208"  output="bufab fin"></label>
+<label  key="593"  output="Candex"></label>
+<label  key="480"  output="cbl"></label>
+<label  key="529"  output="cesarini"></label>
+<label  key="115"  output="cimolai"></label>
+<label  key="576"  output="Condotte Algeria"></label>
+<label  key="506"  output="consorzio"></label>
+<label  key="591"  output="Cosmo"></label>
+<label  key="565"  output="daniel"></label>
+<label  key="19"  output="dresselhaus"></label>
+<label  key="592"  output="Dresselhaus Lemgo"></label>
+<label  key="474"  output="dresselhaus turchia"></label>
+<label  key="584"  output="ECP"></label>
+<label  key="290"  output="engel"></label>
+<label  key="88"  output="etra"></label>
+<label  key="132"  output="fameco"></label>
+<label  key="111"  output="ferromet"></label>
+<label  key="573"  output="Fincantieri"></label>
+<label  key="594"  output="Formut"></label>
+<label  key="542"  output="general"></label>
+<label  key="523"  output="gep"></label>
+<label  key="487"  output="giugliano"></label>
+<label  key="271"  output="gross"></label>
+<label  key="216"  output="hahle"></label>
+<label  key="25"  output="hebe"></label>
+<label  key="532"  output="Hoffmann"></label>
+<label  key="575"  output="IHI"></label>
+<label  key="589"  output="IMS"></label>
+<label  key="281"  output="industrie"></label>
+<label  key="507"  output="iranpitch"></label>
+<label  key="590"  output="Jung Service"></label>
+<label  key="574"  output="kaiser"></label>
+<label  key="419"  output="keller"></label>
+<label  key="472"  output="kunz"></label>
+<label  key="559"  output="lgm"></label>
+<label  key="585"  output="Maeg"></label>
+<label  key="138"  output="mattssons"></label>
+<label  key="154"  output="max"></label>
+<label  key="20"  output="msh m"></label>
+<label  key="194"  output="msh s"></label>
+<label  key="578"  output="PHU"></label>
+<label  key="521"  output="Plarad"></label>
+<label  key="486"  output="procom"></label>
+<label  key="519"  output="Quelle"></label>
+<label  key="95"  output="reyher"></label>
+<label  key="543"  output="Rocade"></label>
+<label  key="270"  output="roth"></label>
+<label  key="558"  output="Sacim"></label>
+<label  key="518"  output="simi"></label>
+<label  key="313"  output="speedexuk"></label>
+<label  key="553"  output="spic"></label>
+<label  key="58"  output="ssh"></label>
+<label  key="292"  output="swebolt"></label>
+<label  key="59"  output="techno"></label>
+<label  key="563"  output="tr esp"></label>
+<label  key="103"  output="tr fast"></label>
+<label  key="265"  output="tr fast 1"></label>
+<label  key="198"  output="tr fast 2"></label>
+<label  key="244"  output="tr holland"></label>
+<label  key="557"  output="Trescal"></label>
+<label  key="577"  output="Utensilmac"></label>
+<label  key="47"  output="volvis"></label>
+<label  key="489"  output="wurth adolf kunz"></label>
+<label  key="140"  output="wurth fin"></label>
+<label  key="255"  output="wurth ind"></label>
+<label  key="479"  output="wurth ind france"></label>
+<label  key="236"  output="wurth nordiska"></label>
+<label  key="185"  output="zimex"></label>
+</table>
+<msgs_num  col_num="5"  count="19"  id=""  query="select klass, op_ud, status, outbound, count(*) as num from v_msg_list where status in (11, 12, 21, 23, 24) group by klass, op_ud, status, outbound ;">
+<msg  klass="2"  num="1"  op_ud="24"  outbound="0"  status="21"></msg>
+<msg  klass="2"  num="4"  op_ud="10"  outbound="0"  status="21"></msg>
+<msg  klass="2"  num="1"  op_ud="23"  outbound="0"  status="21"></msg>
+<msg  klass="2"  num="1"  op_ud="21"  outbound="0"  status="21"></msg>
+<msg  klass="1"  num="1"  op_ud="23"  outbound="0"  status="21"></msg>
+<msg  klass="6"  num="89"  op_ud="10"  outbound="1"  status="23"></msg>
+<msg  klass="2"  num="58"  op_ud="10"  outbound="1"  status="23"></msg>
+<msg  klass="6"  num="10"  op_ud="24"  outbound="1"  status="23"></msg>
+<msg  klass="4"  num="19"  op_ud="10"  outbound="1"  status="23"></msg>
+<msg  klass="4"  num="57"  op_ud="21"  outbound="1"  status="23"></msg>
+<msg  klass="4"  num="50"  op_ud="23"  outbound="1"  status="23"></msg>
+<msg  klass="2"  num="2"  op_ud="24"  outbound="1"  status="23"></msg>
+<msg  klass="9"  num="3"  op_ud="10"  outbound="1"  status="23"></msg>
+<msg  klass="1"  num="1"  op_ud="21"  outbound="1"  status="23"></msg>
+<msg  klass="2"  num="2"  op_ud="21"  outbound="1"  status="23"></msg>
+<msg  klass="3"  num="19"  op_ud="10"  outbound="0"  status="24"></msg>
+<msg  klass="3"  num="56"  op_ud="21"  outbound="0"  status="24"></msg>
+<msg  klass="3"  num="52"  op_ud="23"  outbound="0"  status="24"></msg>
+<msg  klass="2"  num="6"  op_ud="21"  outbound="0"  status="24"></msg>
+</msgs_num>
+<msgs_count  col_num="1"  count="1"  id=""  query="select count(*) as msgs_count from v_msg_list where 1=1 and klass in (1) and status in (21) and outbound in (0) and status != 40">
+<msg  msgs_count="1"></msg>
+</msgs_count>
+<msgs  col_num="22"  count="1"  id=""  query="select id, send_date,rdays, past_days, status, klass, outbound, op_ud, tone, bookmark, first_id, prev_id, files_num, sent_num, subject, abstract, user_isbuyer, user_id, user_code, user_name, user_email, comment from v_msg_list where 1=1 and klass in (1) and status in (21) and outbound in (0) and status != 40 order by id desc limit 50 offset 0"  query_base="select id, send_date,rdays, past_days, status, klass, outbound, op_ud, tone, bookmark, first_id, prev_id, files_num, sent_num, subject, abstract, user_isbuyer, user_id, user_code, user_name, user_email, comment from v_msg_list where 1=1 and klass in (1) and status in (21) and outbound in (0) and status != 40 order by id desc"  query_limit="50"  query_offset="0">
+<msg  abstract="Gentile cliente Dear Sirs Sehr geeherte Damen und Herren In allegato la nostra offerta Please find enclosed our quotation Hier anbei unterbreiten wir unser Angebot Validità offerta 4 settimane/Offer …"  files_num="1"  id="1576438"  klass="1"  op_ud="23"  outbound="0"  past_days="0"  rdays="740009"  send_date="2026-01-28 11:25:42"  status="21"  subject="R: Ihre ANFRAGE: 0017826252"  user_code="rosval"  user_email="commerciale2@rosval.it"  user_id="1467"  user_isbuyer="0"  user_name="Silvia"></msg>
+</msgs>
+</cc:data>

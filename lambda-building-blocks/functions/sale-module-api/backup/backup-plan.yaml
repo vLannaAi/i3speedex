@@ -1,0 +1,250 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Automated Backup Plan for Sale Module API
+
+Parameters:
+  Environment:
+    Type: String
+    Default: production
+    AllowedValues:
+      - dev
+      - staging
+      - production
+    Description: Environment name
+
+  SalesTableName:
+    Type: String
+    Description: Sales DynamoDB table name
+
+  BuyersTableName:
+    Type: String
+    Description: Buyers DynamoDB table name
+
+  ProducersTableName:
+    Type: String
+    Description: Producers DynamoDB table name
+
+  BackupRetentionDays:
+    Type: Number
+    Default: 30
+    Description: Number of days to retain backups
+
+  NotificationEmail:
+    Type: String
+    Description: Email for backup notifications
+
+Resources:
+  # Backup Vault
+  BackupVault:
+    Type: AWS::Backup::BackupVault
+    Properties:
+      BackupVaultName: !Sub 'sale-module-vault-${Environment}'
+      EncryptionKeyArn: !GetAtt BackupEncryptionKey.Arn
+      Notifications:
+        BackupVaultEvents:
+          - BACKUP_JOB_STARTED
+          - BACKUP_JOB_COMPLETED
+          - BACKUP_JOB_FAILED
+          - RESTORE_JOB_STARTED
+          - RESTORE_JOB_COMPLETED
+          - RESTORE_JOB_FAILED
+        SNSTopicArn: !Ref BackupNotificationTopic
+
+  # KMS Key for Backup Encryption
+  BackupEncryptionKey:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: !Sub 'Encryption key for ${Environment} backups'
+      KeyPolicy:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: Enable IAM User Permissions
+            Effect: Allow
+            Principal:
+              AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:root'
+            Action: 'kms:*'
+            Resource: '*'
+          - Sid: Allow Backup Service
+            Effect: Allow
+            Principal:
+              Service: backup.amazonaws.com
+            Action:
+              - 'kms:CreateGrant'
+              - 'kms:DescribeKey'
+              - 'kms:Decrypt'
+              - 'kms:GenerateDataKey'
+            Resource: '*'
+
+  BackupEncryptionKeyAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: !Sub 'alias/sale-module-backup-${Environment}'
+      TargetKeyId: !Ref BackupEncryptionKey
+
+  # SNS Topic for Notifications
+  BackupNotificationTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: !Sub 'sale-module-backup-notifications-${Environment}'
+      Subscription:
+        - Endpoint: !Ref NotificationEmail
+          Protocol: email
+
+  # Backup Plan - Daily
+  DailyBackupPlan:
+    Type: AWS::Backup::BackupPlan
+    Properties:
+      BackupPlan:
+        BackupPlanName: !Sub 'sale-module-daily-${Environment}'
+        BackupPlanRule:
+          - RuleName: DailyBackups
+            TargetBackupVault: !Ref BackupVault
+            ScheduleExpression: 'cron(0 2 * * ? *)'  # 2 AM UTC daily
+            StartWindowMinutes: 60
+            CompletionWindowMinutes: 120
+            Lifecycle:
+              DeleteAfterDays: !Ref BackupRetentionDays
+            RecoveryPointTags:
+              Environment: !Ref Environment
+              Type: Daily
+              ManagedBy: CloudFormation
+
+  # Backup Plan - Weekly
+  WeeklyBackupPlan:
+    Type: AWS::Backup::BackupPlan
+    Properties:
+      BackupPlan:
+        BackupPlanName: !Sub 'sale-module-weekly-${Environment}'
+        BackupPlanRule:
+          - RuleName: WeeklyBackups
+            TargetBackupVault: !Ref BackupVault
+            ScheduleExpression: 'cron(0 3 ? * SUN *)'  # 3 AM UTC Sunday
+            StartWindowMinutes: 120
+            CompletionWindowMinutes: 180
+            Lifecycle:
+              DeleteAfterDays: 90
+              MoveToColdStorageAfterDays: 30
+            RecoveryPointTags:
+              Environment: !Ref Environment
+              Type: Weekly
+              ManagedBy: CloudFormation
+
+  # Backup Plan - Monthly
+  MonthlyBackupPlan:
+    Type: AWS::Backup::BackupPlan
+    Properties:
+      BackupPlan:
+        BackupPlanName: !Sub 'sale-module-monthly-${Environment}'
+        BackupPlanRule:
+          - RuleName: MonthlyBackups
+            TargetBackupVault: !Ref BackupVault
+            ScheduleExpression: 'cron(0 4 1 * ? *)'  # 4 AM UTC 1st of month
+            StartWindowMinutes: 180
+            CompletionWindowMinutes: 240
+            Lifecycle:
+              DeleteAfterDays: 365
+              MoveToColdStorageAfterDays: 90
+            RecoveryPointTags:
+              Environment: !Ref Environment
+              Type: Monthly
+              ManagedBy: CloudFormation
+
+  # IAM Role for Backup
+  BackupRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub 'SaleModuleBackupRole-${Environment}'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: backup.amazonaws.com
+            Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForBackup'
+        - 'arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForRestores'
+
+  # Backup Selection - DynamoDB Tables
+  DailyBackupSelection:
+    Type: AWS::Backup::BackupSelection
+    Properties:
+      BackupPlanId: !Ref DailyBackupPlan
+      BackupSelection:
+        SelectionName: !Sub 'sale-module-tables-${Environment}'
+        IamRoleArn: !GetAtt BackupRole.Arn
+        Resources:
+          - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${SalesTableName}'
+          - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${BuyersTableName}'
+          - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${ProducersTableName}'
+
+  WeeklyBackupSelection:
+    Type: AWS::Backup::BackupSelection
+    Properties:
+      BackupPlanId: !Ref WeeklyBackupPlan
+      BackupSelection:
+        SelectionName: !Sub 'sale-module-tables-weekly-${Environment}'
+        IamRoleArn: !GetAtt BackupRole.Arn
+        Resources:
+          - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${SalesTableName}'
+          - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${BuyersTableName}'
+          - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${ProducersTableName}'
+
+  MonthlyBackupSelection:
+    Type: AWS::Backup::BackupSelection
+    Properties:
+      BackupPlanId: !Ref MonthlyBackupPlan
+      BackupSelection:
+        SelectionName: !Sub 'sale-module-tables-monthly-${Environment}'
+        IamRoleArn: !GetAtt BackupRole.Arn
+        Resources:
+          - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${SalesTableName}'
+          - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${BuyersTableName}'
+          - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${ProducersTableName}'
+
+  # CloudWatch Alarm - Backup Failures
+  BackupFailureAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub 'sale-module-backup-failures-${Environment}'
+      AlarmDescription: Alert on backup job failures
+      MetricName: NumberOfBackupJobsFailed
+      Namespace: AWS/Backup
+      Statistic: Sum
+      Period: 3600
+      EvaluationPeriods: 1
+      Threshold: 1
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      TreatMissingData: notBreaching
+      AlarmActions:
+        - !Ref BackupNotificationTopic
+
+Outputs:
+  BackupVaultName:
+    Description: Backup vault name
+    Value: !Ref BackupVault
+    Export:
+      Name: !Sub '${AWS::StackName}-BackupVault'
+
+  BackupVaultArn:
+    Description: Backup vault ARN
+    Value: !GetAtt BackupVault.BackupVaultArn
+    Export:
+      Name: !Sub '${AWS::StackName}-BackupVaultArn'
+
+  NotificationTopicArn:
+    Description: SNS topic for backup notifications
+    Value: !Ref BackupNotificationTopic
+    Export:
+      Name: !Sub '${AWS::StackName}-NotificationTopic'
+
+  DailyBackupPlanId:
+    Description: Daily backup plan ID
+    Value: !Ref DailyBackupPlan
+
+  WeeklyBackupPlanId:
+    Description: Weekly backup plan ID
+    Value: !Ref WeeklyBackupPlan
+
+  MonthlyBackupPlanId:
+    Description: Monthly backup plan ID
+    Value: !Ref MonthlyBackupPlan

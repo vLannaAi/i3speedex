@@ -1,0 +1,3 @@
+{
+  "body": "{\"html\":\"<!DOCTYPE html><html><head><meta charset='UTF-8'><title>S3 Upload Test</title></head><body><h1>S3 Upload Test</h1><p>This PDF should be uploaded to S3 bucket.</p></body></html>\",\"options\":{\"format\":\"A4\"},\"outputFormat\":\"s3\"}"
+}

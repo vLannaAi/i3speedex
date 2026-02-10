@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sale Module API - Demo & Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: #555;
+            margin: 20px 0 10px 0;
+            font-size: 1.2em;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .login-section {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+
+        .login-form {
+            flex: 1;
+        }
+
+        .user-info {
+            flex: 1;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            background: #667eea;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #5568d3;
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .api-section {
+            margin-top: 20px;
+        }
+
+        .api-endpoint {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 6px;
+            border-left: 4px solid #667eea;
+        }
+
+        .api-endpoint h4 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .method {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .method.get {
+            background: #28a745;
+            color: white;
+        }
+
+        .method.post {
+            background: #007bff;
+            color: white;
+        }
+
+        .method.put {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .method.delete {
+            background: #dc3545;
+            color: white;
+        }
+
+        .endpoint-path {
+            font-family: 'Courier New', monospace;
+            background: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 13px;
+        }
+
+        .response-area {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            margin-top: 10px;
+        }
+
+        .status {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            margin-top: 10px;
+            display: inline-block;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .credentials {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 6px;
+            border: 2px solid #ffc107;
+            margin-bottom: 20px;
+        }
+
+        .credentials h3 {
+            color: #856404;
+            margin-top: 0;
+        }
+
+        .credentials code {
+            background: #fff;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .token-info {
+            background: #e9ecef;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-size: 12px;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>🚀 Sale Module API</h1>
+            <p class="subtitle">Interactive API Demo & Documentation</p>
+
+            <div class="credentials">
+                <h3>📝 Demo Credentials</h3>
+                <p>Use these credentials to test the API:</p>
+                <p><strong>Username:</strong> <code>vicio</code></p>
+                <p><strong>Password:</strong> <code>Password@1234</code></p>
+            </div>
+
+            <h2>🔐 Authentication</h2>
+            <div class="login-section">
+                <div class="login-form">
+                    <form id="loginForm">
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <input type="text" id="username" value="vicio" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" id="password" value="Password@1234" required>
+                        </div>
+                        <button type="submit">Login</button>
+                        <span id="loginLoading" class="loading hidden"></span>
+                    </form>
+                    <div id="loginStatus"></div>
+                </div>
+
+                <div class="user-info hidden" id="userInfo">
+                    <h3>✅ Authenticated</h3>
+                    <p><strong>User:</strong> <span id="currentUser"></span></p>
+                    <p><strong>Email:</strong> <span id="currentEmail"></span></p>
+                    <div class="token-info">
+                        <strong>Token:</strong> <span id="tokenPreview"></span>
+                    </div>
+                    <button onclick="logout()" style="margin-top: 10px;">Logout</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card hidden" id="apiSection">
+            <h2>🌐 API Endpoints</h2>
+            <p class="subtitle">Base URL: <code>https://app.speedex.it/api</code></p>
+
+            <div class="api-section">
+                <h3>Sales Management</h3>
+
+                <div class="api-endpoint">
+                    <h4>
+                        <span class="method get">GET</span>
+                        <span class="endpoint-path">/api/sales</span>
+                    </h4>
+                    <p>Get all sales records</p>
+                    <button onclick="callAPI('GET', '/api/sales')">Test Endpoint</button>
+                </div>
+
+                <div class="api-endpoint">
+                    <h4>
+                        <span class="method get">GET</span>
+                        <span class="endpoint-path">/api/sales/{id}</span>
+                    </h4>
+                    <p>Get a specific sale by ID</p>
+                    <input type="text" id="saleId" placeholder="Enter sale ID" style="margin: 10px 0;">
+                    <button onclick="callAPI('GET', '/api/sales/' + document.getElementById('saleId').value)">Test Endpoint</button>
+                </div>
+
+                <div class="api-endpoint">
+                    <h4>
+                        <span class="method post">POST</span>
+                        <span class="endpoint-path">/api/sales</span>
+                    </h4>
+                    <p>Create a new sale</p>
+                    <textarea id="saleData" style="width: 100%; height: 100px; margin: 10px 0; padding: 10px; border: 2px solid #e9ecef; border-radius: 6px; font-family: 'Courier New', monospace;">{
+  "buyerId": "BUYER001",
+  "producerId": "PROD001",
+  "totalAmount": 1500.00,
+  "items": [
+    {
+      "description": "Product A",
+      "quantity": 10,
+      "unitPrice": 150.00
+    }
+  ]
+}</textarea>
+                    <button onclick="callAPI('POST', '/api/sales', document.getElementById('saleData').value)">Test Endpoint</button>
+                </div>
+
+                <h3>Buyers Management</h3>
+
+                <div class="api-endpoint">
+                    <h4>
+                        <span class="method get">GET</span>
+                        <span class="endpoint-path">/api/buyers</span>
+                    </h4>
+                    <p>Get all buyers</p>
+                    <button onclick="callAPI('GET', '/api/buyers')">Test Endpoint</button>
+                </div>
+
+                <div class="api-endpoint">
+                    <h4>
+                        <span class="method post">POST</span>
+                        <span class="endpoint-path">/api/buyers</span>
+                    </h4>
+                    <p>Create a new buyer</p>
+                    <textarea id="buyerData" style="width: 100%; height: 80px; margin: 10px 0; padding: 10px; border: 2px solid #e9ecef; border-radius: 6px; font-family: 'Courier New', monospace;">{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "phone": "+1234567890"
+}</textarea>
+                    <button onclick="callAPI('POST', '/api/buyers', document.getElementById('buyerData').value)">Test Endpoint</button>
+                </div>
+
+                <h3>Producers Management</h3>
+
+                <div class="api-endpoint">
+                    <h4>
+                        <span class="method get">GET</span>
+                        <span class="endpoint-path">/api/producers</span>
+                    </h4>
+                    <p>Get all producers</p>
+                    <button onclick="callAPI('GET', '/api/producers')">Test Endpoint</button>
+                </div>
+
+                <h3>Dashboard & Reports</h3>
+
+                <div class="api-endpoint">
+                    <h4>
+                        <span class="method get">GET</span>
+                        <span class="endpoint-path">/api/dashboard/stats</span>
+                    </h4>
+                    <p>Get dashboard statistics</p>
+                    <button onclick="callAPI('GET', '/api/dashboard/stats')">Test Endpoint</button>
+                </div>
+            </div>
+
+            <div class="card" style="background: #f8f9fa; margin-top: 20px;">
+                <h3>📊 API Response</h3>
+                <div id="responseStatus"></div>
+                <div class="response-area" id="responseArea">No request made yet. Click any "Test Endpoint" button above to see the response.</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>📚 API Documentation</h2>
+
+            <h3>Authentication</h3>
+            <p>All API requests require authentication using AWS Cognito. The authentication flow:</p>
+            <ol>
+                <li>Login with username and password</li>
+                <li>Receive JWT tokens (ID Token, Access Token, Refresh Token)</li>
+                <li>Include the ID Token in the <code>Authorization</code> header for all API requests</li>
+                <li>Token format: <code>Authorization: Bearer &lt;ID_TOKEN&gt;</code></li>
+            </ol>
+
+            <h3>Base URL</h3>
+            <p><code>https://app.speedex.it/api</code></p>
+
+            <h3>Available Endpoints</h3>
+            <ul>
+                <li><strong>Sales:</strong> GET/POST /api/sales, GET/PUT/DELETE /api/sales/{id}</li>
+                <li><strong>Buyers:</strong> GET/POST /api/buyers, GET/PUT/DELETE /api/buyers/{id}</li>
+                <li><strong>Producers:</strong> GET/POST /api/producers, GET/PUT/DELETE /api/producers/{id}</li>
+                <li><strong>Invoices:</strong> POST /api/invoices, GET /api/invoices/{id}</li>
+                <li><strong>Attachments:</strong> POST /api/attachments/upload, GET /api/attachments/{id}</li>
+                <li><strong>Dashboard:</strong> GET /api/dashboard/stats</li>
+                <li><strong>Reports:</strong> GET /api/reports/sales, GET /api/reports/buyers</li>
+            </ul>
+
+            <h3>Response Format</h3>
+            <p>All responses are in JSON format with the following structure:</p>
+            <pre style="background: #f8f9fa; padding: 15px; border-radius: 6px; overflow-x: auto;">{
+  "statusCode": 200,
+  "body": {
+    "data": [...],
+    "message": "Success"
+  }
+}</pre>
+
+            <h3>Error Handling</h3>
+            <ul>
+                <li><strong>400:</strong> Bad Request - Invalid input data</li>
+                <li><strong>401:</strong> Unauthorized - Missing or invalid authentication token</li>
+                <li><strong>403:</strong> Forbidden - Insufficient permissions</li>
+                <li><strong>404:</strong> Not Found - Resource doesn't exist</li>
+                <li><strong>500:</strong> Internal Server Error - Server-side error</li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@6.3.7/dist/amazon-cognito-identity.min.js"></script>
+    <script>
+        // Cognito Configuration
+        const poolData = {
+            UserPoolId: 'us-east-1_BXA8AaNt5',
+            ClientId: '2vgogh2jvr7nlk2sdho6qljaau'
+        };
+
+        const userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
+        let currentSession = null;
+
+        // Login Form Handler
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const loginLoading = document.getElementById('loginLoading');
+            const loginStatus = document.getElementById('loginStatus');
+
+            loginLoading.classList.remove('hidden');
+            loginStatus.innerHTML = '';
+
+            const authenticationData = {
+                Username: username,
+                Password: password,
+            };
+
+            const authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails(authenticationData);
+
+            const userData = {
+                Username: username,
+                Pool: userPool
+            };
+
+            const cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
+
+            cognitoUser.authenticateUser(authenticationDetails, {
+                onSuccess: function(result) {
+                    currentSession = result;
+                    loginLoading.classList.add('hidden');
+
+                    const idToken = result.getIdToken().getJwtToken();
+                    const payload = result.getIdToken().payload;
+
+                    loginStatus.innerHTML = '<div class="status success">✅ Login successful!</div>';
+
+                    document.getElementById('currentUser').textContent = payload['cognito:username'];
+                    document.getElementById('currentEmail').textContent = payload.email || 'N/A';
+                    document.getElementById('tokenPreview').textContent = idToken.substring(0, 50) + '...';
+
+                    document.getElementById('userInfo').classList.remove('hidden');
+                    document.getElementById('apiSection').classList.remove('hidden');
+                },
+                onFailure: function(err) {
+                    loginLoading.classList.add('hidden');
+                    loginStatus.innerHTML = `<div class="status error">❌ Login failed: ${err.message}</div>`;
+                }
+            });
+        });
+
+        function logout() {
+            const cognitoUser = userPool.getCurrentUser();
+            if (cognitoUser) {
+                cognitoUser.signOut();
+            }
+            currentSession = null;
+            document.getElementById('userInfo').classList.add('hidden');
+            document.getElementById('apiSection').classList.add('hidden');
+            document.getElementById('loginStatus').innerHTML = '<div class="status info">Logged out successfully</div>';
+        }
+
+        async function callAPI(method, path, body = null) {
+            if (!currentSession) {
+                alert('Please login first!');
+                return;
+            }
+
+            const responseArea = document.getElementById('responseArea');
+            const responseStatus = document.getElementById('responseStatus');
+
+            responseArea.textContent = 'Loading...';
+            responseStatus.innerHTML = '';
+
+            const idToken = currentSession.getIdToken().getJwtToken();
+            const url = `https://app.speedex.it${path}`;
+
+            const options = {
+                method: method,
+                headers: {
+                    'Authorization': idToken,
+                    'Content-Type': 'application/json'
+                }
+            };
+
+            if (body && (method === 'POST' || method === 'PUT')) {
+                try {
+                    options.body = typeof body === 'string' ? body : JSON.stringify(body);
+                } catch (e) {
+                    responseArea.textContent = 'Error: Invalid JSON in request body';
+                    responseStatus.innerHTML = '<div class="status error">❌ Invalid JSON</div>';
+                    return;
+                }
+            }
+
+            try {
+                const startTime = Date.now();
+                const response = await fetch(url, options);
+                const endTime = Date.now();
+                const duration = endTime - startTime;
+
+                const contentType = response.headers.get('content-type');
+                let data;
+
+                if (contentType && contentType.includes('application/json')) {
+                    data = await response.json();
+                } else {
+                    data = await response.text();
+                }
+
+                const statusClass = response.ok ? 'success' : 'error';
+                responseStatus.innerHTML = `<div class="status ${statusClass}">
+                    Status: ${response.status} ${response.statusText} | Duration: ${duration}ms
+                </div>`;
+
+                responseArea.textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+            } catch (error) {
+                responseStatus.innerHTML = '<div class="status error">❌ Request Failed</div>';
+                responseArea.textContent = `Error: ${error.message}\n\nPlease check:\n- Network connection\n- API endpoint is correct\n- CORS is configured properly`;
+            }
+        }
+
+        // Auto-login if user is already authenticated
+        window.addEventListener('load', () => {
+            const cognitoUser = userPool.getCurrentUser();
+
+            if (cognitoUser != null) {
+                cognitoUser.getSession((err, session) => {
+                    if (err) {
+                        return;
+                    }
+
+                    if (session.isValid()) {
+                        currentSession = session;
+                        const payload = session.getIdToken().payload;
+                        const idToken = session.getIdToken().getJwtToken();
+
+                        document.getElementById('currentUser').textContent = payload['cognito:username'];
+                        document.getElementById('currentEmail').textContent = payload.email || 'N/A';
+                        document.getElementById('tokenPreview').textContent = idToken.substring(0, 50) + '...';
+
+                        document.getElementById('userInfo').classList.remove('hidden');
+                        document.getElementById('apiSection').classList.remove('hidden');
+                        document.getElementById('loginStatus').innerHTML = '<div class="status success">✅ Already logged in</div>';
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

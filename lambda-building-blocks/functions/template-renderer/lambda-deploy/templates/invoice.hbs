@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <title>{{t 'fattura'}} T{{sale.number}}/{{sale.year}}</title>
+  <style type="text/css">
+    html, body { font-size: {{default sale.font_base 12}}.0px; }
+    /*<![CDATA[*/
+    @page { size: 21.0cm 29.7cm; margin: 0.50in 0.50in 0.20in 0.50in; }
+
+    td { font-size: 0.8em; font-family: 'TrebuchetMS'; }
+    th { font-size: 0.8em; font-family: 'TrebuchetMS'; }
+    div { font-size: 0.8em; font-family: 'TrebuchetMS'; }
+
+    td.logo { text-align: center }
+    td.label { font-size: 1.1em; color: #BB0231; text-align: right; vertical-align: bottom }
+    td.label.small { font-size: 1.0em; }
+    td.label.emessa { font-size: 1.1em; width: 90px; padding-top: 20px; }
+    td.label.empty { font-size: 1.1em; width: 160px }
+    td.label.dict { font-size: 1.1em; width: 140px }
+    td.label.doc { font-size: 1.2em; width: 140px; }
+    span.account { font-size: 1.3em; font-weight: bold; }
+    span.highlight { font-size: 1.3em; font-weight: bold; }
+
+    div.subject { font-size: 1.2em; padding: 0px 0px 5px 28px; color: #444 }
+
+    td.field { font-size: 1.1em; vertical-align: bottom }
+    td.field.emessa { font-size: 1.1em; vertical-align: bottom; width: 600px; font-weight: bold; }
+    td.field.emessa span { font-size: 1.4em; vertical-align: bottom; padding-bottom: -2px; }
+    td.field.small { font-size: 1.0em; vertical-align: bottom }
+    td.field.big { font-size: 1.7em; vertical-align: bottom; text-align: left; font-weight: bold; padding-bottom: -0.4rem; }
+    td.value { font-size: 1.1em; vertical-align: top; text-align: right; }
+
+    td.barcode { text-align: right; margin: 0.0px 0.0px 0.0px 0.0px; }
+    barcode { display: foreign; }
+
+    div.header { region: top; height: 15px; font-size: 0.8em; text-align: center; color: #BB0231; width: 100%; white-space: nowrap; }
+    table.header { border-bottom: solid 1px #BB0231; table-layout: fixed; width: 100%; white-space: nowrap; }
+    td.left { text-align: left; padding-left: 1px; }
+    td.right { text-align: right; padding-right: 1px; }
+
+    div.footer { region: bottom; height: 0.35in; font-size: 0.8em; text-align: justify; color: #777; margin-top: 10px; }
+    table.footer { border-top: solid 1px #777 }
+    table.footer td.left { width: 430px; padding-top: 2px; }
+    table.footer td.right { padding-top: 2px; }
+
+    table.provvigione { width: 100%; margin-top: 20px }
+    table.provvigione td.label { font-size: 1.0em; vertical-align: top; padding-bottom: 0.4em; width: 90px }
+    table.provvigione td.field { font-size: 1.0em; vertical-align: top; padding-bottom: 0.4em; }
+
+    td.label.tot { border-top: 1px solid #000000; padding: 4px 0px 20px 0px; font-size: 1.2em; color: #BB0231; text-align: right; vertical-align: bottom }
+    td.value_tot { border-top: 1px solid #000000; padding: 4px 0px 20px 0px; vertical-align: top; font-size: 1.2em; vertical-align: top; text-align: right; }
+    td.cur_tot { border-top: 1px solid #000000; padding: 4px 0px 20px 0px; vertical-align: top; font-size: 1.2em; vertical-align: top; text-align: left; color: #777777; }
+
+    div.footer span.page:before { content: counter(page, decimal); }
+    div.footer span.pages:before { content: counter(pages, decimal); }
+    span.page-ref > span:before { content: page-ref(class); }
+
+    div.invoice_list { border-right: 0.5px dotted #777777; border-bottom: 0.5px dotted #777777; table-omit-header-at-break: false; margin-top: 10px; page-break-inside: avoid; page-break-before: auto; }
+
+    table.invoice_list th { background: #BB0231; color: #ffffff; font-size: 1.1em; border-left: 0.5px solid #ffffff; text-align: right; line-height: 10px; padding-top: 4px; padding-bottom: 3px; }
+    table.invoice_list th.description { width: 192px; text-align: left }
+    table.invoice_list th.descr { width: 122px; text-align: left }
+    table.invoice_list th.code { width: 80px; text-align: left }
+    table.invoice_list th.empty { width: 20px; }
+    table.invoice_list th.qty { width: 40px; }
+    table.invoice_list th.price { width: 50px; }
+    table.invoice_list th.price_long { width: 60px; }
+    table.invoice_list th.cost { width: 60px; }
+    table.invoice_list th.discount_perc { width: 30px; }
+    table.invoice_list th.iva_perc { width: 30px; }
+    table.invoice_list th.iva_total { width: 50px; }
+    table.invoice_list th.total { width: 60px; }
+
+    table.invoice_list span.small_price { font-size: 0.8em }
+    table.invoice_list td { font-size: 1.0em; border-left: 0.5px dotted #777777; text-align: right }
+    table.invoice_list td.id { font-size: 0.8em; border-left: 0.5px dotted #777777; text-align: center }
+    table.invoice_list td.buyer { text-align: left }
+
+    table.invoice_list th.semi_total1 { border-top: 2px solid #BB0231; background: #f3f3f3; color: #444444; font-size: 0.9em; font-weight: normal; border-left: none; border-right: none; text-align: right; padding-top: 4px; }
+    table.invoice_list th.semi_total2 { border-top: 1px dotted #777; background: #f3f3f3; color: #444444; font-size: 0.9em; font-weight: normal; border-left: none; border-right: none; text-align: right; padding-top: 4px; }
+    table.invoice_list th.last_col { border-left: 1px dotted #777 }
+    table.invoice_list th.big_total { border-top: 2px solid #000000; border-bottom: 0.5px solid #999999; background: #f0f0f0; color: #000000; font-size: 1.2em; font-weight: bold; border-left: none; border-right: none; text-align: right; padding-top: 4px; }
+    table.invoice_list th.big_eur { border-top: 2px solid #000000; border-bottom: 0.5px solid #999999; background: #f0f0f0; color: #000000; font-size: 1.2em; font-weight: bold; border-left: none; border-right: none; text-align: left; padding-top: 4px; }
+
+    div.invoice_list tr.alt0 { background-color: #f9f9f9; }
+    div.invoice_list tr.alt1 { background-color: #ffffff; }
+    div.invoice_list table.title { width: 100%; margin-top: 40px; margin-bottom: 15px; }
+    div.invoice_list table.title td { text-align: left }
+
+    div.invoice_info { text-align: left; width: 100%; margin-top: 20px }
+    div.invoice_info table { width: 100% }
+
+    div.emessa { text-align: left; margin-top: 2px; }
+    div.emessa table { width: 100% }
+
+    p.head_line { text-align: left; padding-top: 20px; margin: 0px 0px 50px 30px; }
+    img.speedex_logo { display: graphic; src: src; scale: uniform; z }
+    /*]]>*/
+  </style>
+</head>
+<body>
+  <!-- Footer (page numbers) -->
+  <div class="footer">
+    <table class="footer" table-layout="fixed" width="100%" border="0">
+      <tr>
+        <td class="left">{{t 'fattura'}} T{{sale.number}}/{{sale.year}} {{buyer.name}} - {{formatDate sale.reg_date}}</td>
+        <td class="right">{{t 'pag'}} <span class="page"/> {{t 'di'}} <span class="pages"/></td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- Logo -->
+  <div>
+    <table width="100%">
+      <tr>
+        <td class="logo"><img style="speedex_logo" src="../../media/_svg/speedex_red_large.svg" /></td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- Document Info -->
+  <div class="invoice_info">
+    <table cellspacing="6" class="invoice_info">
+      <tr>
+        <td class="label empty" rowspan="4"></td>
+        <td class="label doc">{{t 'documento'}}</td>
+        <td class="field big">
+          {{#if (eq sale.status 'proforma')}}
+            {{t 'fattura_pro_forma'}}
+          {{else if (lt sale.pay_load 0)}}
+            {{t 'nota_di_credito'}}
+          {{else}}
+            {{t 'fattura'}}
+          {{/if}}
+        </td>
+      </tr>
+      <tr>
+        <td class="label">{{t 'numero'}}</td>
+        <td class="field"><span class="highlight">T{{sale.number}}/{{sale.year}}</span></td>
+      </tr>
+      <tr>
+        <td class="label">{{t 'data'}}</td>
+        <td class="field">{{formatDate sale.reg_date}}</td>
+      </tr>
+      <tr>
+        <td class="label">{{t 'transazione'}}</td>
+        <td class="field">D{{sale.full_id}}</td>
+      </tr>
+      {{#if sale.reference}}
+        <tr>
+          <td class="label">{{t 'rif'}}</td>
+          <td class="field">{{sale.reference}}</td>
+        </tr>
+      {{/if}}
+    </table>
+  </div>
+
+  <!-- Speedex Info (Cedente) -->
+  <div class="emessa">
+    <table cellspacing="6">
+      <tr>
+        <td class="label emessa">{{t 'cedente'}}</td>
+        <td class="field emessa"><span>Speedex Srl</span></td>
+      </tr>
+      {{#if (dateBefore sale.reg_date 20190201)}}
+        <tr><td class="label small">{{t 'indirizzo'}}</td><td class="field small">Via Watt, 37</td></tr>
+        <tr><td class="label small"></td><td class="field small">2017 Milano (MI)</td></tr>
+      {{else}}
+        <tr><td class="label small">{{t 'indirizzo'}}</td><td class="field small">Via Lago di Nemi, 25</td></tr>
+        <tr><td class="label small"></td><td class="field small">20142 Milano (MI)</td></tr>
+      {{/if}}
+      <tr><td class="label small"></td><td class="field small">Italia</td></tr>
+      <tr><td class="label small">{{t 'partita_iva'}}</td><td class="field small">IT05056450157</td></tr>
+      <tr><td class="label small">Email</td><td class="field small">info@speedex.it</td></tr>
+      <tr><td class="label small">{{t 'tel'}}</td><td class="field small">+39 02 89121816</td></tr>
+      <tr><td class="label small">Fax</td><td class="field small">+39 02 36504578</td></tr>
+    </table>
+  </div>
+
+  <!-- Buyer Info (Cessionario) -->
+  <div>
+    <table cellspacing="6">
+      <tr>
+        <td class="label empty"></td>
+        <td class="label dict">{{t 'cessionario'}}</td>
+        <td class="field"><span class="account">{{buyer.name}}</span></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td class="label small">{{t 'indirizzo'}}</td>
+        <td class="field small">{{buyer.address}}{{#if buyer.box}} {{buyer.box}}{{/if}}</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td class="label"></td>
+        <td class="field small">{{#if buyer.zip}}{{buyer.zip}} {{/if}}{{#if buyer.city}}{{buyer.city}}{{/if}}{{#if buyer.prov}} ({{buyer.prov}}){{/if}}</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td class="label"></td>
+        <td class="field small">{{getCountryName countries buyer.country}}</td>
+      </tr>
+      {{#if buyer.vat}}
+        <tr>
+          <td></td>
+          <td class="label small">{{t 'partita_iva'}}</td>
+          <td class="field small">{{buyer.vat}}</td>
+        </tr>
+      {{/if}}
+      {{#if buyer.taxid}}
+        <tr>
+          <td></td>
+          <td class="label small">{{t 'codice_fiscale'}}</td>
+          <td class="field small">{{buyer.taxid}}</td>
+        </tr>
+      {{/if}}
+      {{#if sale.email}}
+        <tr>
+          <td></td>
+          <td class="label small">Email</td>
+          <td class="field small">{{sale.email}}</td>
+        </tr>
+      {{/if}}
+      {{#if sale.tel}}
+        <tr>
+          <td></td>
+          <td class="label small">{{t 'tel'}}</td>
+          <td class="field small">{{sale.tel}}</td>
+        </tr>
+      {{/if}}
+      {{#if sale.fax}}
+        <tr>
+          <td></td>
+          <td class="label small">{{t 'fax'}}</td>
+          <td class="field small">{{sale.fax}}</td>
+        </tr>
+      {{/if}}
+    </table>
+  </div>
+
+  <!-- Line Items -->
+  <div class="invoice_list">
+    {{#if sale.buyer_ref}}
+      <div class="subject">{{{nl2br sale.buyer_ref}}}</div>
+    {{/if}}
+
+    <table class="invoice_list" cellpadding="2" cellspacing="2" table-layout="fixed">
+      <thead>
+        <tr>
+          <th class="empty"></th>
+          {{#if (hasCode sale_lines)}}
+            <th class="descr">{{t 'descrizione'}}</th>
+            <th class="code">{{t 'codice'}}</th>
+          {{else}}
+            <th class="description">{{t 'descrizione'}}</th>
+          {{/if}}
+          <th class="qty">{{t 'qty'}}</th>
+          {{#if (hasDiscount sale_lines)}}
+            <th class="price">{{t 'prezzo'}}<br/><span class="small_price">{{sale.currency}}</span></th>
+            <th class="discount_perc">{{t 'sconto'}}<br/><span class="small_price">%</span></th>
+          {{else}}
+            <th class="price_long">{{t 'prezzo'}}<br/><span class="small_price">{{sale.currency}}</span></th>
+          {{/if}}
+          <th class="cost">{{t 'imponibile'}}<br/><span class="small_price">{{sale.currency}}</span></th>
+          <th class="iva_perc">{{t 'iva'}}<br/><span class="small_price">%</span></th>
+          <th class="iva_total">{{t 'iva'}}<br/><span class="small_price">{{sale.currency}}</span></th>
+          <th class="total">{{t 'totale_line'}}<br/><span class="small_price">{{sale.currency}}</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each sale_lines}}
+          <tr class="alt{{mod @index 2}}">
+            <td>{{add @index 1}}</td>
+            {{#if (hasCode ../sale_lines)}}
+              <td class="buyer">{{{nl2br description}}}</td>
+              <td class="buyer">{{code}}</td>
+            {{else}}
+              <td class="buyer">{{{nl2br description}}}</td>
+            {{/if}}
+            <td>{{#if qty}}{{formatQty qty}}{{/if}}</td>
+            {{#if (hasDiscount ../sale_lines)}}
+              <td>{{#if price}}{{formatFlexValue price}}{{/if}}</td>
+              <td>{{#if discount}}{{formatVAT discount}}{{/if}}</td>
+            {{else}}
+              <td>{{#if price}}{{formatFlexValue price}}{{/if}}</td>
+            {{/if}}
+            <td>{{formatValue (calcCost price qty discount)}}</td>
+            <td>{{formatVAT vat}}%</td>
+            <td>{{#if price}}{{formatValue (calcVATAmount price qty discount vat)}}{{/if}}</td>
+            <td>{{formatValue (calcLineTotal price qty discount vat)}}</td>
+          </tr>
+        {{/each}}
+
+        {{#if sale.stamp}}
+          <tr class="alt{{mod (add (length sale_lines) 1) 2}}">
+            <td>{{add (length sale_lines) 1}}</td>
+            {{#if (hasCode sale_lines)}}
+              <td class="buyer">{{t 'marca_da_bollo'}}</td>
+              <td class="buyer"></td>
+            {{else}}
+              <td class="buyer">{{t 'marca_da_bollo'}}</td>
+            {{/if}}
+            <td>1</td>
+            {{#if (hasDiscount sale_lines)}}
+              <td>{{formatValue 2}}</td>
+              <td></td>
+            {{else}}
+              <td>{{formatValue 2}}</td>
+            {{/if}}
+            <td>{{formatValue 2}}</td>
+            <td>{{formatVAT 0}}%</td>
+            <td>{{formatValue 0}}</td>
+            <td>{{formatValue 2}}</td>
+          </tr>
+        {{/if}}
+
+        <!-- Totals -->
+        <tr>
+          <th class="semi_total1" colspan="{{colSpan sale_lines}}">{{t 'totale_imponibile'}} {{sale.currency}} {{formatValue sale.eur_amount}}</th>
+          <th class="semi_total1 last_col" colspan="3"></th>
+        </tr>
+        <tr>
+          <th class="semi_total2" colspan="{{add (colSpan sale_lines) 2}}">{{t 'totale_iva'}} {{sale.currency}} {{formatValue sale.vat}}</th>
+          <th class="semi_total2 last_col"></th>
+        </tr>
+        {{#if (eq buyer.vatoff 'split')}}
+          <tr>
+            <th class="semi_total1" colspan="{{add (colSpan sale_lines) 3}}">{{t 'totale_fattura'}}  {{formatValue sale.to_pay}} {{sale.currency}}</th>
+          </tr>
+          <tr>
+            <th class="semi_total2" colspan="{{add (colSpan sale_lines) 3}}">{{t 'split_payment'}}  {{formatValue (negate sale.vat)}} {{sale.currency}}</th>
+          </tr>
+        {{/if}}
+        <tr>
+          <th class="big_total" colspan="{{add (colSpan sale_lines) 3}}">{{t 'totale_da_pagare'}}  {{formatValue sale.pay_load}} {{sale.currency}}</th>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Additional Info -->
+  <div>
+    <table cellspacing="6" class="provvigione">
+      {{#if (eq sale.vat_off 'novat')}}
+        <tr>
+          <td class="label">Annotazioni IVA</td>
+          <td class="field">{{t 'vat_off_N31'}}</td>
+        </tr>
+      {{/if}}
+
+      {{#if sale.package}}
+        <tr>
+          <td class="label">{{t 'imballo'}}</td>
+          <td class="field">{{{nl2br sale.package}}}</td>
+        </tr>
+      {{/if}}
+
+      {{#if sale.delivery}}
+        <tr>
+          <td class="label">{{t 'shipping'}}</td>
+          <td class="field">{{{nl2br sale.delivery}}}</td>
+        </tr>
+      {{/if}}
+
+      <!-- Payment Methods -->
+      {{#if (eq sale.payment 'MP12')}}
+        <tr>
+          <td class="label">{{t 'pagamento'}}</td>
+          <td class="field">{{t sale.payment}}<br/>{{{nl2br sale.payment_note}}}</td>
+        </tr>
+        <tr>
+          <td class="label">{{t 'scadenza'}}</td>
+          <td class="field">{{formatDate sale.payment_date}}</td>
+        </tr>
+        <tr>
+          <td class="label">{{t 'banca'}}</td>
+          <td class="field">{{sale.payment_bank}}</td>
+        </tr>
+        <tr>
+          <td class="label">IBAN</td>
+          <td class="field">{{sale.payment_bank_iban}}</td>
+        </tr>
+      {{else if (eq sale.payment 'MP05R')}}
+        <tr>
+          <td class="label">{{t 'pagamento'}}</td>
+          <td class="field">{{t sale.payment}}<br/>{{{nl2br sale.payment_note}}}</td>
+        </tr>
+        <tr>
+          <td class="label">{{t 'scadenza'}}</td>
+          <td class="field">{{formatDate sale.payment_date}}</td>
+        </tr>
+        <tr>
+          <td class="label">{{t 'banca'}}</td>
+          <td class="field">{{sale.payment_bank}}</td>
+        </tr>
+        <tr>
+          <td class="label">IBAN</td>
+          <td class="field">{{sale.payment_bank_iban}}</td>
+        </tr>
+      {{else if sale.bank_id}}
+        <tr>
+          <td class="label">{{t 'pagamento'}}</td>
+          <td class="field">{{t 'tramite_bonifico'}}<br/>{{{nl2br sale.payment_note}}}</td>
+        </tr>
+        {{#if sale.payment_date}}
+          <tr>
+            <td class="label">{{t 'scadenza'}}</td>
+            <td class="field">{{formatDate sale.payment_date}}</td>
+          </tr>
+        {{/if}}
+        {{#with (getBank banks sale.bank_id)}}
+          <tr>
+            <td class="label">{{t 'banca'}}</td>
+            <td class="field">{{name}}{{#if branch_address}}, {{branch_address}}{{/if}}</td>
+          </tr>
+          {{#if swift}}
+            <tr>
+              <td class="label">SWIFT</td>
+              <td class="field">{{swift}}</td>
+            </tr>
+          {{/if}}
+          <tr>
+            <td class="label">IBAN</td>
+            <td class="field">{{iban}}</td>
+          </tr>
+        {{/with}}
+      {{/if}}
+
+      {{#if sale.sale_note}}
+        <tr>
+          <td class="label">{{t 'note'}}</td>
+          <td class="field">{{{nl2br sale.sale_note}}}</td>
+        </tr>
+      {{/if}}
+    </table>
+  </div>
+</body>
+</html>

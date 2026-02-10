@@ -1,0 +1,105 @@
+{
+  "environment": "dev",
+  "region": "us-east-1",
+  "accountId": "123456789012",
+  "projectName": "sale-module-api",
+
+  "dynamodb": {
+    "salesTable": "SalesTable-dev",
+    "buyersTable": "BuyersTable-dev",
+    "producersTable": "ProducersTable-dev",
+    "billingMode": "PAY_PER_REQUEST",
+    "pointInTimeRecovery": false,
+    "deletionProtection": false
+  },
+
+  "s3": {
+    "attachmentsBucket": "sale-module-attachments-dev",
+    "invoicesBucket": "sale-module-invoices-dev",
+    "versioning": false,
+    "lifecycleRules": {
+      "attachments": {
+        "transitionToIA": 90,
+        "transitionToGlacier": 180,
+        "expiration": 365
+      },
+      "invoices": {
+        "transitionToIA": 30,
+        "transitionToGlacier": 90,
+        "expiration": 2555
+      }
+    }
+  },
+
+  "cognito": {
+    "userPoolName": "SaleModuleUsers-dev",
+    "userPoolClientName": "SaleModuleClient-dev",
+    "mfaConfiguration": "OPTIONAL",
+    "passwordPolicy": {
+      "minimumLength": 8,
+      "requireUppercase": true,
+      "requireLowercase": true,
+      "requireNumbers": true,
+      "requireSymbols": false
+    }
+  },
+
+  "lambda": {
+    "runtime": "nodejs18.x",
+    "timeout": 30,
+    "memorySize": 512,
+    "environment": {
+      "ENVIRONMENT": "dev",
+      "LOG_LEVEL": "debug",
+      "ENABLE_XRAY": "false"
+    }
+  },
+
+  "apiGateway": {
+    "stageName": "dev",
+    "throttling": {
+      "burstLimit": 100,
+      "rateLimit": 50
+    },
+    "logging": {
+      "level": "INFO",
+      "dataTrace": true
+    },
+    "customDomain": {
+      "enabled": false,
+      "domainName": "",
+      "certificateArn": ""
+    }
+  },
+
+  "cloudfront": {
+    "enabled": false,
+    "priceClass": "PriceClass_100",
+    "waf": {
+      "enabled": false
+    }
+  },
+
+  "backup": {
+    "enabled": false,
+    "pitr": false,
+    "s3Versioning": false
+  },
+
+  "monitoring": {
+    "enableDetailedMetrics": true,
+    "alarmEmail": "dev-team@i2speedex.com",
+    "alarms": {
+      "lambdaErrors": true,
+      "apiGateway5xx": true,
+      "dynamodbThrottling": true
+    }
+  },
+
+  "tags": {
+    "Environment": "dev",
+    "Project": "SaleModule",
+    "ManagedBy": "CloudFormation",
+    "CostCenter": "Engineering"
+  }
+}

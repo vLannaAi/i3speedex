@@ -1,0 +1,143 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://i2speedex.com/schemas/buyer.json",
+  "title": "Buyer",
+  "description": "Buyer (Comprador) entity schema for DynamoDB",
+  "type": "object",
+  "required": [
+    "PK",
+    "SK",
+    "EntityType",
+    "BuyerId",
+    "Name",
+    "Document",
+    "Status"
+  ],
+  "properties": {
+    "PK": {
+      "type": "string",
+      "pattern": "^BUYER#[A-Z0-9]+$"
+    },
+    "SK": {
+      "type": "string",
+      "const": "#METADATA#buyer"
+    },
+    "EntityType": {
+      "type": "string",
+      "const": "Buyer"
+    },
+    "BuyerId": {
+      "type": "string",
+      "pattern": "^BUYER[0-9]{3,}$"
+    },
+    "Name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "TradeName": {
+      "type": "string",
+      "maxLength": 200
+    },
+    "Document": {
+      "type": "string",
+      "description": "CNPJ or CPF"
+    },
+    "DocumentType": {
+      "type": "string",
+      "enum": ["CNPJ", "CPF"]
+    },
+    "Email": {
+      "type": "string",
+      "format": "email"
+    },
+    "Phone": {
+      "type": "string"
+    },
+    "Mobile": {
+      "type": "string"
+    },
+    "Address": {
+      "type": "object",
+      "required": ["Street", "City", "State", "PostalCode", "Country"],
+      "properties": {
+        "Street": { "type": "string" },
+        "Number": { "type": "string" },
+        "Complement": { "type": "string" },
+        "Neighborhood": { "type": "string" },
+        "City": { "type": "string" },
+        "State": { "type": "string", "pattern": "^[A-Z]{2}$" },
+        "PostalCode": { "type": "string" },
+        "Country": { "type": "string", "pattern": "^[A-Z]{2}$" }
+      }
+    },
+    "BillingAddress": {
+      "type": "object",
+      "properties": {
+        "Street": { "type": "string" },
+        "Number": { "type": "string" },
+        "Complement": { "type": "string" },
+        "Neighborhood": { "type": "string" },
+        "City": { "type": "string" },
+        "State": { "type": "string", "pattern": "^[A-Z]{2}$" },
+        "PostalCode": { "type": "string" },
+        "Country": { "type": "string", "pattern": "^[A-Z]{2}$" }
+      }
+    },
+    "Status": {
+      "type": "string",
+      "enum": ["ACTIVE", "INACTIVE", "BLOCKED", "SUSPENDED"]
+    },
+    "CreditLimit": {
+      "type": "number",
+      "minimum": 0
+    },
+    "PaymentTerms": {
+      "type": "string",
+      "enum": ["CASH", "15_DAYS", "30_DAYS", "45_DAYS", "60_DAYS", "90_DAYS"]
+    },
+    "ContactPerson": {
+      "type": "string"
+    },
+    "ContactEmail": {
+      "type": "string",
+      "format": "email"
+    },
+    "ContactPhone": {
+      "type": "string"
+    },
+    "TaxId": {
+      "type": "string"
+    },
+    "StateRegistration": {
+      "type": "string"
+    },
+    "Notes": {
+      "type": "string",
+      "maxLength": 1000
+    },
+    "CreatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "CreatedBy": {
+      "type": "string"
+    },
+    "UpdatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "UpdatedBy": {
+      "type": "string"
+    },
+    "GSI1PK": {
+      "type": "string",
+      "const": "BUYERS"
+    },
+    "GSI1SK": {
+      "type": "string",
+      "pattern": "^BUYER#"
+    }
+  },
+  "additionalProperties": false
+}

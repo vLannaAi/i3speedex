@@ -1,0 +1,559 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudFront CDN Distribution for Sale Module API
+
+Parameters:
+  Environment:
+    Type: String
+    Default: production
+    AllowedValues:
+      - dev
+      - staging
+      - production
+    Description: Environment name
+
+  ApiGatewayDomainName:
+    Type: String
+    Description: API Gateway domain name (e.g., abc123.execute-api.us-east-1.amazonaws.com)
+
+  ApiGatewayStage:
+    Type: String
+    Default: prod
+    Description: API Gateway stage name
+
+  AttachmentsBucketName:
+    Type: String
+    Description: S3 bucket for attachments
+
+  InvoicesBucketName:
+    Type: String
+    Description: S3 bucket for invoices
+
+  ACMCertificateArn:
+    Type: String
+    Description: ACM certificate ARN for custom domain (must be in us-east-1)
+    Default: ''
+
+  CustomDomainName:
+    Type: String
+    Description: Custom domain name (e.g., api.sale-module.i2speedex.com)
+    Default: ''
+
+  EnableWAF:
+    Type: String
+    Default: 'false'
+    AllowedValues:
+      - 'true'
+      - 'false'
+    Description: Enable AWS WAF
+
+  PriceClass:
+    Type: String
+    Default: PriceClass_100
+    AllowedValues:
+      - PriceClass_100  # US, Canada, Europe
+      - PriceClass_200  # US, Canada, Europe, Asia, Middle East, Africa
+      - PriceClass_All  # All edge locations
+    Description: CloudFront price class
+
+Conditions:
+  HasCustomDomain: !Not [!Equals [!Ref CustomDomainName, '']]
+  HasACMCertificate: !Not [!Equals [!Ref ACMCertificateArn, '']]
+  EnableWAFCondition: !Equals [!Ref EnableWAF, 'true']
+  IsProduction: !Equals [!Ref Environment, 'production']
+
+Resources:
+  # CloudFront Origin Access Identity for S3
+  CloudFrontOAI:
+    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: !Sub 'OAI for Sale Module ${Environment}'
+
+  # S3 Bucket Policies
+  AttachmentsBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref AttachmentsBucketName
+      PolicyDocument:
+        Statement:
+          - Sid: CloudFrontOAIAccess
+            Effect: Allow
+            Principal:
+              CanonicalUser: !GetAtt CloudFrontOAI.S3CanonicalUserId
+            Action: 's3:GetObject'
+            Resource: !Sub 'arn:aws:s3:::${AttachmentsBucketName}/*'
+
+  InvoicesBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref InvoicesBucketName
+      PolicyDocument:
+        Statement:
+          - Sid: CloudFrontOAIAccess
+            Effect: Allow
+            Principal:
+              CanonicalUser: !GetAtt CloudFrontOAI.S3CanonicalUserId
+            Action: 's3:GetObject'
+            Resource: !Sub 'arn:aws:s3:::${InvoicesBucketName}/*'
+
+  # Cache Policies
+  ApiCachePolicy:
+    Type: AWS::CloudFront::CachePolicy
+    Properties:
+      CachePolicyConfig:
+        Name: !Sub 'SaleModuleApiCachePolicy-${Environment}'
+        Comment: Cache policy for API endpoints
+        DefaultTTL: 0
+        MaxTTL: 0
+        MinTTL: 0
+        ParametersInCacheKeyAndForwardedToOrigin:
+          EnableAcceptEncodingGzip: false
+          EnableAcceptEncodingBrotli: false
+          CookiesConfig:
+            CookieBehavior: none
+          HeadersConfig:
+            HeaderBehavior: none
+          QueryStringsConfig:
+            QueryStringBehavior: none
+
+  StaticAssetsCachePolicy:
+    Type: AWS::CloudFront::CachePolicy
+    Properties:
+      CachePolicyConfig:
+        Name: !Sub 'SaleModuleStaticCachePolicy-${Environment}'
+        Comment: Cache policy for static assets (attachments, invoices)
+        DefaultTTL: 86400  # 1 day
+        MaxTTL: 31536000   # 1 year
+        MinTTL: 0
+        ParametersInCacheKeyAndForwardedToOrigin:
+          EnableAcceptEncodingGzip: true
+          EnableAcceptEncodingBrotli: true
+          CookiesConfig:
+            CookieBehavior: none
+          HeadersConfig:
+            HeaderBehavior: none
+          QueryStringsConfig:
+            QueryStringBehavior: none
+
+  # Origin Request Policy
+  ApiOriginRequestPolicy:
+    Type: AWS::CloudFront::OriginRequestPolicy
+    Properties:
+      OriginRequestPolicyConfig:
+        Name: !Sub 'SaleModuleApiOriginPolicy-${Environment}'
+        Comment: Origin request policy for API endpoints
+        CookiesConfig:
+          CookieBehavior: none
+        HeadersConfig:
+          HeaderBehavior: whitelist
+          Headers:
+            - Accept
+            - Content-Type
+            - Referer
+        QueryStringsConfig:
+          QueryStringBehavior: all
+
+  # Response Headers Policy
+  SecurityHeadersPolicy:
+    Type: AWS::CloudFront::ResponseHeadersPolicy
+    Properties:
+      ResponseHeadersPolicyConfig:
+        Name: !Sub 'SaleModuleSecurityHeaders-${Environment}'
+        Comment: Security headers for Sale Module API
+        SecurityHeadersConfig:
+          StrictTransportSecurity:
+            AccessControlMaxAgeSec: 63072000
+            IncludeSubdomains: true
+            Override: true
+          ContentTypeOptions:
+            Override: true
+          FrameOptions:
+            FrameOption: DENY
+            Override: true
+          XSSProtection:
+            ModeBlock: true
+            Protection: true
+            Override: true
+          ReferrerPolicy:
+            ReferrerPolicy: strict-origin-when-cross-origin
+            Override: true
+        CorsConfig:
+          AccessControlAllowOrigins:
+            Items:
+              - '*'  # Adjust based on your requirements
+          AccessControlAllowMethods:
+            Items:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+          AccessControlAllowHeaders:
+            Items:
+              - '*'
+          AccessControlAllowCredentials: false
+          OriginOverride: true
+
+  # CloudFront Distribution
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Comment: !Sub 'Sale Module API CDN - ${Environment}'
+        Enabled: true
+        HttpVersion: http2and3
+        IPV6Enabled: true
+        PriceClass: !Ref PriceClass
+
+        # Custom Domain
+        Aliases:
+          !If
+            - HasCustomDomain
+            - [!Ref CustomDomainName]
+            - !Ref AWS::NoValue
+
+        ViewerCertificate:
+          !If
+            - HasACMCertificate
+            - AcmCertificateArn: !Ref ACMCertificateArn
+              MinimumProtocolVersion: TLSv1.2_2021
+              SslSupportMethod: sni-only
+            - CloudFrontDefaultCertificate: true
+
+        # Origins
+        Origins:
+          # API Gateway Origin
+          - Id: ApiGatewayOrigin
+            DomainName: !Ref ApiGatewayDomainName
+            OriginPath: !Sub '/${ApiGatewayStage}'
+            CustomOriginConfig:
+              HTTPSPort: 443
+              OriginProtocolPolicy: https-only
+              OriginSSLProtocols:
+                - TLSv1.2
+            OriginCustomHeaders:
+              - HeaderName: X-Forwarded-Host
+                HeaderValue: !If [HasCustomDomain, !Ref CustomDomainName, !Ref ApiGatewayDomainName]
+
+          # Attachments S3 Origin
+          - Id: AttachmentsOrigin
+            DomainName: !Sub '${AttachmentsBucketName}.s3.${AWS::Region}.amazonaws.com'
+            S3OriginConfig:
+              OriginAccessIdentity: !Sub 'origin-access-identity/cloudfront/${CloudFrontOAI}'
+
+          # Invoices S3 Origin
+          - Id: InvoicesOrigin
+            DomainName: !Sub '${InvoicesBucketName}.s3.${AWS::Region}.amazonaws.com'
+            S3OriginConfig:
+              OriginAccessIdentity: !Sub 'origin-access-identity/cloudfront/${CloudFrontOAI}'
+
+        # Default Cache Behavior (API) - uses legacy ForwardedValues to forward Authorization header
+        DefaultCacheBehavior:
+          TargetOriginId: ApiGatewayOrigin
+          ViewerProtocolPolicy: redirect-to-https
+          AllowedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+            - PUT
+            - POST
+            - PATCH
+            - DELETE
+          CachedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+          Compress: true
+          ForwardedValues:
+            QueryString: true
+            Headers:
+              - Authorization
+              - Accept
+              - Content-Type
+              - Referer
+          DefaultTTL: 0
+          MinTTL: 0
+          MaxTTL: 0
+          ResponseHeadersPolicyId: !Ref SecurityHeadersPolicy
+
+        # Additional Cache Behaviors
+        CacheBehaviors:
+          # Attachments
+          - PathPattern: '/attachments/*'
+            TargetOriginId: AttachmentsOrigin
+            ViewerProtocolPolicy: redirect-to-https
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+            CachedMethods:
+              - GET
+              - HEAD
+            Compress: true
+            CachePolicyId: !Ref StaticAssetsCachePolicy
+            ResponseHeadersPolicyId: !Ref SecurityHeadersPolicy
+
+          # Invoices
+          - PathPattern: '/invoices/*'
+            TargetOriginId: InvoicesOrigin
+            ViewerProtocolPolicy: redirect-to-https
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+            CachedMethods:
+              - GET
+              - HEAD
+            Compress: true
+            CachePolicyId: !Ref StaticAssetsCachePolicy
+            ResponseHeadersPolicyId: !Ref SecurityHeadersPolicy
+
+        # Custom Error Responses
+        CustomErrorResponses:
+          - ErrorCode: 403
+            ResponseCode: 403
+            ResponsePagePath: /error.html
+            ErrorCachingMinTTL: 300
+          - ErrorCode: 404
+            ResponseCode: 404
+            ResponsePagePath: /error.html
+            ErrorCachingMinTTL: 300
+          - ErrorCode: 500
+            ResponseCode: 500
+            ResponsePagePath: /error.html
+            ErrorCachingMinTTL: 0
+          - ErrorCode: 502
+            ResponseCode: 502
+            ResponsePagePath: /error.html
+            ErrorCachingMinTTL: 0
+          - ErrorCode: 503
+            ResponseCode: 503
+            ResponsePagePath: /error.html
+            ErrorCachingMinTTL: 0
+          - ErrorCode: 504
+            ResponseCode: 504
+            ResponsePagePath: /error.html
+            ErrorCachingMinTTL: 0
+
+        # Logging
+        Logging:
+          Bucket: !GetAtt LogsBucket.DomainName
+          Prefix: !Sub 'cloudfront/${Environment}/'
+          IncludeCookies: false
+
+        # WAF
+        WebACLId: !If
+          - EnableWAFCondition
+          - !GetAtt WAFWebACL.Arn
+          - !Ref AWS::NoValue
+
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Application
+          Value: SaleModule
+        - Key: ManagedBy
+          Value: CloudFormation
+
+  # Logs S3 Bucket
+  LogsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'sale-module-cdn-logs-${Environment}-${AWS::AccountId}'
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      LifecycleConfiguration:
+        Rules:
+          - Id: DeleteOldLogs
+            Status: Enabled
+            ExpirationInDays: 90
+            Transitions:
+              - TransitionInDays: 30
+                StorageClass: STANDARD_IA
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerPreferred
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Application
+          Value: SaleModule
+
+  LogsBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref LogsBucket
+      PolicyDocument:
+        Statement:
+          - Sid: AllowCloudFrontLogs
+            Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action: 's3:PutObject'
+            Resource: !Sub '${LogsBucket.Arn}/*'
+            Condition:
+              StringEquals:
+                'aws:SourceAccount': !Ref AWS::AccountId
+
+  # WAF Web ACL (Optional)
+  WAFWebACL:
+    Type: AWS::WAFv2::WebACL
+    Condition: EnableWAFCondition
+    Properties:
+      Name: !Sub 'SaleModuleWAF-${Environment}'
+      Scope: CLOUDFRONT
+      DefaultAction:
+        Allow: {}
+      Rules:
+        # Rate Limiting
+        - Name: RateLimitRule
+          Priority: 1
+          Statement:
+            RateBasedStatement:
+              Limit: !If [IsProduction, 2000, 10000]
+              AggregateKeyType: IP
+          Action:
+            Block: {}
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: RateLimitRule
+
+        # AWS Managed Rules - Core Rule Set
+        - Name: AWSManagedRulesCommonRuleSet
+          Priority: 2
+          OverrideAction:
+            None: {}
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesCommonRuleSet
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: AWSManagedRulesCommonRuleSet
+
+        # AWS Managed Rules - Known Bad Inputs
+        - Name: AWSManagedRulesKnownBadInputsRuleSet
+          Priority: 3
+          OverrideAction:
+            None: {}
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesKnownBadInputsRuleSet
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: AWSManagedRulesKnownBadInputsRuleSet
+
+        # Block SQL Injection
+        - Name: AWSManagedRulesSQLiRuleSet
+          Priority: 4
+          OverrideAction:
+            None: {}
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesSQLiRuleSet
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: AWSManagedRulesSQLiRuleSet
+
+      VisibilityConfig:
+        SampledRequestsEnabled: true
+        CloudWatchMetricsEnabled: true
+        MetricName: !Sub 'SaleModuleWAF-${Environment}'
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Application
+          Value: SaleModule
+
+  # CloudWatch Alarms
+  CloudFrontErrorRateAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub 'SaleModule-CloudFront-ErrorRate-${Environment}'
+      AlarmDescription: Alert when CloudFront error rate is high
+      MetricName: 5xxErrorRate
+      Namespace: AWS/CloudFront
+      Statistic: Average
+      Period: 300
+      EvaluationPeriods: 2
+      Threshold: 5
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: DistributionId
+          Value: !Ref CloudFrontDistribution
+      TreatMissingData: notBreaching
+
+  CloudFront4xxErrorRateAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub 'SaleModule-CloudFront-4xxErrorRate-${Environment}'
+      AlarmDescription: Alert when CloudFront 4xx error rate is high
+      MetricName: 4xxErrorRate
+      Namespace: AWS/CloudFront
+      Statistic: Average
+      Period: 300
+      EvaluationPeriods: 2
+      Threshold: 25
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: DistributionId
+          Value: !Ref CloudFrontDistribution
+      TreatMissingData: notBreaching
+
+Outputs:
+  DistributionId:
+    Description: CloudFront distribution ID
+    Value: !Ref CloudFrontDistribution
+    Export:
+      Name: !Sub '${AWS::StackName}-DistributionId'
+
+  DistributionDomainName:
+    Description: CloudFront distribution domain name
+    Value: !GetAtt CloudFrontDistribution.DomainName
+    Export:
+      Name: !Sub '${AWS::StackName}-DomainName'
+
+  DistributionURL:
+    Description: CloudFront distribution URL
+    Value: !Sub 'https://${CloudFrontDistribution.DomainName}'
+    Export:
+      Name: !Sub '${AWS::StackName}-URL'
+
+  CustomDomainURL:
+    Condition: HasCustomDomain
+    Description: Custom domain URL
+    Value: !Sub 'https://${CustomDomainName}'
+    Export:
+      Name: !Sub '${AWS::StackName}-CustomURL'
+
+  LogsBucketName:
+    Description: S3 bucket for CloudFront logs
+    Value: !Ref LogsBucket
+    Export:
+      Name: !Sub '${AWS::StackName}-LogsBucket'
+
+  WAFWebACLArn:
+    Condition: EnableWAFCondition
+    Description: WAF Web ACL ARN
+    Value: !GetAtt WAFWebACL.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-WAFArn'
+
+  OAIId:
+    Description: Origin Access Identity ID
+    Value: !Ref CloudFrontOAI
+    Export:
+      Name: !Sub '${AWS::StackName}-OAI'

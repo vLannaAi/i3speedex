@@ -1,0 +1,82 @@
+{
+  "template": "invoice",
+  "language": "en",
+  "data": {
+    "sale": {
+      "id": 2001,
+      "number": 42,
+      "year": 2024,
+      "status": "sent",
+      "reg_date": "20240315",
+      "full_id": "2024-042",
+      "currency": "EUR",
+      "amount": 5750.00,
+      "eur_amount": 5750.00,
+      "vat_perc": 22,
+      "vat": 1265.00,
+      "tax": 0.00,
+      "total": 7015.00,
+      "to_pay": 7015.00,
+      "pay_load": 7015.00,
+      "buyer_ref": "Customer PO #12345",
+      "bank_id": "unicredit",
+      "font_base": 12
+    },
+    "buyer": {
+      "id": 5,
+      "code": "berrang_m",
+      "name": "Berrang SE",
+      "country": "DEU",
+      "address": "Elsa-Brandstroem-Strasse 12",
+      "city": "Mannheim",
+      "zip": "D-68229",
+      "box": "Postfach 100463",
+      "vat": "DE364389326",
+      "tel": "0049 621 8786 0",
+      "fax": "0049 621 8786400",
+      "email": "info@berrang.de",
+      "lang": "en",
+      "currency": "EUR"
+    },
+    "producer": {
+      "id": 22,
+      "code": "korea",
+      "name": "KPF Korea Parts & Fasteners",
+      "country": "KOR"
+    },
+    "sale_lines": [
+      {
+        "id": 173,
+        "sale_id": 2001,
+        "pos": 1,
+        "code": "GV302-EZ",
+        "description": "TONE ELECTRIC SHEAR WRENCH",
+        "qty": 1,
+        "price": 5750.000000,
+        "discount": 0,
+        "vat": 0
+      }
+    ],
+    "banks": [
+      {
+        "id": "unicredit",
+        "name": "UniCredit Banca",
+        "branch_address": "Via Spezia 2, Milano",
+        "iban": "IT32G0200801633000103119694",
+        "swift": "UNCRITM1B51"
+      }
+    ],
+    "countries": [
+      {
+        "code": "DEU",
+        "name": "Germany",
+        "it_name": "Germania"
+      },
+      {
+        "code": "KOR",
+        "name": "South Korea",
+        "it_name": "Corea del Sud"
+      }
+    ]
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "name": "template-renderer",
+  "version": "1.0.0",
+  "description": "Lambda function to render HTML from templates with multi-language support",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint src --ext .ts",
+    "format": "prettier --write \"src/**/*.ts\""
+  },
+  "keywords": [
+    "lambda",
+    "template",
+    "handlebars",
+    "i18n",
+    "invoice",
+    "renderer"
+  ],
+  "author": "Speedex",
+  "license": "MIT",
+  "dependencies": {
+    "handlebars": "^4.7.8",
+    "i18next": "^23.15.0",
+    "date-fns": "^3.6.0"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.145",
+    "@types/handlebars": "^4.1.0",
+    "@types/jest": "^29.5.13",
+    "@types/node": "^20.14.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "eslint": "^8.57.0",
+    "jest": "^29.7.0",
+    "prettier": "^3.3.0",
+    "ts-jest": "^29.2.0",
+    "typescript": "^5.5.0"
+  }
+}

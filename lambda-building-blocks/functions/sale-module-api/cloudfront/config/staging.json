@@ -1,0 +1,28 @@
+{
+  "StackName": "sale-module-cloudfront-staging",
+  "Parameters": {
+    "Environment": "staging",
+    "ApiGatewayDomainName": "xyz789ghi.execute-api.us-east-1.amazonaws.com",
+    "ApiGatewayStage": "staging",
+    "AttachmentsBucketName": "sale-module-attachments-staging",
+    "InvoicesBucketName": "sale-module-invoices-staging",
+    "ACMCertificateArn": "arn:aws:acm:us-east-1:123456789012:certificate/staging-cert-id",
+    "CustomDomainName": "api-staging.sale-module.i2speedex.com",
+    "EnableWAF": "true",
+    "PriceClass": "PriceClass_100"
+  },
+  "Tags": [
+    {
+      "Key": "Environment",
+      "Value": "staging"
+    },
+    {
+      "Key": "Application",
+      "Value": "SaleModule"
+    },
+    {
+      "Key": "CostCenter",
+      "Value": "Engineering"
+    }
+  ]
+}

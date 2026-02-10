@@ -1,0 +1,85 @@
+{
+  "source": {
+    "type": "postgresql",
+    "host": "s9-database.internal.i2speedex.com",
+    "port": 5432,
+    "database": "s9_production",
+    "username": "migration_user",
+    "password": "${DB_PASSWORD}",
+    "ssl": true,
+    "connectionTimeout": 30000,
+    "schema": "public"
+  },
+  "target": {
+    "region": "us-east-1",
+    "salesTable": "SalesTable-dev",
+    "buyersTable": "BuyersTable-dev",
+    "producersTable": "ProducersTable-dev",
+    "endpoint": null,
+    "useLocalStack": false
+  },
+  "migration": {
+    "batchSize": 25,
+    "maxRetries": 3,
+    "retryDelay": 5,
+    "exponentialBackoff": true,
+    "continueOnError": false,
+    "backupBeforeLoad": true,
+    "validateAfterLoad": true,
+    "batchDelay": 100,
+    "dryRun": false
+  },
+  "extraction": {
+    "buyers": {
+      "query": "SELECT * FROM msg_anag WHERE kind IN (2, 3) AND enabled = true ORDER BY first_id",
+      "limit": null,
+      "offset": 0
+    },
+    "producers": {
+      "query": "SELECT * FROM msg_anag WHERE kind = 1 AND enabled = true ORDER BY first_id",
+      "limit": null,
+      "offset": 0
+    },
+    "sales": {
+      "query": "SELECT * FROM msg WHERE enabled = true ORDER BY first_id",
+      "limit": null,
+      "offset": 0,
+      "includeLines": true
+    }
+  },
+  "transformation": {
+    "generateIds": true,
+    "preserveTimestamps": true,
+    "defaultCurrency": "EUR",
+    "defaultLanguage": "it",
+    "userMapping": {
+      "admin": "admin@i2speedex.com",
+      "operator1": "operator1@i2speedex.com",
+      "operator2": "operator2@i2speedex.com"
+    }
+  },
+  "validation": {
+    "strictMode": true,
+    "validateReferences": true,
+    "checkDuplicates": true,
+    "businessRules": true
+  },
+  "logging": {
+    "level": "INFO",
+    "console": true,
+    "file": "data/reports/migration.log",
+    "cloudWatch": false,
+    "cloudWatchGroup": "/migration/sale-module"
+  },
+  "backup": {
+    "enabled": true,
+    "directory": "data/backups",
+    "format": "json",
+    "compress": true
+  },
+  "checkpoint": {
+    "enabled": true,
+    "file": "data/.checkpoint.json",
+    "interval": 100
+  }
+}

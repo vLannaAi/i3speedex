@@ -1,0 +1,165 @@
+{
+  "standardFormats": [
+    {
+      "input": "\"John Smith\" <john.smith@example.com>",
+      "expectedEmail": "john.smith@example.com",
+      "expectedDisplayName": "John Smith",
+      "expectedGivenName": "John",
+      "expectedSurname": "Smith"
+    },
+    {
+      "input": "John Smith <john.smith@example.com>",
+      "expectedEmail": "john.smith@example.com",
+      "expectedDisplayName": "John Smith"
+    },
+    {
+      "input": "<john.smith@example.com>",
+      "expectedEmail": "john.smith@example.com",
+      "expectedDisplayName": null
+    },
+    {
+      "input": "john.smith@example.com",
+      "expectedEmail": "john.smith@example.com",
+      "expectedDisplayName": null
+    }
+  ],
+  "mimeEncoded": [
+    {
+      "input": "=?UTF-8?Q?M=C3=BCller?= <muller@example.com>",
+      "expectedEmail": "muller@example.com",
+      "description": "UTF-8 Q-encoded German umlaut"
+    },
+    {
+      "input": "=?UTF-8?B?TcO8bGxlcg==?= <muller@example.com>",
+      "expectedEmail": "muller@example.com",
+      "description": "UTF-8 B-encoded German umlaut"
+    },
+    {
+      "input": "=?iso-8859-1?Q?caf=E9?= <cafe@example.com>",
+      "expectedEmail": "cafe@example.com",
+      "description": "ISO-8859-1 Q-encoded"
+    }
+  ],
+  "italianFormats": [
+    {
+      "input": "Sig. Giovanni Rossi <giovanni.rossi@azienda.it>",
+      "expectedEmail": "giovanni.rossi@azienda.it",
+      "expectedTitle": "Sig.",
+      "expectedGivenName": "Giovanni",
+      "expectedSurname": "Rossi"
+    },
+    {
+      "input": "Sig.ra Maria Bianchi <maria.bianchi@azienda.it>",
+      "expectedEmail": "maria.bianchi@azienda.it",
+      "expectedTitle": "Sig.ra"
+    },
+    {
+      "input": "Dott. Marco Verdi <m.verdi@studio.it>",
+      "expectedEmail": "m.verdi@studio.it",
+      "expectedTitle": "Dott."
+    },
+    {
+      "input": "Ing. Paolo Neri <paolo.neri@ingegneria.it>",
+      "expectedEmail": "paolo.neri@ingegneria.it",
+      "expectedTitle": "Ing."
+    }
+  ],
+  "germanFormats": [
+    {
+      "input": "Herr Klaus Weber <k.weber@firma.de>",
+      "expectedEmail": "k.weber@firma.de",
+      "expectedTitle": "Herr"
+    },
+    {
+      "input": "Frau Dr. Anna Schmidt <anna.schmidt@unternehmen.de>",
+      "expectedEmail": "anna.schmidt@unternehmen.de",
+      "expectedTitle": "Frau"
+    }
+  ],
+  "companyAddresses": [
+    {
+      "input": "ACME Corp S.R.L. <info@acme.it>",
+      "expectedEmail": "info@acme.it",
+      "expectedIsPersonal": false,
+      "expectedCompanyName": "ACME Corp S.R.L."
+    },
+    {
+      "input": "Wuerth Industrie GmbH <vertrieb@wuerth-industrie.com>",
+      "expectedEmail": "vertrieb@wuerth-industrie.com",
+      "expectedIsPersonal": false
+    },
+    {
+      "input": "Dresselhaus AG <info@dresselhaus.de>",
+      "expectedEmail": "info@dresselhaus.de",
+      "expectedIsPersonal": false
+    }
+  ],
+  "serviceAddresses": [
+    {
+      "input": "info@company.com",
+      "expectedIsPersonal": false
+    },
+    {
+      "input": "sales@company.com",
+      "expectedIsPersonal": false
+    },
+    {
+      "input": "support@company.com",
+      "expectedIsPersonal": false
+    },
+    {
+      "input": "noreply@company.com",
+      "expectedIsPersonal": false
+    },
+    {
+      "input": "amministrazione@azienda.it",
+      "expectedIsPersonal": false
+    }
+  ],
+  "edgeCases": [
+    {
+      "input": "\t- John Smith <john@example.com>",
+      "expectedEmail": "john@example.com",
+      "description": "Leading special characters"
+    },
+    {
+      "input": "'John Smith' <john@example.com>",
+      "expectedEmail": "john@example.com",
+      "description": "Single quoted name"
+    },
+    {
+      "input": "Rossi, Marco <marco.rossi@email.it>",
+      "expectedEmail": "marco.rossi@email.it",
+      "expectedGivenName": "Marco",
+      "expectedSurname": "Rossi",
+      "description": "Lastname, Firstname format"
+    },
+    {
+      "input": "Anna Verdi - Rosval <anna.verdi@rosval.it>",
+      "expectedEmail": "anna.verdi@rosval.it",
+      "description": "Name with company suffix"
+    },
+    {
+      "input": "+393351249145@fax.messagenet.it",
+      "expectedEmail": "+393351249145@fax.messagenet.it",
+      "description": "Fax number as email"
+    }
+  ],
+  "invalidFormats": [
+    {
+      "input": "not an email",
+      "expectedEmail": "",
+      "description": "Plain text"
+    },
+    {
+      "input": "",
+      "expectedEmail": "",
+      "description": "Empty string"
+    },
+    {
+      "input": "???",
+      "expectedEmail": "",
+      "description": "Unicode replacement characters"
+    }
+  ]
+}

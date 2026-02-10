@@ -1,0 +1,138 @@
+/**
+ * Test fixtures for Sales
+ */
+
+import { Sale, SaleLine, Buyer, Producer, Attachment } from '../../src/common/types';
+
+export const mockBuyer: Buyer = {
+  PK: 'BUYER#BUYER001',
+  SK: 'METADATA',
+  buyerId: 'BUYER001',
+  companyName: 'Acme Corp',
+  vatNumber: 'IT12345678901',
+  fiscalCode: 'RSSMRA80A01H501U',
+  address: 'Via Roma 1',
+  city: 'Milan',
+  province: 'MI',
+  postalCode: '20100',
+  country: 'IT',
+  email: 'info@acme.com',
+  phone: '+39 02 1234567',
+  status: 'active',
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-01-01T00:00:00.000Z',
+  createdBy: 'admin@i2speedex.com',
+  updatedBy: 'admin@i2speedex.com',
+};
+
+export const mockProducer: Producer = {
+  PK: 'PRODUCER#PROD001',
+  SK: 'METADATA',
+  producerId: 'PROD001',
+  companyName: 'Factory Inc',
+  vatNumber: 'IT98765432109',
+  fiscalCode: 'RSSMRA80A01H501U',
+  address: 'Via Milano 1',
+  city: 'Rome',
+  province: 'RM',
+  postalCode: '00100',
+  country: 'IT',
+  email: 'sales@factory.com',
+  phone: '+39 06 7654321',
+  status: 'active',
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-01-01T00:00:00.000Z',
+  createdBy: 'admin@i2speedex.com',
+  updatedBy: 'admin@i2speedex.com',
+};
+
+export const mockSale: Sale = {
+  PK: 'SALE#SALE001',
+  SK: 'METADATA',
+  saleId: 'SALE001',
+  saleNumber: 1,
+  saleDate: '2026-01-29',
+  buyerId: 'BUYER001',
+  buyerName: 'Acme Corp',
+  buyerVatNumber: 'IT12345678901',
+  buyerFiscalCode: 'RSSMRA80A01H501U',
+  buyerAddress: 'Via Roma 1',
+  buyerCity: 'Milan',
+  buyerProvince: 'MI',
+  buyerPostalCode: '20100',
+  buyerCountry: 'IT',
+  producerId: 'PROD001',
+  producerName: 'Factory Inc',
+  producerVatNumber: 'IT98765432109',
+  producerFiscalCode: 'RSSMRA80A01H501U',
+  producerAddress: 'Via Milano 1',
+  producerCity: 'Rome',
+  producerProvince: 'RM',
+  producerPostalCode: '00100',
+  producerCountry: 'IT',
+  subtotal: 1000.00,
+  taxAmount: 220.00,
+  total: 1220.00,
+  currency: 'EUR',
+  status: 'confirmed',
+  invoiceGenerated: false,
+  linesCount: 1,
+  createdAt: '2026-01-29T10:00:00.000Z',
+  updatedAt: '2026-01-29T10:00:00.000Z',
+  createdBy: 'admin@i2speedex.com',
+  updatedBy: 'admin@i2speedex.com',
+};
+
+export const mockSaleLine: SaleLine = {
+  PK: 'SALE#SALE001',
+  SK: 'LINE#LINE001',
+  saleId: 'SALE001',
+  lineId: 'LINE001',
+  lineNumber: 1,
+  productDescription: 'Product A',
+  quantity: 10,
+  unitPrice: 100.00,
+  discount: 0,
+  discountAmount: 0,
+  netAmount: 1000.00,
+  taxRate: 22,
+  taxAmount: 220.00,
+  totalAmount: 1220.00,
+  unitOfMeasure: 'pz',
+  createdAt: '2026-01-29T10:00:00.000Z',
+  updatedAt: '2026-01-29T10:00:00.000Z',
+  createdBy: 'admin@i2speedex.com',
+  updatedBy: 'admin@i2speedex.com',
+};
+
+export const mockDraftSale: Sale = {
+  ...mockSale,
+  saleId: 'SALE002',
+  status: 'draft',
+  invoiceGenerated: false,
+};
+
+export const mockInvoicedSale: Sale = {
+  ...mockSale,
+  saleId: 'SALE003',
+  status: 'invoiced',
+  invoiceGenerated: true,
+  invoiceGeneratedAt: '2026-01-29T12:00:00.000Z',
+  invoiceNumber: 'INV-1-2026',
+};
+
+export const mockAttachment: Attachment = {
+  PK: 'SALE#SALE001',
+  SK: 'ATTACHMENT#ATT001',
+  attachmentId: 'ATT001',
+  saleId: 'SALE001',
+  fileName: 'invoice-document.pdf',
+  fileType: 'application/pdf',
+  fileSize: 1024000,
+  s3Key: 'attachments/2026/SALE001/ATT001.pdf',
+  description: 'Invoice supporting document',
+  createdAt: '2026-01-29T10:00:00.000Z',
+  updatedAt: '2026-01-29T10:00:00.000Z',
+  createdBy: 'admin@i2speedex.com',
+  updatedBy: 'admin@i2speedex.com',
+};
