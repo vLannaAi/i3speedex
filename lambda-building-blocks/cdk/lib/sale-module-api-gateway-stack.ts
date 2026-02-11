@@ -63,7 +63,7 @@ export class SaleModuleApiGatewayStack extends cdk.Stack {
         ],
         allowOrigins: environment === 'prod'
           ? ['https://sales.i2speedex.com']
-          : ['http://localhost:3000', `https://${environment}-sales.i2speedex.com`],
+          : ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002', `https://${environment}-sales.i2speedex.com`],
         allowCredentials: true,
         maxAge: cdk.Duration.hours(1),
       },
