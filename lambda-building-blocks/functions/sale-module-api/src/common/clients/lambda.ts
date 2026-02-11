@@ -33,16 +33,29 @@ export const FunctionNames = {
 // ========================================
 
 /**
- * Invoke a Lambda function
+ * Invoke a Lambda function that expects an API Gateway proxy event.
+ * Wraps the payload in an APIGatewayProxyEvent-like structure so the
+ * target Lambda can read it from event.body.
  */
 async function invokeFunction<TRequest, TResponse>(
   functionName: string,
   payload: TRequest
 ): Promise<TResponse> {
+  const event = {
+    httpMethod: 'POST',
+    path: '/',
+    body: JSON.stringify(payload),
+    headers: { 'Content-Type': 'application/json' },
+    pathParameters: null,
+    queryStringParameters: null,
+    requestContext: { requestId: `invoke-${Date.now()}` },
+    isBase64Encoded: false,
+  };
+
   const params: InvokeCommandInput = {
     FunctionName: functionName,
     InvocationType: 'RequestResponse',
-    Payload: Buffer.from(JSON.stringify(payload)),
+    Payload: Buffer.from(JSON.stringify(event)),
   };
 
   const command = new InvokeCommand(params);
@@ -172,14 +185,20 @@ export async function convertHtmlToPdf(params: {
     payload
   );
 
-  // Check if response is base64 encoded
+  // Parse the response body from the API Gateway-style response
+  const body = typeof response.body === 'string' ? JSON.parse(response.body) : response.body;
+
+  // Check for pdfBase64 field (default output format from html-to-pdf Lambda)
+  if (body.pdfBase64) {
+    return Buffer.from(body.pdfBase64, 'base64');
+  }
+
+  // Fallback: check if response itself is base64 encoded
   if (response.isBase64Encoded && typeof response.body === 'string') {
     return Buffer.from(response.body, 'base64');
   }
 
-  // If not base64, it might be JSON with pdf field
-  const body = typeof response.body === 'string' ? JSON.parse(response.body) : response.body;
-
+  // Fallback: check for pdf field
   if (body.pdf) {
     return Buffer.from(body.pdf, 'base64');
   }

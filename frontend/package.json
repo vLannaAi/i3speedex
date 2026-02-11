@@ -1,0 +1,28 @@
+{
+  "name": "i3speedex-frontend",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "lint": "eslint .",
+    "typecheck": "nuxt typecheck"
+  },
+  "dependencies": {
+    "amazon-cognito-identity-js": "^6.3.12",
+    "@vueuse/core": "^11.3.0",
+    "nuxt": "^3.16.0",
+    "vue": "^3.5.13",
+    "vue-router": "^4.5.0"
+  },
+  "devDependencies": {
+    "@unocss/nuxt": "^66.6.0",
+    "@unocss/preset-uno": "^66.6.0",
+    "@unocss/preset-icons": "^66.6.0",
+    "@iconify-json/mdi": "^1.2.3",
+    "typescript": "^5.7.0"
+  }
+}

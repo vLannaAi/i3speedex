@@ -163,9 +163,9 @@ new SaleModuleLambdaStack(app, `SaleModuleLambda-${environment === 'dev' ? 'Dev'
   buyersTableName: dynamoDBStack.buyersTable.tableName,
   producersTableName: dynamoDBStack.producersTable.tableName,
   documentsBucketName: s3Stack.documentsBucket.bucketName,
-  templateRendererFunctionName: `TemplateRendererLambda-${environment === 'dev' ? 'Dev' : 'Prod'}`,
-  htmlToPdfFunctionName: `HtmlToPdfLambda-${environment === 'dev' ? 'Dev' : 'Prod'}`,
-  sdiGeneratorFunctionName: `SdiInvoiceGeneratorLambda-${environment === 'dev' ? 'Dev' : 'Prod'}`,
+  templateRendererFunctionName: `template-renderer-${environment}`,
+  htmlToPdfFunctionName: `html-to-pdf-${environment}`,
+  sdiGeneratorFunctionName: `sdi-invoice-generator-${environment}`,
   env: {
     region: process.env.CDK_DEFAULT_REGION || 'eu-west-1',
     account: process.env.CDK_DEFAULT_ACCOUNT,
