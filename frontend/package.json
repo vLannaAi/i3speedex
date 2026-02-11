@@ -12,8 +12,9 @@
     "typecheck": "nuxt typecheck"
   },
   "dependencies": {
-    "amazon-cognito-identity-js": "^6.3.12",
+    "@nuxtjs/google-fonts": "^3.2.0",
     "@vueuse/core": "^11.3.0",
+    "amazon-cognito-identity-js": "^6.3.12",
     "nuxt": "^3.16.0",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0"

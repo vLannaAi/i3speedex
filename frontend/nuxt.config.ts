@@ -3,7 +3,16 @@ export default defineNuxtConfig({
   future: { compatibilityVersion: 4 },
   ssr: false,
 
-  modules: ['@unocss/nuxt'],
+  modules: ['@unocss/nuxt', '@nuxtjs/google-fonts'],
+
+  googleFonts: {
+    families: {
+      'Google Sans Flex': [300, 400, 500, 600, 700],
+    },
+    display: 'swap',
+    preload: true,
+    download: true,
+  },
 
   css: ['~/assets/css/main.css'],
 

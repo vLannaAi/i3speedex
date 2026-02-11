@@ -4,9 +4,17 @@
 }
 
 html {
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+  font-family: 'Google Sans Flex', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  font-size: 14px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
 }
 
 body {
