@@ -12,7 +12,7 @@ const errorMsg = ref('')
 async function handleLogin() {
   errorMsg.value = ''
   if (!email.value || !password.value) {
-    errorMsg.value = 'Inserisci email e password'
+    errorMsg.value = 'Enter email and password'
     return
   }
   loading.value = true
@@ -24,17 +24,17 @@ async function handleLogin() {
     return
   }
   if (!result.success) {
-    errorMsg.value = result.error || 'Autenticazione fallita'
+    errorMsg.value = result.error || 'Authentication failed'
     return
   }
-  toast.success('Accesso effettuato')
+  toast.success('Signed in successfully')
   navigateTo('/')
 }
 </script>
 
 <template>
   <div>
-    <h2 class="text-xl font-semibold text-gray-900 mb-6">Accedi</h2>
+    <h2 class="text-xl font-semibold text-gray-900 mb-6">Sign In</h2>
 
     <form @submit.prevent="handleLogin" class="space-y-4">
       <div>
@@ -44,7 +44,7 @@ async function handleLogin() {
           v-model="email"
           type="email"
           class="input-base"
-          placeholder="nome@azienda.it"
+          placeholder="name@company.com"
           autocomplete="email"
         >
       </div>
@@ -71,13 +71,13 @@ async function handleLogin() {
         :disabled="loading"
       >
         <i v-if="loading" class="fa-solid fa-spinner fa-spin" />
-        {{ loading ? 'Accesso...' : 'Accedi' }}
+        {{ loading ? 'Signing in...' : 'Sign In' }}
       </button>
     </form>
 
     <div class="mt-4 text-center">
       <NuxtLink to="/forgot-password" class="text-sm link">
-        Password dimenticata?
+        Forgot password?
       </NuxtLink>
     </div>
   </div>

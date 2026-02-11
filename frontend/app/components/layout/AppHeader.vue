@@ -169,7 +169,7 @@ onUnmounted(() => document.removeEventListener('keydown', onGlobalKeydown))
           ref="inputRef"
           v-model="searchQuery"
           type="text"
-          placeholder="Cerca vendite, acquirenti, produttori... (⌘K)"
+          placeholder="Search sales, buyers, producers... (⌘K)"
           class="input-base pl-10 pr-8"
           @input="onInput"
           @focus="onFocus"
@@ -191,15 +191,15 @@ onUnmounted(() => document.removeEventListener('keydown', onGlobalKeydown))
       >
         <div v-if="loading" class="px-4 py-3 flex items-center gap-2 text-sm text-gray-500">
           <i class="fa-solid fa-spinner fa-spin" />
-          Ricerca in corso...
+          Searching...
         </div>
         <div v-else-if="totalCount === 0 && searchQuery.trim().length >= 2" class="px-4 py-6 text-center text-sm text-gray-500">
           <i class="fa-solid fa-magnifying-glass-minus text-2xl mx-auto mb-2 text-gray-300" />
-          Nessun risultato per "{{ searchQuery }}"
+          No results for "{{ searchQuery }}"
         </div>
         <template v-else>
           <div v-if="results.sales.length > 0">
-            <div class="px-3 py-1.5 text-xs font-medium text-gray-400 uppercase bg-gray-50 sticky top-0">Vendite ({{ results.sales.length }})</div>
+            <div class="px-3 py-1.5 text-xs font-medium text-gray-400 uppercase bg-gray-50 sticky top-0">Sales ({{ results.sales.length }})</div>
             <button v-for="(sale, i) in results.sales" :key="sale.saleId" class="w-full px-3 py-2 flex items-center gap-3 text-left text-sm hover:bg-gray-50 transition-colors" :class="{ 'bg-primary-50': activeIndex === i }" :data-active="activeIndex === i" @mousedown.prevent="navigate({ type: 'sale', item: sale })" @mouseenter="activeIndex = i">
               <i class="fa-solid fa-file-invoice text-primary-500 shrink-0" />
               <div class="flex-1 min-w-0">
@@ -210,7 +210,7 @@ onUnmounted(() => document.removeEventListener('keydown', onGlobalKeydown))
             </button>
           </div>
           <div v-if="results.buyers.length > 0">
-            <div class="px-3 py-1.5 text-xs font-medium text-gray-400 uppercase bg-gray-50 sticky top-0">Acquirenti ({{ results.buyers.length }})</div>
+            <div class="px-3 py-1.5 text-xs font-medium text-gray-400 uppercase bg-gray-50 sticky top-0">Buyers ({{ results.buyers.length }})</div>
             <button v-for="(buyer, i) in results.buyers" :key="buyer.buyerId" class="w-full px-3 py-2 flex items-center gap-3 text-left text-sm hover:bg-gray-50 transition-colors" :class="{ 'bg-primary-50': activeIndex === results.sales.length + i }" :data-active="activeIndex === results.sales.length + i" @mousedown.prevent="navigate({ type: 'buyer', item: buyer })" @mouseenter="activeIndex = results.sales.length + i">
               <i class="fa-solid fa-building text-blue-500 shrink-0" />
               <div class="flex-1 min-w-0">
@@ -220,7 +220,7 @@ onUnmounted(() => document.removeEventListener('keydown', onGlobalKeydown))
             </button>
           </div>
           <div v-if="results.producers.length > 0">
-            <div class="px-3 py-1.5 text-xs font-medium text-gray-400 uppercase bg-gray-50 sticky top-0">Produttori ({{ results.producers.length }})</div>
+            <div class="px-3 py-1.5 text-xs font-medium text-gray-400 uppercase bg-gray-50 sticky top-0">Producers ({{ results.producers.length }})</div>
             <button v-for="(producer, i) in results.producers" :key="producer.producerId" class="w-full px-3 py-2 flex items-center gap-3 text-left text-sm hover:bg-gray-50 transition-colors" :class="{ 'bg-primary-50': activeIndex === results.sales.length + results.buyers.length + i }" :data-active="activeIndex === results.sales.length + results.buyers.length + i" @mousedown.prevent="navigate({ type: 'producer', item: producer })" @mouseenter="activeIndex = results.sales.length + results.buyers.length + i">
               <i class="fa-solid fa-industry text-amber-500 shrink-0" />
               <div class="flex-1 min-w-0">
@@ -255,7 +255,7 @@ onUnmounted(() => document.removeEventListener('keydown', onGlobalKeydown))
               ref="mobileInputRef"
               v-model="searchQuery"
               type="text"
-              placeholder="Cerca..."
+              placeholder="Search..."
               class="input-base pl-10 pr-8"
               @input="onInput"
               @keydown="onKeydown"
@@ -272,18 +272,18 @@ onUnmounted(() => document.removeEventListener('keydown', onGlobalKeydown))
         <div class="overflow-y-auto" style="max-height: calc(100vh - var(--header-height))">
           <div v-if="loading" class="px-4 py-6 flex items-center justify-center gap-2 text-sm text-gray-500">
             <i class="fa-solid fa-spinner fa-spin" />
-            Ricerca in corso...
+            Searching...
           </div>
           <div v-else-if="totalCount === 0 && searchQuery.trim().length >= 2" class="px-4 py-12 text-center text-sm text-gray-500">
             <i class="fa-solid fa-magnifying-glass-minus text-3xl mx-auto mb-2 text-gray-300" />
-            Nessun risultato per "{{ searchQuery }}"
+            No results for "{{ searchQuery }}"
           </div>
           <div v-else-if="searchQuery.trim().length < 2 && !loading" class="px-4 py-12 text-center text-sm text-gray-400">
-            Digita almeno 2 caratteri per cercare
+            Type at least 2 characters to search
           </div>
           <template v-else>
             <div v-if="results.sales.length > 0">
-              <div class="px-4 py-2 text-xs font-medium text-gray-400 uppercase bg-gray-50 sticky top-0">Vendite ({{ results.sales.length }})</div>
+              <div class="px-4 py-2 text-xs font-medium text-gray-400 uppercase bg-gray-50 sticky top-0">Sales ({{ results.sales.length }})</div>
               <button v-for="sale in results.sales" :key="sale.saleId" class="w-full px-4 py-3 flex items-center gap-3 text-left text-sm border-b border-gray-50 active:bg-gray-50" @click="navigate({ type: 'sale', item: sale })">
                 <i class="fa-solid fa-file-invoice text-primary-500 shrink-0 text-lg" />
                 <div class="flex-1 min-w-0">
@@ -293,7 +293,7 @@ onUnmounted(() => document.removeEventListener('keydown', onGlobalKeydown))
               </button>
             </div>
             <div v-if="results.buyers.length > 0">
-              <div class="px-4 py-2 text-xs font-medium text-gray-400 uppercase bg-gray-50 sticky top-0">Acquirenti ({{ results.buyers.length }})</div>
+              <div class="px-4 py-2 text-xs font-medium text-gray-400 uppercase bg-gray-50 sticky top-0">Buyers ({{ results.buyers.length }})</div>
               <button v-for="buyer in results.buyers" :key="buyer.buyerId" class="w-full px-4 py-3 flex items-center gap-3 text-left text-sm border-b border-gray-50 active:bg-gray-50" @click="navigate({ type: 'buyer', item: buyer })">
                 <i class="fa-solid fa-building text-blue-500 shrink-0 text-lg" />
                 <div class="flex-1 min-w-0">
@@ -303,7 +303,7 @@ onUnmounted(() => document.removeEventListener('keydown', onGlobalKeydown))
               </button>
             </div>
             <div v-if="results.producers.length > 0">
-              <div class="px-4 py-2 text-xs font-medium text-gray-400 uppercase bg-gray-50 sticky top-0">Produttori ({{ results.producers.length }})</div>
+              <div class="px-4 py-2 text-xs font-medium text-gray-400 uppercase bg-gray-50 sticky top-0">Producers ({{ results.producers.length }})</div>
               <button v-for="producer in results.producers" :key="producer.producerId" class="w-full px-4 py-3 flex items-center gap-3 text-left text-sm border-b border-gray-50 active:bg-gray-50" @click="navigate({ type: 'producer', item: producer })">
                 <i class="fa-solid fa-industry text-amber-500 shrink-0 text-lg" />
                 <div class="flex-1 min-w-0">

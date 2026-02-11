@@ -21,12 +21,12 @@ const filters = ref<Record<string, string | undefined>>({})
 
 const columns: Column[] = [
   { key: 'saleNumber', label: '#', sortable: true, width: '80px' },
-  { key: 'saleDate', label: 'Data', sortable: true },
-  { key: 'buyerName', label: 'Acquirente', sortable: true },
-  { key: 'producerName', label: 'Produttore', sortable: true },
-  { key: 'total', label: 'Totale', sortable: true, align: 'right' },
-  { key: 'status', label: 'Stato' },
-  { key: 'linesCount', label: 'Righe', align: 'center' },
+  { key: 'saleDate', label: 'Date', sortable: true },
+  { key: 'buyerName', label: 'Buyer', sortable: true },
+  { key: 'producerName', label: 'Producer', sortable: true },
+  { key: 'total', label: 'Total', sortable: true, align: 'right' },
+  { key: 'status', label: 'Status' },
+  { key: 'linesCount', label: 'Lines', align: 'center' },
 ]
 
 async function load() {
@@ -93,21 +93,21 @@ function openSale(sale: Sale) {
 
 <template>
   <div>
-    <BreadcrumbNav :items="[{ label: 'Dashboard', to: '/' }, { label: 'Vendite' }]" />
+    <BreadcrumbNav :items="[{ label: 'Dashboard', to: '/' }, { label: 'Sales' }]" />
     <div class="flex items-center justify-between mb-6">
       <div>
-        <h1 class="page-title">Vendite</h1>
-        <p class="page-subtitle">Gestisci le vendite</p>
+        <h1 class="page-title">Sales</h1>
+        <p class="page-subtitle">Manage your sales</p>
       </div>
       <NuxtLink v-if="canWrite" to="/sales/new" class="btn-primary">
-        <i class="fa-solid fa-plus" /> Nuova Vendita
+        <i class="fa-solid fa-plus" /> New Sale
       </NuxtLink>
     </div>
 
     <!-- Search + Filters -->
     <div class="card mb-4">
       <div class="p-4">
-        <SearchInput v-model="search" placeholder="Cerca vendite..." />
+        <SearchInput v-model="search" placeholder="Search sales..." />
       </div>
       <div class="px-4 pb-4">
         <SaleFilters :buyers="buyers" :producers="producers" @filter="onFilter" />
@@ -135,11 +135,11 @@ function openSale(sale: Sale) {
         </template>
         <template #empty>
           <EmptyState
-            title="Nessuna vendita"
-            description="Inizia creando la prima vendita"
+            title="No sales"
+            description="Get started by creating your first sale"
             icon="fa-solid fa-file-invoice"
             :action-to="canWrite ? '/sales/new' : undefined"
-            :action-label="canWrite ? 'Nuova Vendita' : undefined"
+            :action-label="canWrite ? 'New Sale' : undefined"
           />
         </template>
       </DataTable>

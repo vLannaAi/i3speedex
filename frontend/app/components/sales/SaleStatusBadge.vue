@@ -12,11 +12,11 @@ const colorMap: Record<SaleStatus, string> = {
 }
 
 const labelMap: Record<SaleStatus, string> = {
-  draft: 'Bozza',
-  confirmed: 'Confermata',
-  invoiced: 'Fatturata',
-  paid: 'Pagata',
-  cancelled: 'Annullata',
+  draft: 'Draft',
+  confirmed: 'Confirmed',
+  invoiced: 'Invoiced',
+  paid: 'Paid',
+  cancelled: 'Cancelled',
 }
 </script>
 

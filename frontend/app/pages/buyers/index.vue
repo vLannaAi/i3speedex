@@ -15,13 +15,13 @@ const totalPages = ref(0)
 const search = ref('')
 
 const columns: Column[] = [
-  { key: 'companyName', label: 'Ragione Sociale', sortable: true },
-  { key: 'city', label: 'Città', sortable: true },
+  { key: 'companyName', label: 'Company Name', sortable: true },
+  { key: 'city', label: 'City', sortable: true },
   { key: 'province', label: 'Prov.' },
-  { key: 'vatNumber', label: 'P.IVA' },
-  { key: 'status', label: 'Stato' },
-  { key: 'totalSales', label: 'Vendite', align: 'right', sortable: true },
-  { key: 'totalRevenue', label: 'Fatturato', align: 'right', sortable: true },
+  { key: 'vatNumber', label: 'VAT No.' },
+  { key: 'status', label: 'Status' },
+  { key: 'totalSales', label: 'Sales', align: 'right', sortable: true },
+  { key: 'totalRevenue', label: 'Revenue', align: 'right', sortable: true },
 ]
 
 async function load() {
@@ -53,20 +53,20 @@ function openBuyer(buyer: Buyer) {
 
 <template>
   <div>
-    <BreadcrumbNav :items="[{ label: 'Dashboard', to: '/' }, { label: 'Acquirenti' }]" />
+    <BreadcrumbNav :items="[{ label: 'Dashboard', to: '/' }, { label: 'Buyers' }]" />
     <div class="flex items-center justify-between mb-6">
       <div>
-        <h1 class="page-title">Acquirenti</h1>
-        <p class="page-subtitle">Gestisci i tuoi acquirenti</p>
+        <h1 class="page-title">Buyers</h1>
+        <p class="page-subtitle">Manage your buyers</p>
       </div>
       <NuxtLink v-if="canWrite" to="/buyers/new" class="btn-primary">
-        <i class="fa-solid fa-plus" /> Nuovo Acquirente
+        <i class="fa-solid fa-plus" /> New Buyer
       </NuxtLink>
     </div>
 
     <div class="card mb-4">
       <div class="p-4">
-        <SearchInput v-model="search" placeholder="Cerca acquirenti..." />
+        <SearchInput v-model="search" placeholder="Search buyers..." />
       </div>
     </div>
 
@@ -87,11 +87,11 @@ function openBuyer(buyer: Buyer) {
         </template>
         <template #empty>
           <EmptyState
-            title="Nessun acquirente"
-            description="Inizia aggiungendo il primo acquirente"
+            title="No buyers"
+            description="Get started by adding your first buyer"
             icon="fa-solid fa-users"
             :action-to="canWrite ? '/buyers/new' : undefined"
-            :action-label="canWrite ? 'Nuovo Acquirente' : undefined"
+            :action-label="canWrite ? 'New Buyer' : undefined"
           />
         </template>
       </DataTable>

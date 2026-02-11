@@ -51,48 +51,48 @@ watch([status, buyerId, producerId, startDate, endDate], () => apply())
   <div class="mb-4">
     <button class="btn-ghost btn-sm" @click="open = !open">
       <i class="fa-solid fa-filter" />
-      Filtri
+      Filters
       <span v-if="hasFilters" class="w-2 h-2 rounded-full bg-primary-500" />
     </button>
 
     <div v-if="open" class="mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
       <div>
-        <label class="label-base">Stato</label>
+        <label class="label-base">Status</label>
         <select v-model="status" class="input-base">
-          <option value="">Tutti</option>
-          <option value="draft">Bozza</option>
-          <option value="confirmed">Confermata</option>
-          <option value="invoiced">Fatturata</option>
-          <option value="paid">Pagata</option>
-          <option value="cancelled">Annullata</option>
+          <option value="">All</option>
+          <option value="draft">Draft</option>
+          <option value="confirmed">Confirmed</option>
+          <option value="invoiced">Invoiced</option>
+          <option value="paid">Paid</option>
+          <option value="cancelled">Cancelled</option>
         </select>
       </div>
       <div>
-        <label class="label-base">Acquirente</label>
+        <label class="label-base">Buyer</label>
         <select v-model="buyerId" class="input-base">
-          <option value="">Tutti</option>
+          <option value="">All</option>
           <option v-for="b in buyers" :key="b.buyerId" :value="b.buyerId">{{ b.companyName }}</option>
         </select>
       </div>
       <div>
-        <label class="label-base">Produttore</label>
+        <label class="label-base">Producer</label>
         <select v-model="producerId" class="input-base">
-          <option value="">Tutti</option>
+          <option value="">All</option>
           <option v-for="p in producers" :key="p.producerId" :value="p.producerId">{{ p.companyName }}</option>
         </select>
       </div>
       <div>
-        <label class="label-base">Data da</label>
+        <label class="label-base">Date from</label>
         <input v-model="startDate" type="date" class="input-base">
       </div>
       <div>
-        <label class="label-base">Data a</label>
+        <label class="label-base">Date to</label>
         <input v-model="endDate" type="date" class="input-base">
       </div>
     </div>
 
     <button v-if="open && hasFilters" class="btn-ghost btn-sm mt-2 text-xs" @click="reset">
-      <i class="fa-solid fa-xmark" /> Resetta filtri
+      <i class="fa-solid fa-xmark" /> Reset filters
     </button>
   </div>
 </template>

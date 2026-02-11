@@ -15,13 +15,13 @@ const colorMap: Record<string, string> = {
 }
 
 const labelMap: Record<string, string> = {
-  draft: 'Bozza',
-  confirmed: 'Confermata',
-  invoiced: 'Fatturata',
-  paid: 'Pagata',
-  cancelled: 'Annullata',
-  active: 'Attivo',
-  inactive: 'Inattivo',
+  draft: 'Draft',
+  confirmed: 'Confirmed',
+  invoiced: 'Invoiced',
+  paid: 'Paid',
+  cancelled: 'Cancelled',
+  active: 'Active',
+  inactive: 'Inactive',
 }
 
 const classes = computed(() => colorMap[props.status] || 'bg-gray-100 text-gray-700')

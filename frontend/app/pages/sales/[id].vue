@@ -23,10 +23,10 @@ const showDeleteDialog = ref(false)
 const showConfirmDialog = ref(false)
 
 const tabs = [
-  { key: 'details', label: 'Dettagli', icon: 'fa-regular fa-circle-info' },
-  { key: 'lines', label: 'Righe', icon: 'fa-solid fa-list-ol' },
-  { key: 'invoice', label: 'Fattura', icon: 'fa-regular fa-file-lines' },
-  { key: 'attachments', label: 'Allegati', icon: 'fa-solid fa-paperclip' },
+  { key: 'details', label: 'Details', icon: 'fa-regular fa-circle-info' },
+  { key: 'lines', label: 'Lines', icon: 'fa-solid fa-list-ol' },
+  { key: 'invoice', label: 'Invoice', icon: 'fa-regular fa-file-lines' },
+  { key: 'attachments', label: 'Attachments', icon: 'fa-solid fa-paperclip' },
 ]
 
 // Edit form
@@ -88,7 +88,7 @@ async function saveDetails() {
       internalNotes: form.internalNotes || undefined,
       referenceNumber: form.referenceNumber || undefined,
     })
-    toast.success('Vendita aggiornata')
+    toast.success('Sale updated')
     editing.value = false
     await load()
   } catch (e: any) {
@@ -102,7 +102,7 @@ async function handleConfirm() {
   showConfirmDialog.value = false
   try {
     await confirmSale(saleId)
-    toast.success('Vendita confermata')
+    toast.success('Sale confirmed')
     await load()
   } catch (e: any) {
     toast.error(e.message)
@@ -113,7 +113,7 @@ async function handleDelete() {
   showDeleteDialog.value = false
   try {
     await deleteSale(saleId)
-    toast.success('Vendita eliminata')
+    toast.success('Sale deleted')
     router.push('/sales')
   } catch (e: any) {
     toast.error(e.message)
@@ -143,7 +143,7 @@ onMounted(() => load())
   <div>
     <BreadcrumbNav :items="[
       { label: 'Dashboard', to: '/' },
-      { label: 'Vendite', to: '/sales' },
+      { label: 'Sales', to: '/sales' },
       { label: sale ? `#${sale.saleNumber}` : '...' },
     ]" />
 
@@ -154,7 +154,7 @@ onMounted(() => load())
     <div v-else-if="sale" class="flex items-start justify-between mb-6">
       <div>
         <div class="flex items-center gap-3">
-          <h1 class="page-title">Vendita #{{ sale.saleNumber }}</h1>
+          <h1 class="page-title">Sale #{{ sale.saleNumber }}</h1>
           <SaleStatusBadge :status="sale.status" />
         </div>
         <p class="page-subtitle">
@@ -199,65 +199,65 @@ onMounted(() => load())
       <div v-if="activeTab === 'details'" class="space-y-6">
         <div class="card card-body">
           <div class="flex items-center justify-between mb-4">
-            <h3 class="section-title">Informazioni Vendita</h3>
+            <h3 class="section-title">Sale Information</h3>
             <button v-if="isEditable && !editing" class="btn-ghost btn-sm" @click="editing = true">
-              <i class="fa-solid fa-pen" /> Modifica
+              <i class="fa-solid fa-pen" /> Edit
             </button>
           </div>
 
           <template v-if="editing">
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <FormField label="Data vendita" required>
+              <FormField label="Sale date" required>
                 <FormDatePicker v-model="form.saleDate" />
               </FormField>
-              <FormField label="Metodo pagamento">
-                <FormSelect v-model="form.paymentMethod" :options="PAYMENT_METHODS" placeholder="Seleziona..." />
+              <FormField label="Payment method">
+                <FormSelect v-model="form.paymentMethod" :options="PAYMENT_METHODS" placeholder="Select..." />
               </FormField>
-              <FormField label="Termini pagamento">
-                <FormSelect v-model="form.paymentTerms" :options="PAYMENT_TERMS" placeholder="Seleziona..." />
+              <FormField label="Payment terms">
+                <FormSelect v-model="form.paymentTerms" :options="PAYMENT_TERMS" placeholder="Select..." />
               </FormField>
-              <FormField label="Metodo consegna">
+              <FormField label="Delivery method">
                 <FormInput v-model="form.deliveryMethod" />
               </FormField>
-              <FormField label="Data consegna">
+              <FormField label="Delivery date">
                 <FormDatePicker v-model="form.deliveryDate" />
               </FormField>
-              <FormField label="Riferimento">
+              <FormField label="Reference">
                 <FormInput v-model="form.referenceNumber" />
               </FormField>
               <div class="sm:col-span-2 lg:col-span-3">
-                <FormField label="Note">
+                <FormField label="Notes">
                   <FormTextarea v-model="form.notes" :max-length="1000" />
                 </FormField>
               </div>
               <div class="sm:col-span-2 lg:col-span-3">
-                <FormField label="Note interne">
+                <FormField label="Internal notes">
                   <FormTextarea v-model="form.internalNotes" :max-length="1000" />
                 </FormField>
               </div>
             </div>
             <div class="flex gap-2 mt-4">
               <button class="btn-primary btn-sm" :disabled="saving" @click="saveDetails">
-                <i v-if="saving" class="fa-solid fa-spinner fa-spin" /> Salva
+                <i v-if="saving" class="fa-solid fa-spinner fa-spin" /> Save
               </button>
-              <button class="btn-ghost btn-sm" @click="editing = false; populateForm(sale!)">Annulla</button>
+              <button class="btn-ghost btn-sm" @click="editing = false; populateForm(sale!)">Cancel</button>
             </div>
           </template>
 
           <template v-else>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
-              <div><span class="text-gray-500">Data:</span> <span class="font-medium">{{ formatDate(sale.saleDate) }}</span></div>
-              <div><span class="text-gray-500">Pagamento:</span> <span class="font-medium">{{ sale.paymentMethod || '—' }}</span></div>
-              <div><span class="text-gray-500">Termini:</span> <span class="font-medium">{{ sale.paymentTerms || '—' }}</span></div>
-              <div><span class="text-gray-500">Consegna:</span> <span class="font-medium">{{ sale.deliveryMethod || '—' }}</span></div>
-              <div><span class="text-gray-500">Data consegna:</span> <span class="font-medium">{{ formatDate(sale.deliveryDate) }}</span></div>
-              <div><span class="text-gray-500">Riferimento:</span> <span class="font-medium">{{ sale.referenceNumber || '—' }}</span></div>
+              <div><span class="text-gray-500">Date:</span> <span class="font-medium">{{ formatDate(sale.saleDate) }}</span></div>
+              <div><span class="text-gray-500">Payment:</span> <span class="font-medium">{{ sale.paymentMethod || '—' }}</span></div>
+              <div><span class="text-gray-500">Terms:</span> <span class="font-medium">{{ sale.paymentTerms || '—' }}</span></div>
+              <div><span class="text-gray-500">Delivery:</span> <span class="font-medium">{{ sale.deliveryMethod || '—' }}</span></div>
+              <div><span class="text-gray-500">Delivery date:</span> <span class="font-medium">{{ formatDate(sale.deliveryDate) }}</span></div>
+              <div><span class="text-gray-500">Reference:</span> <span class="font-medium">{{ sale.referenceNumber || '—' }}</span></div>
               <div v-if="sale.notes" class="sm:col-span-2 lg:col-span-3">
-                <span class="text-gray-500">Note:</span>
+                <span class="text-gray-500">Notes:</span>
                 <p class="font-medium mt-1">{{ sale.notes }}</p>
               </div>
               <div v-if="sale.internalNotes" class="sm:col-span-2 lg:col-span-3">
-                <span class="text-gray-500">Note interne:</span>
+                <span class="text-gray-500">Internal notes:</span>
                 <p class="font-medium mt-1">{{ sale.internalNotes }}</p>
               </div>
             </div>
@@ -267,18 +267,18 @@ onMounted(() => load())
         <!-- Buyer & Producer info -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div class="card card-body">
-            <h3 class="section-title mb-3">Acquirente</h3>
+            <h3 class="section-title mb-3">Buyer</h3>
             <div class="space-y-1 text-sm">
               <p class="font-medium text-gray-900">{{ sale.buyerName }}</p>
-              <p v-if="sale.buyerVatNumber" class="text-gray-500">P.IVA: {{ sale.buyerVatNumber }}</p>
+              <p v-if="sale.buyerVatNumber" class="text-gray-500">VAT: {{ sale.buyerVatNumber }}</p>
               <p v-if="sale.buyerAddress" class="text-gray-500">{{ sale.buyerAddress }}, {{ sale.buyerCity }} {{ sale.buyerProvince ? `(${sale.buyerProvince})` : '' }} {{ sale.buyerPostalCode }}</p>
             </div>
           </div>
           <div class="card card-body">
-            <h3 class="section-title mb-3">Produttore</h3>
+            <h3 class="section-title mb-3">Producer</h3>
             <div class="space-y-1 text-sm">
               <p class="font-medium text-gray-900">{{ sale.producerName }}</p>
-              <p v-if="sale.producerVatNumber" class="text-gray-500">P.IVA: {{ sale.producerVatNumber }}</p>
+              <p v-if="sale.producerVatNumber" class="text-gray-500">VAT: {{ sale.producerVatNumber }}</p>
               <p v-if="sale.producerAddress" class="text-gray-500">{{ sale.producerAddress }}, {{ sale.producerCity }} {{ sale.producerProvince ? `(${sale.producerProvince})` : '' }} {{ sale.producerPostalCode }}</p>
             </div>
           </div>
@@ -291,8 +291,8 @@ onMounted(() => load())
 
         <!-- Metadata -->
         <div class="text-xs text-gray-400 space-y-1">
-          <p>Creata il {{ formatDateTime(sale.createdAt) }} da {{ sale.createdBy }}</p>
-          <p>Aggiornata il {{ formatDateTime(sale.updatedAt) }} da {{ sale.updatedBy }}</p>
+          <p>Created on {{ formatDateTime(sale.createdAt) }} by {{ sale.createdBy }}</p>
+          <p>Updated on {{ formatDateTime(sale.updatedAt) }} by {{ sale.updatedBy }}</p>
         </div>
       </div>
 
@@ -311,13 +311,13 @@ onMounted(() => load())
 
       <!-- Invoice tab -->
       <div v-if="activeTab === 'invoice'" class="card card-body">
-        <h3 class="section-title mb-4">Generazione Fattura</h3>
+        <h3 class="section-title mb-4">Invoice Generation</h3>
         <InvoiceActions :sale="sale" />
       </div>
 
       <!-- Attachments tab -->
       <div v-if="activeTab === 'attachments'" class="card card-body">
-        <h3 class="section-title mb-4">Allegati</h3>
+        <h3 class="section-title mb-4">Attachments</h3>
         <AttachmentUpload v-if="canWrite" :sale-id="saleId" @uploaded="refreshAttachments" />
         <div class="mt-4">
           <AttachmentList :sale-id="saleId" :attachments="attachments" :readonly="!canWrite" @refresh="refreshAttachments" />
@@ -328,17 +328,17 @@ onMounted(() => load())
     <!-- Dialogs -->
     <ConfirmDialog
       :open="showConfirmDialog"
-      title="Conferma vendita"
-      message="Sei sicuro di voler confermare questa vendita? Lo stato cambierà a 'Confermata'."
-      confirm-label="Conferma"
+      title="Confirm sale"
+      message="Are you sure you want to confirm this sale? The status will change to 'Confirmed'."
+      confirm-label="Confirm"
       @confirm="handleConfirm"
       @cancel="showConfirmDialog = false"
     />
     <ConfirmDialog
       :open="showDeleteDialog"
-      title="Elimina vendita"
-      message="Sei sicuro di voler eliminare questa vendita? L'operazione non è reversibile."
-      confirm-label="Elimina"
+      title="Delete sale"
+      message="Are you sure you want to delete this sale? This action cannot be undone."
+      confirm-label="Delete"
       variant="danger"
       @confirm="handleDelete"
       @cancel="showDeleteDialog = false"

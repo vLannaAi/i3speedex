@@ -12,48 +12,48 @@ const errorMsg = ref('')
 async function handleChange() {
   errorMsg.value = ''
   if (!newPassword.value) {
-    errorMsg.value = 'Inserisci la nuova password'
+    errorMsg.value = 'Enter the new password'
     return
   }
   if (newPassword.value !== confirmPassword.value) {
-    errorMsg.value = 'Le password non coincidono'
+    errorMsg.value = 'Passwords do not match'
     return
   }
   if (newPassword.value.length < 8) {
-    errorMsg.value = 'La password deve avere almeno 8 caratteri'
+    errorMsg.value = 'Password must be at least 8 characters'
     return
   }
   loading.value = true
   const result = await completeNewPassword(newPassword.value)
   loading.value = false
   if (!result.success) {
-    errorMsg.value = result.error || 'Errore cambio password'
+    errorMsg.value = result.error || 'Password change failed'
     return
   }
-  toast.success('Password aggiornata con successo')
+  toast.success('Password updated successfully')
   navigateTo('/')
 }
 </script>
 
 <template>
   <div>
-    <h2 class="text-xl font-semibold text-gray-900 mb-2">Cambia Password</h2>
-    <p class="text-sm text-gray-500 mb-6">Devi impostare una nuova password per procedere.</p>
+    <h2 class="text-xl font-semibold text-gray-900 mb-2">Change Password</h2>
+    <p class="text-sm text-gray-500 mb-6">You must set a new password to continue.</p>
 
     <form @submit.prevent="handleChange" class="space-y-4">
       <div>
-        <label class="label-base" for="newPw">Nuova password</label>
+        <label class="label-base" for="newPw">New password</label>
         <input id="newPw" v-model="newPassword" type="password" class="input-base" placeholder="••••••••" autocomplete="new-password">
       </div>
       <div>
-        <label class="label-base" for="confirmPw">Conferma password</label>
+        <label class="label-base" for="confirmPw">Confirm password</label>
         <input id="confirmPw" v-model="confirmPassword" type="password" class="input-base" placeholder="••••••••" autocomplete="new-password">
       </div>
-      <p class="text-xs text-gray-400">Minimo 8 caratteri, con maiuscole, minuscole e numeri.</p>
+      <p class="text-xs text-gray-400">Minimum 8 characters, with uppercase, lowercase and numbers.</p>
       <div v-if="errorMsg" class="text-sm text-danger-600 bg-danger-50 rounded-lg px-3 py-2">{{ errorMsg }}</div>
       <button type="submit" class="btn-primary w-full" :disabled="loading">
         <i v-if="loading" class="fa-solid fa-spinner fa-spin" />
-        Imposta password
+        Set password
       </button>
     </form>
   </div>

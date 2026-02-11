@@ -84,7 +84,7 @@ const sortedData = computed(() => {
         <tr>
           <td :colspan="columns.length" class="px-4 py-12 text-center text-sm text-gray-500">
             <slot name="empty">
-              <EmptyState title="Nessun risultato" icon="fa-solid fa-database" />
+              <EmptyState title="No results" icon="fa-solid fa-database" />
             </slot>
           </td>
         </tr>

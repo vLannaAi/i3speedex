@@ -132,7 +132,7 @@ export function useAuth() {
         },
         onFailure(err: Error) {
           state.isLoading = false
-          resolve({ success: false, error: err.message || 'Autenticazione fallita' })
+          resolve({ success: false, error: err.message || 'Authentication failed' })
         },
         newPasswordRequired(_userAttributes: CognitoUserAttribute[]) {
           state.isLoading = false
@@ -145,7 +145,7 @@ export function useAuth() {
   function completeNewPassword(newPassword: string): Promise<{ success: boolean; error?: string }> {
     return new Promise((resolve) => {
       if (!cognitoUser) {
-        resolve({ success: false, error: 'Sessione non valida' })
+        resolve({ success: false, error: 'Invalid session' })
         return
       }
       cognitoUser.completeNewPasswordChallenge(newPassword, {}, {
@@ -157,7 +157,7 @@ export function useAuth() {
           resolve({ success: true })
         },
         onFailure(err: Error) {
-          resolve({ success: false, error: err.message || 'Cambio password fallito' })
+          resolve({ success: false, error: err.message || 'Password change failed' })
         },
       })
     })

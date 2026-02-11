@@ -9,7 +9,7 @@ function handleLogout() {
 
 const roleLabel = computed(() => {
   if (isAdmin.value) return 'Admin'
-  if (isOperator.value) return 'Operatore'
+  if (isOperator.value) return 'Operator'
   return 'Viewer'
 })
 </script>
@@ -42,7 +42,7 @@ const roleLabel = computed(() => {
         @click="handleLogout"
       >
         <i class="fa-solid fa-right-from-bracket text-base" />
-        Esci
+        Sign Out
       </button>
     </div>
 

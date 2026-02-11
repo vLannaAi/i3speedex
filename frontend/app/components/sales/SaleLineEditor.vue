@@ -68,7 +68,7 @@ function editLine(line: SaleLine) {
 
 async function save() {
   if (!form.productDescription) {
-    toast.error('Inserisci la descrizione del prodotto')
+    toast.error('Enter the product description')
     return
   }
   saving.value = true
@@ -85,10 +85,10 @@ async function save() {
     }
     if (editing.value) {
       await updateSaleLine(props.saleId, editing.value, data)
-      toast.success('Riga aggiornata')
+      toast.success('Line updated')
     } else {
       await createSaleLine(props.saleId, data)
-      toast.success('Riga aggiunta')
+      toast.success('Line added')
     }
     resetForm()
     emit('refresh')
@@ -103,7 +103,7 @@ async function removeLine(lineId: string) {
   deleting.value = lineId
   try {
     await deleteSaleLine(props.saleId, lineId)
-    toast.success('Riga eliminata')
+    toast.success('Line deleted')
     emit('refresh')
   } catch (e: any) {
     toast.error(e.message)
@@ -121,20 +121,20 @@ async function removeLine(lineId: string) {
         <thead>
           <tr class="border-b border-gray-200 bg-gray-50/50 text-xs text-gray-500 uppercase">
             <th class="px-3 py-2 text-left">#</th>
-            <th class="px-3 py-2 text-left">Descrizione</th>
-            <th class="px-3 py-2 text-right">Q.tà</th>
-            <th class="px-3 py-2 text-right">Prezzo</th>
-            <th class="px-3 py-2 text-right">Sc.%</th>
-            <th class="px-3 py-2 text-right">Netto</th>
-            <th class="px-3 py-2 text-right">IVA%</th>
-            <th class="px-3 py-2 text-right">Totale</th>
+            <th class="px-3 py-2 text-left">Description</th>
+            <th class="px-3 py-2 text-right">Qty</th>
+            <th class="px-3 py-2 text-right">Price</th>
+            <th class="px-3 py-2 text-right">Disc.%</th>
+            <th class="px-3 py-2 text-right">Net</th>
+            <th class="px-3 py-2 text-right">VAT%</th>
+            <th class="px-3 py-2 text-right">Total</th>
             <th v-if="!readonly" class="px-3 py-2 w-20" />
           </tr>
         </thead>
         <tbody>
           <tr v-if="lines.length === 0">
             <td :colspan="readonly ? 8 : 9" class="px-3 py-8 text-center text-gray-400">
-              Nessuna riga
+              No lines
             </td>
           </tr>
           <tr
@@ -175,57 +175,57 @@ async function removeLine(lineId: string) {
     <!-- Add/Edit form -->
     <div v-if="!readonly" class="mt-4">
       <button v-if="!showForm" class="btn-secondary btn-sm" @click="showForm = true">
-        <i class="fa-solid fa-plus" /> Aggiungi riga
+        <i class="fa-solid fa-plus" /> Add line
       </button>
 
       <div v-if="showForm" class="border border-gray-200 rounded-lg p-4 bg-gray-50 mt-2">
         <h4 class="text-sm font-semibold text-gray-900 mb-3">
-          {{ editing ? 'Modifica riga' : 'Nuova riga' }}
+          {{ editing ? 'Edit line' : 'New line' }}
         </h4>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <div class="sm:col-span-2">
-            <FormField label="Descrizione" required>
-              <FormInput v-model="form.productDescription" placeholder="Descrizione prodotto/servizio" />
+            <FormField label="Description" required>
+              <FormInput v-model="form.productDescription" placeholder="Product/service description" />
             </FormField>
           </div>
-          <FormField label="Codice">
+          <FormField label="Code">
             <FormInput v-model="form.productCode" placeholder="COD001" />
           </FormField>
-          <FormField label="Unità di misura">
+          <FormField label="Unit of measure">
             <FormSelect v-model="form.unitOfMeasure" :options="UNITS_OF_MEASURE" />
           </FormField>
-          <FormField label="Quantità" required>
+          <FormField label="Quantity" required>
             <FormInput v-model="form.quantity" type="number" />
           </FormField>
-          <FormField label="Prezzo unitario" required>
+          <FormField label="Unit price" required>
             <FormCurrency v-model="form.unitPrice" />
           </FormField>
-          <FormField label="Sconto %">
+          <FormField label="Discount %">
             <FormInput v-model="form.discount" type="number" placeholder="0" />
           </FormField>
-          <FormField label="Aliquota IVA" required>
+          <FormField label="VAT rate" required>
             <FormSelect v-model="form.taxRate" :options="TAX_RATES" />
           </FormField>
           <div class="sm:col-span-2 lg:col-span-4">
-            <FormField label="Note">
-              <FormInput v-model="form.notes" placeholder="Note riga" />
+            <FormField label="Notes">
+              <FormInput v-model="form.notes" placeholder="Line notes" />
             </FormField>
           </div>
         </div>
 
         <!-- Preview -->
         <div class="mt-3 flex items-center gap-4 text-sm text-gray-600">
-          <span>Netto: <strong>{{ formatCurrency(preview.netAmount) }}</strong></span>
-          <span>IVA: <strong>{{ formatCurrency(preview.taxAmount) }}</strong></span>
-          <span>Totale: <strong class="text-gray-900">{{ formatCurrency(preview.totalAmount) }}</strong></span>
+          <span>Net: <strong>{{ formatCurrency(preview.netAmount) }}</strong></span>
+          <span>VAT: <strong>{{ formatCurrency(preview.taxAmount) }}</strong></span>
+          <span>Total: <strong class="text-gray-900">{{ formatCurrency(preview.totalAmount) }}</strong></span>
         </div>
 
         <div class="mt-4 flex gap-2">
           <button class="btn-primary btn-sm" :disabled="saving" @click="save">
             <i v-if="saving" class="fa-solid fa-spinner fa-spin" />
-            {{ editing ? 'Aggiorna' : 'Aggiungi' }}
+            {{ editing ? 'Update' : 'Add' }}
           </button>
-          <button class="btn-ghost btn-sm" @click="resetForm">Annulla</button>
+          <button class="btn-ghost btn-sm" @click="resetForm">Cancel</button>
         </div>
       </div>
     </div>

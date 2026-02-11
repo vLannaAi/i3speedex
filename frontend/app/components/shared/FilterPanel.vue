@@ -10,7 +10,7 @@ defineProps<{
   <div>
     <button class="btn-ghost btn-sm" @click="open = !open">
       <i class="fa-solid fa-filter" />
-      Filtri
+      Filters
       <span v-if="hasFilters" class="w-2 h-2 rounded-full bg-primary-500" />
       <i :class="open ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down'" class="text-xs" />
     </button>

@@ -14,12 +14,12 @@ const totalPages = ref(0)
 const search = ref('')
 
 const columns: Column[] = [
-  { key: 'companyName', label: 'Ragione Sociale', sortable: true },
-  { key: 'city', label: 'Città', sortable: true },
+  { key: 'companyName', label: 'Company Name', sortable: true },
+  { key: 'city', label: 'City', sortable: true },
   { key: 'province', label: 'Prov.' },
-  { key: 'vatNumber', label: 'P.IVA' },
-  { key: 'status', label: 'Stato' },
-  { key: 'totalSales', label: 'Vendite', align: 'right', sortable: true },
+  { key: 'vatNumber', label: 'VAT No.' },
+  { key: 'status', label: 'Status' },
+  { key: 'totalSales', label: 'Sales', align: 'right', sortable: true },
 ]
 
 async function load() {
@@ -51,20 +51,20 @@ function openProducer(producer: Producer) {
 
 <template>
   <div>
-    <BreadcrumbNav :items="[{ label: 'Dashboard', to: '/' }, { label: 'Produttori' }]" />
+    <BreadcrumbNav :items="[{ label: 'Dashboard', to: '/' }, { label: 'Producers' }]" />
     <div class="flex items-center justify-between mb-6">
       <div>
-        <h1 class="page-title">Produttori</h1>
-        <p class="page-subtitle">Gestisci i tuoi produttori</p>
+        <h1 class="page-title">Producers</h1>
+        <p class="page-subtitle">Manage your producers</p>
       </div>
       <NuxtLink v-if="canWrite" to="/producers/new" class="btn-primary">
-        <i class="fa-solid fa-plus" /> Nuovo Produttore
+        <i class="fa-solid fa-plus" /> New Producer
       </NuxtLink>
     </div>
 
     <div class="card mb-4">
       <div class="p-4">
-        <SearchInput v-model="search" placeholder="Cerca produttori..." />
+        <SearchInput v-model="search" placeholder="Search producers..." />
       </div>
     </div>
 
@@ -82,11 +82,11 @@ function openProducer(producer: Producer) {
         </template>
         <template #empty>
           <EmptyState
-            title="Nessun produttore"
-            description="Inizia aggiungendo il primo produttore"
+            title="No producers"
+            description="Get started by adding your first producer"
             icon="fa-solid fa-industry"
             :action-to="canWrite ? '/producers/new' : undefined"
-            :action-label="canWrite ? 'Nuovo Produttore' : undefined"
+            :action-label="canWrite ? 'New Producer' : undefined"
           />
         </template>
       </DataTable>

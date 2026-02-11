@@ -21,8 +21,8 @@ const to = computed(() => Math.min(props.page * props.pageSize, props.total > 0 
 <template>
   <div class="flex items-center justify-between px-4 py-3 border-t border-gray-200 bg-white text-sm">
     <div class="text-gray-500">
-      <span v-if="total > 0">{{ from }}–{{ to }}{{ hasMore ? '+' : ` di ${total}` }}</span>
-      <span v-else>Nessun risultato</span>
+      <span v-if="total > 0">{{ from }}–{{ to }}{{ hasMore ? '+' : ` of ${total}` }}</span>
+      <span v-else>No results</span>
     </div>
 
     <div class="flex items-center gap-3">
@@ -31,7 +31,7 @@ const to = computed(() => Math.min(props.page * props.pageSize, props.total > 0 
         class="text-sm border border-gray-300 rounded-md px-2 py-1"
         @change="emit('update:pageSize', Number(($event.target as HTMLSelectElement).value))"
       >
-        <option v-for="s in pageSizes" :key="s" :value="s">{{ s }} / pag.</option>
+        <option v-for="s in pageSizes" :key="s" :value="s">{{ s }} / page</option>
       </select>
 
       <div class="flex gap-1">

@@ -32,13 +32,13 @@ export default defineNuxtConfig({
   app: {
     pageTransition: { name: 'page', mode: 'out-in' },
     head: {
-      title: 'i3speedex — Gestione Vendite',
+      title: 'i3speedex — Sales Management',
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { name: 'description', content: 'Gestione vendite, acquirenti e produttori' },
+        { name: 'description', content: 'Sales, buyers and producers management' },
       ],
-      htmlAttrs: { lang: 'it' },
+      htmlAttrs: { lang: 'en' },
       script: [
         { src: 'https://kit.fontawesome.com/9ab53866ec.js', crossorigin: 'anonymous' },
       ],

@@ -13,11 +13,11 @@ function handleError() {
     <div class="text-center max-w-md">
       <p class="text-6xl font-bold text-primary-600 mb-4">{{ error.statusCode }}</p>
       <h1 class="text-2xl font-bold text-gray-900 mb-2">
-        {{ error.statusCode === 404 ? 'Pagina non trovata' : 'Si è verificato un errore' }}
+        {{ error.statusCode === 404 ? 'Page not found' : 'An error occurred' }}
       </h1>
       <p class="text-gray-500 mb-6">{{ error.message }}</p>
       <button class="btn-primary" @click="handleError">
-        Torna alla dashboard
+        Back to dashboard
       </button>
     </div>
   </div>

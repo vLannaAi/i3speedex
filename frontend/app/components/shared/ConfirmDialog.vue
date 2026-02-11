@@ -22,11 +22,11 @@ const emit = defineEmits<{
       <div class="fixed inset-0 bg-black/40" @click="emit('cancel')" />
       <!-- Dialog -->
       <div class="bg-white rounded-xl shadow-xl max-w-md w-full relative z-10 p-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ title || 'Conferma' }}</h3>
+        <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ title || 'Confirm' }}</h3>
         <p class="text-sm text-gray-600 mb-6">{{ message }}</p>
         <div class="flex justify-end gap-3">
           <button class="btn-secondary" :disabled="loading" @click="emit('cancel')">
-            {{ cancelLabel || 'Annulla' }}
+            {{ cancelLabel || 'Cancel' }}
           </button>
           <button
             :class="variant === 'danger' ? 'btn-danger' : 'btn-primary'"
@@ -34,7 +34,7 @@ const emit = defineEmits<{
             @click="emit('confirm')"
           >
             <i v-if="loading" class="fa-solid fa-spinner fa-spin" />
-            {{ confirmLabel || 'Conferma' }}
+            {{ confirmLabel || 'Confirm' }}
           </button>
         </div>
       </div>

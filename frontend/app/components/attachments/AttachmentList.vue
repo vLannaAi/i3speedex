@@ -19,7 +19,7 @@ async function remove(attachmentId: string) {
   deleting.value = attachmentId
   try {
     await deleteAttachment(props.saleId, attachmentId)
-    toast.success('Allegato eliminato')
+    toast.success('Attachment deleted')
     emit('refresh')
   } catch (e: any) {
     toast.error(e.message)
@@ -42,7 +42,7 @@ function fileIcon(type: string) {
 
 <template>
   <div v-if="attachments.length === 0" class="text-sm text-gray-500 text-center py-6">
-    Nessun allegato
+    No attachments
   </div>
   <ul v-else class="divide-y divide-gray-100">
     <li

@@ -3,7 +3,7 @@
     <div class="w-full max-w-md">
       <div class="text-center mb-8">
         <h1 class="text-3xl font-bold text-primary-700">i3speedex</h1>
-        <p class="text-gray-500 mt-1">Gestione Vendite</p>
+        <p class="text-gray-500 mt-1">Sales Management</p>
       </div>
       <div class="card card-body">
         <slot />

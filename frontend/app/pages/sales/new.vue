@@ -28,9 +28,9 @@ const errors = reactive<Record<string, string>>({})
 
 function validate(): boolean {
   Object.keys(errors).forEach(k => delete errors[k])
-  if (!form.saleDate) errors.saleDate = 'Data obbligatoria'
-  if (!form.buyerId) errors.buyerId = 'Seleziona un acquirente'
-  if (!form.producerId) errors.producerId = 'Seleziona un produttore'
+  if (!form.saleDate) errors.saleDate = 'Date is required'
+  if (!form.buyerId) errors.buyerId = 'Select a buyer'
+  if (!form.producerId) errors.producerId = 'Select a producer'
   return Object.keys(errors).length === 0
 }
 
@@ -52,7 +52,7 @@ async function handleSubmit() {
       currency: form.currency,
     })
     if (res.success && res.data) {
-      toast.success('Vendita creata')
+      toast.success('Sale created')
       router.push(`/sales/${res.data.saleId}`)
     }
   } catch (e: any) {
@@ -76,26 +76,26 @@ function onBuyerSelect(buyer: Buyer) {
   <div>
     <BreadcrumbNav :items="[
       { label: 'Dashboard', to: '/' },
-      { label: 'Vendite', to: '/sales' },
-      { label: 'Nuova Vendita' },
+      { label: 'Sales', to: '/sales' },
+      { label: 'New Sale' },
     ]" />
     <div class="mb-6">
-      <h1 class="page-title">Nuova Vendita</h1>
-      <p class="page-subtitle">Compila i dati per creare una nuova vendita</p>
+      <h1 class="page-title">New Sale</h1>
+      <p class="page-subtitle">Fill in the details to create a new sale</p>
     </div>
 
     <form @submit.prevent="handleSubmit" class="space-y-6">
       <!-- Main info -->
       <div class="card card-body">
-        <h3 class="section-title mb-4">Informazioni Principali</h3>
+        <h3 class="section-title mb-4">Main Information</h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <FormField label="Data vendita" required :error="errors.saleDate">
+          <FormField label="Sale date" required :error="errors.saleDate">
             <FormDatePicker v-model="form.saleDate" :error="!!errors.saleDate" />
           </FormField>
-          <FormField label="Acquirente" required :error="errors.buyerId">
+          <FormField label="Buyer" required :error="errors.buyerId">
             <BuyerSelect v-model="form.buyerId" :error="!!errors.buyerId" @select="onBuyerSelect" />
           </FormField>
-          <FormField label="Produttore" required :error="errors.producerId">
+          <FormField label="Producer" required :error="errors.producerId">
             <ProducerSelect v-model="form.producerId" :error="!!errors.producerId" />
           </FormField>
         </div>
@@ -103,45 +103,45 @@ function onBuyerSelect(buyer: Buyer) {
 
       <!-- Payment & delivery -->
       <div class="card card-body">
-        <h3 class="section-title mb-4">Pagamento e Consegna</h3>
+        <h3 class="section-title mb-4">Payment & Delivery</h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <FormField label="Metodo pagamento">
-            <FormSelect v-model="form.paymentMethod" :options="PAYMENT_METHODS" placeholder="Seleziona..." />
+          <FormField label="Payment method">
+            <FormSelect v-model="form.paymentMethod" :options="PAYMENT_METHODS" placeholder="Select..." />
           </FormField>
-          <FormField label="Termini pagamento">
-            <FormSelect v-model="form.paymentTerms" :options="PAYMENT_TERMS" placeholder="Seleziona..." />
+          <FormField label="Payment terms">
+            <FormSelect v-model="form.paymentTerms" :options="PAYMENT_TERMS" placeholder="Select..." />
           </FormField>
-          <FormField label="Metodo consegna">
-            <FormInput v-model="form.deliveryMethod" placeholder="Es. Corriere, Ritiro..." />
+          <FormField label="Delivery method">
+            <FormInput v-model="form.deliveryMethod" placeholder="e.g. Courier, Pickup..." />
           </FormField>
-          <FormField label="Data consegna">
+          <FormField label="Delivery date">
             <FormDatePicker v-model="form.deliveryDate" />
           </FormField>
-          <FormField label="Riferimento">
-            <FormInput v-model="form.referenceNumber" placeholder="Rif. ordine, DDT..." />
+          <FormField label="Reference">
+            <FormInput v-model="form.referenceNumber" placeholder="Order ref., DDT..." />
           </FormField>
         </div>
       </div>
 
       <!-- Notes -->
       <div class="card card-body">
-        <h3 class="section-title mb-4">Note</h3>
+        <h3 class="section-title mb-4">Notes</h3>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <FormField label="Note">
-            <FormTextarea v-model="form.notes" placeholder="Note visibili in fattura" :max-length="1000" />
+          <FormField label="Notes">
+            <FormTextarea v-model="form.notes" placeholder="Notes visible on invoice" :max-length="1000" />
           </FormField>
-          <FormField label="Note interne">
-            <FormTextarea v-model="form.internalNotes" placeholder="Note solo uso interno" :max-length="1000" />
+          <FormField label="Internal notes">
+            <FormTextarea v-model="form.internalNotes" placeholder="Internal use only" :max-length="1000" />
           </FormField>
         </div>
       </div>
 
       <!-- Submit -->
       <div class="flex justify-end gap-3">
-        <NuxtLink to="/sales" class="btn-secondary">Annulla</NuxtLink>
+        <NuxtLink to="/sales" class="btn-secondary">Cancel</NuxtLink>
         <button type="submit" class="btn-primary" :disabled="saving">
           <i v-if="saving" class="fa-solid fa-spinner fa-spin" />
-          Crea Vendita
+          Create Sale
         </button>
       </div>
     </form>

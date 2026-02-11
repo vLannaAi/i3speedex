@@ -63,7 +63,7 @@ export function useApi() {
         }
       }
       // Extract error message from API response
-      const message = error?.data?.message || error?.response?._data?.message || error?.message || 'Errore di rete'
+      const message = error?.data?.message || error?.response?._data?.message || error?.message || 'Network error'
       throw new Error(message)
     }
   }

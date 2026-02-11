@@ -30,11 +30,11 @@ const navSections: NavSection[] = [
   },
   {
     key: 'management',
-    label: 'Gestione',
+    label: 'Management',
     items: [
-      { label: 'Vendite', icon: 'fa-solid fa-file-invoice', to: '/sales' },
-      { label: 'Acquirenti', icon: 'fa-solid fa-users', to: '/buyers' },
-      { label: 'Produttori', icon: 'fa-solid fa-industry', to: '/producers' },
+      { label: 'Sales', icon: 'fa-solid fa-file-invoice', to: '/sales' },
+      { label: 'Buyers', icon: 'fa-solid fa-users', to: '/buyers' },
+      { label: 'Producers', icon: 'fa-solid fa-industry', to: '/producers' },
     ],
   },
 ]
@@ -68,7 +68,7 @@ function isActive(to: string) {
         </template>
         <template v-else>
           <span class="text-xl font-bold text-primary-700">i3speedex</span>
-          <p class="text-xs text-gray-400 mt-0.5">Gestione Vendite</p>
+          <p class="text-xs text-gray-400 mt-0.5">Sales Management</p>
         </template>
       </NuxtLink>
     </div>
@@ -136,7 +136,7 @@ function isActive(to: string) {
         @click="emit('toggle')"
       >
         <i :class="mode === 'collapsed' ? 'fa-solid fa-angles-right' : 'fa-solid fa-angles-left'" />
-        <span v-if="mode !== 'collapsed'" class="text-xs">Comprimi</span>
+        <span v-if="mode !== 'collapsed'" class="text-xs">Collapse</span>
       </button>
     </div>
   </aside>

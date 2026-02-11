@@ -62,7 +62,7 @@ const mainMargin = computed(() => {
       >
         <div class="inline-flex items-center gap-2">
           <i class="fa-solid fa-wifi-slash" />
-          Connessione assente — Le modifiche non verranno salvate
+          No connection — Changes will not be saved
         </div>
       </div>
     </Transition>

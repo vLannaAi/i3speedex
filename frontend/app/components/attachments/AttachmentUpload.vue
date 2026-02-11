@@ -19,7 +19,7 @@ async function handleFiles(files: FileList | null) {
     for (const file of Array.from(files)) {
       await uploadFile(props.saleId, file, description.value || undefined)
     }
-    toast.success('File caricato')
+    toast.success('File uploaded')
     description.value = ''
     emit('uploaded')
   } catch (e: any) {
@@ -49,17 +49,17 @@ function onFileSelect(e: Event) {
       @drop.prevent="onDrop"
     >
       <i class="fa-solid fa-cloud-arrow-up text-3xl text-gray-400 mx-auto mb-2" />
-      <p class="text-sm text-gray-600">Trascina i file qui oppure</p>
+      <p class="text-sm text-gray-600">Drag files here or</p>
       <label class="btn-secondary btn-sm mt-2 cursor-pointer">
-        Sfoglia
+        Browse
         <input type="file" multiple class="hidden" @change="onFileSelect">
       </label>
       <div v-if="uploading" class="mt-3 flex items-center justify-center gap-2 text-sm text-primary-600">
-        <i class="fa-solid fa-spinner fa-spin" /> Caricamento in corso...
+        <i class="fa-solid fa-spinner fa-spin" /> Uploading...
       </div>
     </div>
     <div class="mt-2">
-      <FormInput v-model="description" placeholder="Descrizione (opzionale)" />
+      <FormInput v-model="description" placeholder="Description (optional)" />
     </div>
   </div>
 </template>

@@ -49,7 +49,7 @@ onMounted(() => loadBuyers())
       @click="open = !open"
     >
       <span :class="selectedName ? 'text-gray-900' : 'text-gray-400'">
-        {{ selectedName || 'Seleziona acquirente...' }}
+        {{ selectedName || 'Select buyer...' }}
       </span>
       <i class="fa-solid fa-chevron-down text-gray-400" />
     </div>
@@ -59,14 +59,14 @@ onMounted(() => loadBuyers())
         <input
           v-model="search"
           type="text"
-          placeholder="Cerca acquirente..."
+          placeholder="Search buyer..."
           class="input-base text-sm"
           @click.stop
         >
       </div>
       <div class="overflow-y-auto max-h-48">
-        <div v-if="loading" class="p-3 text-sm text-gray-500 text-center">Caricamento...</div>
-        <div v-else-if="buyers.length === 0" class="p-3 text-sm text-gray-500 text-center">Nessun risultato</div>
+        <div v-if="loading" class="p-3 text-sm text-gray-500 text-center">Loading...</div>
+        <div v-else-if="buyers.length === 0" class="p-3 text-sm text-gray-500 text-center">No results</div>
         <button
           v-for="b in buyers"
           :key="b.buyerId"

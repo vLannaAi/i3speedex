@@ -35,7 +35,7 @@ const actionColor: Record<string, string> = {
   <div>
     <div class="mb-6">
       <h1 class="page-title">Dashboard</h1>
-      <p class="page-subtitle">Panoramica delle vendite</p>
+      <p class="page-subtitle">Sales overview</p>
     </div>
 
     <!-- Stat cards -->
@@ -46,27 +46,27 @@ const actionColor: Record<string, string> = {
     </div>
     <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
       <StatCard
-        label="Vendite Totali"
+        label="Total Sales"
         :value="stats?.totalSales ?? 0"
         icon="fa-solid fa-file-invoice"
         color="primary"
         :trend="stats?.salesGrowth"
       />
       <StatCard
-        label="Ricavi"
+        label="Revenue"
         :value="formatCurrency(stats?.totalRevenue ?? 0)"
         icon="fa-solid fa-money-bills"
         color="success"
         :trend="stats?.revenueGrowth"
       />
       <StatCard
-        label="Acquirenti Attivi"
+        label="Active Buyers"
         :value="stats?.activeBuyers ?? 0"
         icon="fa-solid fa-users"
         color="warning"
       />
       <StatCard
-        label="Produttori Attivi"
+        label="Active Producers"
         :value="stats?.activeProducers ?? 0"
         icon="fa-solid fa-industry"
         color="danger"
@@ -90,16 +90,16 @@ const actionColor: Record<string, string> = {
       <!-- Top Buyers -->
       <div class="card">
         <div class="px-5 py-4 border-b border-gray-100">
-          <h3 class="section-title">Top 5 Acquirenti</h3>
+          <h3 class="section-title">Top 5 Buyers</h3>
         </div>
         <div v-if="loading" class="p-5"><LoadingSkeleton :lines="5" /></div>
-        <div v-else-if="topBuyers.length === 0" class="p-5 text-center text-sm text-gray-500">Nessun dato</div>
+        <div v-else-if="topBuyers.length === 0" class="p-5 text-center text-sm text-gray-500">No data</div>
         <table v-else class="w-full">
           <thead>
             <tr class="border-b border-gray-100 text-left text-xs text-gray-500 uppercase">
-              <th class="px-5 py-2.5">Acquirente</th>
-              <th class="px-5 py-2.5 text-right">Vendite</th>
-              <th class="px-5 py-2.5 text-right">Totale</th>
+              <th class="px-5 py-2.5">Buyer</th>
+              <th class="px-5 py-2.5 text-right">Sales</th>
+              <th class="px-5 py-2.5 text-right">Total</th>
             </tr>
           </thead>
           <tbody>
@@ -119,10 +119,10 @@ const actionColor: Record<string, string> = {
       <!-- Recent Activity -->
       <div class="card">
         <div class="px-5 py-4 border-b border-gray-100">
-          <h3 class="section-title">Attività Recente</h3>
+          <h3 class="section-title">Recent Activity</h3>
         </div>
         <div v-if="loading" class="p-5"><LoadingSkeleton :lines="5" /></div>
-        <div v-else-if="recentActivity.length === 0" class="p-5 text-center text-sm text-gray-500">Nessuna attività recente</div>
+        <div v-else-if="recentActivity.length === 0" class="p-5 text-center text-sm text-gray-500">No recent activity</div>
         <ul v-else class="divide-y divide-gray-50">
           <li
             v-for="item in recentActivity"

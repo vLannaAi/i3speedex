@@ -27,7 +27,7 @@ defineProps<{
       <p class="text-2xl font-bold text-gray-900 mt-1">{{ value }}</p>
       <p v-if="trend !== undefined" class="text-xs mt-1" :class="trend >= 0 ? 'text-success-600' : 'text-danger-600'">
         <span>{{ trend >= 0 ? '+' : '' }}{{ trend }}%</span>
-        <span class="text-gray-400 ml-1">vs mese prec.</span>
+        <span class="text-gray-400 ml-1">vs prev. month</span>
       </p>
     </div>
   </div>

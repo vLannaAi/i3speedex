@@ -31,7 +31,7 @@ function clear() {
     <input
       :value="local"
       type="text"
-      :placeholder="placeholder || 'Cerca...'"
+      :placeholder="placeholder || 'Search...'"
       class="input-base pl-10 pr-8"
       @input="onInput"
     >

@@ -21,7 +21,7 @@ async function handleGeneratePdf() {
   generating.value = true
   try {
     await generatePdf(props.sale.saleId, language.value)
-    toast.success('PDF generato con successo')
+    toast.success('PDF generated successfully')
   } catch (e: any) {
     toast.error(e.message)
   } finally {
@@ -33,7 +33,7 @@ async function handleGenerateSdi() {
   generating.value = true
   try {
     await generateSdi(props.sale.saleId)
-    toast.success('XML SDI generato con successo')
+    toast.success('SDI XML generated successfully')
   } catch (e: any) {
     toast.error(e.message)
   } finally {
@@ -59,12 +59,12 @@ async function handleDownload() {
 <template>
   <div class="space-y-4">
     <div v-if="!canGenerate" class="text-sm text-gray-500">
-      La vendita deve essere confermata prima di generare fatture.
+      The sale must be confirmed before generating invoices.
     </div>
 
     <template v-else>
       <div class="flex items-center gap-3">
-        <FormField label="Lingua">
+        <FormField label="Language">
           <FormSelect v-model="language" :options="INVOICE_LANGUAGES" />
         </FormField>
       </div>
@@ -76,7 +76,7 @@ async function handleDownload() {
           @click="handleGeneratePdf"
         >
           <i :class="generating ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-file-pdf'" />
-          Genera PDF
+          Generate PDF
         </button>
         <button
           class="btn-secondary btn-sm"
@@ -84,7 +84,7 @@ async function handleDownload() {
           @click="handleGenerateSdi"
         >
           <i :class="generating ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-file-code'" />
-          Genera XML SDI
+          Generate SDI XML
         </button>
         <button
           v-if="sale.invoiceGenerated"
@@ -93,13 +93,13 @@ async function handleDownload() {
           @click="handleDownload"
         >
           <i :class="downloading ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-download'" />
-          Scarica
+          Download
         </button>
       </div>
 
       <div v-if="sale.invoiceGenerated" class="text-xs text-gray-400">
-        Fattura generata il {{ sale.invoiceGeneratedAt }}
-        <span v-if="sale.invoiceNumber"> — N. {{ sale.invoiceNumber }}</span>
+        Invoice generated on {{ sale.invoiceGeneratedAt }}
+        <span v-if="sale.invoiceNumber"> — No. {{ sale.invoiceNumber }}</span>
       </div>
     </template>
   </div>

@@ -82,7 +82,7 @@ async function save() {
       notes: form.notes || undefined,
       status: form.status,
     })
-    toast.success('Produttore aggiornato')
+    toast.success('Producer updated')
     editing.value = false
     await load()
   } catch (e: any) {
@@ -96,7 +96,7 @@ async function handleDelete() {
   showDeleteDialog.value = false
   try {
     await deleteProducer(producerId)
-    toast.success('Produttore eliminato')
+    toast.success('Producer deleted')
     router.push('/producers')
   } catch (e: any) {
     toast.error(e.message)
@@ -110,7 +110,7 @@ onMounted(() => load())
   <div>
     <BreadcrumbNav :items="[
       { label: 'Dashboard', to: '/' },
-      { label: 'Produttori', to: '/producers' },
+      { label: 'Producers', to: '/producers' },
       { label: producer?.companyName || '...' },
     ]" />
     <div v-if="loading" class="mb-6"><LoadingSkeleton :lines="2" height="28px" /></div>
@@ -120,16 +120,16 @@ onMounted(() => load())
           <h1 class="page-title">{{ producer.companyName }}</h1>
           <div class="flex items-center gap-2 mt-1">
             <StatusBadge :status="producer.status" />
-            <span v-if="producer.vatNumber" class="text-sm text-gray-500">P.IVA {{ producer.vatNumber }}</span>
+            <span v-if="producer.vatNumber" class="text-sm text-gray-500">VAT {{ producer.vatNumber }}</span>
           </div>
         </div>
       </div>
       <div v-if="canWrite" class="flex gap-2">
         <button v-if="!editing" class="btn-secondary btn-sm" @click="editing = true">
-          <i class="fa-solid fa-pen" /> Modifica
+          <i class="fa-solid fa-pen" /> Edit
         </button>
         <button class="btn-danger btn-sm" @click="showDeleteDialog = true">
-          <i class="fa-regular fa-trash-can" /> Elimina
+          <i class="fa-regular fa-trash-can" /> Delete
         </button>
       </div>
     </div>
@@ -138,45 +138,45 @@ onMounted(() => load())
       <template v-if="editing">
         <form @submit.prevent="save" class="space-y-6">
           <div class="card card-body">
-            <h3 class="section-title mb-4">Dati Azienda</h3>
+            <h3 class="section-title mb-4">Company Details</h3>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <FormField label="Ragione Sociale" required><FormInput v-model="form.companyName" /></FormField>
-              <FormField label="P.IVA"><FormInput v-model="form.vatNumber" placeholder="IT12345678901" /></FormField>
-              <FormField label="Codice Fiscale"><FormInput v-model="form.fiscalCode" /></FormField>
-              <FormField label="Stato">
-                <FormSelect v-model="form.status" :options="[{ value: 'active', label: 'Attivo' }, { value: 'inactive', label: 'Inattivo' }]" />
+              <FormField label="Company Name" required><FormInput v-model="form.companyName" /></FormField>
+              <FormField label="VAT No."><FormInput v-model="form.vatNumber" placeholder="IT12345678901" /></FormField>
+              <FormField label="Fiscal Code"><FormInput v-model="form.fiscalCode" /></FormField>
+              <FormField label="Status">
+                <FormSelect v-model="form.status" :options="[{ value: 'active', label: 'Active' }, { value: 'inactive', label: 'Inactive' }]" />
               </FormField>
             </div>
           </div>
 
           <div class="card card-body">
-            <h3 class="section-title mb-4">Indirizzo</h3>
+            <h3 class="section-title mb-4">Address</h3>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div class="sm:col-span-2 lg:col-span-3"><FormField label="Indirizzo" required><FormInput v-model="form.address" /></FormField></div>
-              <FormField label="Città" required><FormInput v-model="form.city" /></FormField>
-              <FormField label="Provincia"><FormSelect v-model="form.province" :options="provinceOptions" placeholder="Seleziona..." /></FormField>
-              <FormField label="CAP" required><FormInput v-model="form.postalCode" /></FormField>
-              <FormField label="Paese" required><FormSelect v-model="form.country" :options="COUNTRIES" /></FormField>
+              <div class="sm:col-span-2 lg:col-span-3"><FormField label="Address" required><FormInput v-model="form.address" /></FormField></div>
+              <FormField label="City" required><FormInput v-model="form.city" /></FormField>
+              <FormField label="Province"><FormSelect v-model="form.province" :options="provinceOptions" placeholder="Select..." /></FormField>
+              <FormField label="Postal Code" required><FormInput v-model="form.postalCode" /></FormField>
+              <FormField label="Country" required><FormSelect v-model="form.country" :options="COUNTRIES" /></FormField>
             </div>
           </div>
 
           <div class="card card-body">
-            <h3 class="section-title mb-4">Contatti</h3>
+            <h3 class="section-title mb-4">Contacts</h3>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <FormField label="Email"><FormInput v-model="form.email" type="email" /></FormField>
-              <FormField label="Telefono"><FormInput v-model="form.phone" /></FormField>
-              <FormField label="Sito Web"><FormInput v-model="form.website" placeholder="https://..." /></FormField>
+              <FormField label="Phone"><FormInput v-model="form.phone" /></FormField>
+              <FormField label="Website"><FormInput v-model="form.website" placeholder="https://..." /></FormField>
             </div>
           </div>
 
           <div class="card card-body">
-            <FormField label="Note"><FormTextarea v-model="form.notes" :max-length="1000" /></FormField>
+            <FormField label="Notes"><FormTextarea v-model="form.notes" :max-length="1000" /></FormField>
           </div>
 
           <div class="flex justify-end gap-3">
-            <button type="button" class="btn-secondary" @click="editing = false; populateForm(producer!)">Annulla</button>
+            <button type="button" class="btn-secondary" @click="editing = false; populateForm(producer!)">Cancel</button>
             <button type="submit" class="btn-primary" :disabled="saving">
-              <i v-if="saving" class="fa-solid fa-spinner fa-spin" /> Salva
+              <i v-if="saving" class="fa-solid fa-spinner fa-spin" /> Save
             </button>
           </div>
         </form>
@@ -185,36 +185,36 @@ onMounted(() => load())
       <template v-else>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div class="card card-body">
-            <h3 class="section-title mb-3">Dati Azienda</h3>
+            <h3 class="section-title mb-3">Company Details</h3>
             <dl class="space-y-2 text-sm">
-              <div><dt class="text-gray-500 inline">P.IVA:</dt> <dd class="inline font-medium">{{ producer.vatNumber || '—' }}</dd></div>
-              <div><dt class="text-gray-500 inline">Codice Fiscale:</dt> <dd class="inline font-medium">{{ producer.fiscalCode || '—' }}</dd></div>
+              <div><dt class="text-gray-500 inline">VAT No.:</dt> <dd class="inline font-medium">{{ producer.vatNumber || '—' }}</dd></div>
+              <div><dt class="text-gray-500 inline">Fiscal Code:</dt> <dd class="inline font-medium">{{ producer.fiscalCode || '—' }}</dd></div>
             </dl>
           </div>
           <div class="card card-body">
-            <h3 class="section-title mb-3">Indirizzo</h3>
+            <h3 class="section-title mb-3">Address</h3>
             <p class="text-sm">{{ producer.address }}</p>
             <p class="text-sm">{{ producer.postalCode }} {{ producer.city }} {{ producer.province ? `(${producer.province})` : '' }}</p>
             <p class="text-sm text-gray-500">{{ COUNTRIES.find(c => c.value === producer!.country)?.label || producer.country }}</p>
           </div>
           <div class="card card-body">
-            <h3 class="section-title mb-3">Contatti</h3>
+            <h3 class="section-title mb-3">Contacts</h3>
             <dl class="space-y-2 text-sm">
               <div><dt class="text-gray-500 inline">Email:</dt> <dd class="inline font-medium">{{ producer.email || '—' }}</dd></div>
-              <div><dt class="text-gray-500 inline">Telefono:</dt> <dd class="inline font-medium">{{ producer.phone || '—' }}</dd></div>
-              <div><dt class="text-gray-500 inline">Sito Web:</dt> <dd class="inline font-medium">{{ producer.website || '—' }}</dd></div>
+              <div><dt class="text-gray-500 inline">Phone:</dt> <dd class="inline font-medium">{{ producer.phone || '—' }}</dd></div>
+              <div><dt class="text-gray-500 inline">Website:</dt> <dd class="inline font-medium">{{ producer.website || '—' }}</dd></div>
             </dl>
           </div>
           <div class="card card-body">
-            <h3 class="section-title mb-3">Statistiche</h3>
+            <h3 class="section-title mb-3">Statistics</h3>
             <dl class="space-y-2 text-sm">
-              <div><dt class="text-gray-500 inline">Vendite totali:</dt> <dd class="inline font-medium">{{ producer.totalSales ?? 0 }}</dd></div>
-              <div><dt class="text-gray-500 inline">Ultima vendita:</dt> <dd class="inline font-medium">{{ formatDate(producer.lastSaleDate) }}</dd></div>
+              <div><dt class="text-gray-500 inline">Total sales:</dt> <dd class="inline font-medium">{{ producer.totalSales ?? 0 }}</dd></div>
+              <div><dt class="text-gray-500 inline">Last sale:</dt> <dd class="inline font-medium">{{ formatDate(producer.lastSaleDate) }}</dd></div>
             </dl>
           </div>
         </div>
         <div v-if="producer.notes" class="card card-body mt-6">
-          <h3 class="section-title mb-2">Note</h3>
+          <h3 class="section-title mb-2">Notes</h3>
           <p class="text-sm text-gray-600">{{ producer.notes }}</p>
         </div>
       </template>
@@ -222,9 +222,9 @@ onMounted(() => load())
 
     <ConfirmDialog
       :open="showDeleteDialog"
-      title="Elimina produttore"
-      message="Sei sicuro di voler eliminare questo produttore?"
-      confirm-label="Elimina"
+      title="Delete producer"
+      message="Are you sure you want to delete this producer?"
+      confirm-label="Delete"
       variant="danger"
       @confirm="handleDelete"
       @cancel="showDeleteDialog = false"
