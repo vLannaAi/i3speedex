@@ -51,7 +51,7 @@ onMounted(() => loadBuyers())
       <span :class="selectedName ? 'text-gray-900' : 'text-gray-400'">
         {{ selectedName || 'Seleziona acquirente...' }}
       </span>
-      <div class="i-mdi-chevron-down text-gray-400" />
+      <i class="fa-solid fa-chevron-down text-gray-400" />
     </div>
 
     <div v-if="open" class="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-20 max-h-64 overflow-hidden">
@@ -78,7 +78,7 @@ onMounted(() => loadBuyers())
             <p class="font-medium">{{ b.companyName }}</p>
             <p class="text-xs text-gray-400">{{ b.city }}{{ b.province ? ` (${b.province})` : '' }}</p>
           </div>
-          <div v-if="b.buyerId === modelValue" class="i-mdi-check text-primary-600" />
+          <i v-if="b.buyerId === modelValue" class="fa-solid fa-check text-primary-600" />
         </button>
       </div>
     </div>

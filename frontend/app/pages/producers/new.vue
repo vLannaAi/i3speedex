@@ -134,7 +134,7 @@ async function handleSubmit() {
       <div class="flex justify-end gap-3">
         <NuxtLink to="/producers" class="btn-secondary">Annulla</NuxtLink>
         <button type="submit" class="btn-primary" :disabled="saving">
-          <div v-if="saving" class="i-mdi-loading animate-spin" /> Crea Produttore
+          <i v-if="saving" class="fa-solid fa-spinner fa-spin" /> Crea Produttore
         </button>
       </div>
     </form>

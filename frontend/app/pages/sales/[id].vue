@@ -23,10 +23,10 @@ const showDeleteDialog = ref(false)
 const showConfirmDialog = ref(false)
 
 const tabs = [
-  { key: 'details', label: 'Dettagli', icon: 'i-mdi-information-outline' },
-  { key: 'lines', label: 'Righe', icon: 'i-mdi-format-list-numbered' },
-  { key: 'invoice', label: 'Fattura', icon: 'i-mdi-file-document-outline' },
-  { key: 'attachments', label: 'Allegati', icon: 'i-mdi-attachment' },
+  { key: 'details', label: 'Dettagli', icon: 'fa-regular fa-circle-info' },
+  { key: 'lines', label: 'Righe', icon: 'fa-solid fa-list-ol' },
+  { key: 'invoice', label: 'Fattura', icon: 'fa-regular fa-file-lines' },
+  { key: 'attachments', label: 'Allegati', icon: 'fa-solid fa-paperclip' },
 ]
 
 // Edit form
@@ -181,7 +181,7 @@ onMounted(() => load())
           @click="activeTab = tab.key"
         >
           <div class="inline-flex items-center gap-1.5">
-            <div :class="tab.icon" />
+            <i :class="tab.icon" />
             {{ tab.label }}
             <span v-if="tab.key === 'lines' && lines.length" class="text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded-full">{{ lines.length }}</span>
             <span v-if="tab.key === 'attachments' && attachments.length" class="text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded-full">{{ attachments.length }}</span>
@@ -201,7 +201,7 @@ onMounted(() => load())
           <div class="flex items-center justify-between mb-4">
             <h3 class="section-title">Informazioni Vendita</h3>
             <button v-if="isEditable && !editing" class="btn-ghost btn-sm" @click="editing = true">
-              <div class="i-mdi-pencil-outline" /> Modifica
+              <i class="fa-solid fa-pen" /> Modifica
             </button>
           </div>
 
@@ -238,7 +238,7 @@ onMounted(() => load())
             </div>
             <div class="flex gap-2 mt-4">
               <button class="btn-primary btn-sm" :disabled="saving" @click="saveDetails">
-                <div v-if="saving" class="i-mdi-loading animate-spin" /> Salva
+                <i v-if="saving" class="fa-solid fa-spinner fa-spin" /> Salva
               </button>
               <button class="btn-ghost btn-sm" @click="editing = false; populateForm(sale!)">Annulla</button>
             </div>

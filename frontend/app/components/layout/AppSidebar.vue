@@ -10,10 +10,10 @@ defineEmits<{
 const route = useRoute()
 
 const navItems = [
-  { label: 'Dashboard', icon: 'i-mdi-view-dashboard-outline', to: '/' },
-  { label: 'Vendite', icon: 'i-mdi-receipt-text-outline', to: '/sales' },
-  { label: 'Acquirenti', icon: 'i-mdi-account-group-outline', to: '/buyers' },
-  { label: 'Produttori', icon: 'i-mdi-factory', to: '/producers' },
+  { label: 'Dashboard', icon: 'fa-solid fa-gauge', to: '/' },
+  { label: 'Vendite', icon: 'fa-solid fa-file-invoice', to: '/sales' },
+  { label: 'Acquirenti', icon: 'fa-solid fa-users', to: '/buyers' },
+  { label: 'Produttori', icon: 'fa-solid fa-industry', to: '/producers' },
 ]
 
 function isActive(to: string) {
@@ -46,7 +46,7 @@ function isActive(to: string) {
               ? 'bg-primary-50 text-primary-700'
               : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'"
           >
-            <div :class="item.icon" class="text-lg" />
+            <i :class="item.icon" class="text-lg" />
             {{ item.label }}
           </NuxtLink>
         </li>

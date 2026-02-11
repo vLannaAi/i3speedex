@@ -2,10 +2,10 @@
 const { toasts, remove } = useToast()
 
 const iconMap: Record<string, string> = {
-  success: 'i-mdi-check-circle',
-  error: 'i-mdi-alert-circle',
-  warning: 'i-mdi-alert',
-  info: 'i-mdi-information',
+  success: 'fa-solid fa-circle-check',
+  error: 'fa-solid fa-circle-exclamation',
+  warning: 'fa-solid fa-triangle-exclamation',
+  info: 'fa-solid fa-circle-info',
 }
 
 const colorMap: Record<string, string> = {
@@ -25,9 +25,9 @@ const colorMap: Record<string, string> = {
         class="rounded-lg border-l-4 px-4 py-3 shadow-md flex items-start gap-3"
         :class="colorMap[toast.type]"
       >
-        <div :class="iconMap[toast.type]" class="text-lg mt-0.5 shrink-0" />
+        <i :class="iconMap[toast.type]" class="text-lg mt-0.5 shrink-0" />
         <p class="text-sm flex-1">{{ toast.message }}</p>
-        <button class="i-mdi-close text-sm opacity-60 hover:opacity-100 shrink-0" @click="remove(toast.id)" />
+        <button class="text-sm opacity-60 hover:opacity-100 shrink-0" @click="remove(toast.id)"><i class="fa-solid fa-xmark" /></button>
       </div>
     </TransitionGroup>
   </div>

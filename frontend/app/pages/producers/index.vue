@@ -58,7 +58,7 @@ function openProducer(producer: Producer) {
         <p class="page-subtitle">Gestisci i tuoi produttori</p>
       </div>
       <NuxtLink v-if="canWrite" to="/producers/new" class="btn-primary">
-        <div class="i-mdi-plus" /> Nuovo Produttore
+        <i class="fa-solid fa-plus" /> Nuovo Produttore
       </NuxtLink>
     </div>
 
@@ -84,7 +84,7 @@ function openProducer(producer: Producer) {
           <EmptyState
             title="Nessun produttore"
             description="Inizia aggiungendo il primo produttore"
-            icon="i-mdi-factory"
+            icon="fa-solid fa-industry"
             :action-to="canWrite ? '/producers/new' : undefined"
             :action-label="canWrite ? 'Nuovo Produttore' : undefined"
           />

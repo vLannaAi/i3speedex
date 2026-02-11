@@ -126,10 +126,10 @@ onMounted(() => load())
       </div>
       <div v-if="canWrite" class="flex gap-2">
         <button v-if="!editing" class="btn-secondary btn-sm" @click="editing = true">
-          <div class="i-mdi-pencil-outline" /> Modifica
+          <i class="fa-solid fa-pen" /> Modifica
         </button>
         <button class="btn-danger btn-sm" @click="showDeleteDialog = true">
-          <div class="i-mdi-delete-outline" /> Elimina
+          <i class="fa-regular fa-trash-can" /> Elimina
         </button>
       </div>
     </div>
@@ -176,7 +176,7 @@ onMounted(() => load())
           <div class="flex justify-end gap-3">
             <button type="button" class="btn-secondary" @click="editing = false; populateForm(producer!)">Annulla</button>
             <button type="submit" class="btn-primary" :disabled="saving">
-              <div v-if="saving" class="i-mdi-loading animate-spin" /> Salva
+              <i v-if="saving" class="fa-solid fa-spinner fa-spin" /> Salva
             </button>
           </div>
         </form>

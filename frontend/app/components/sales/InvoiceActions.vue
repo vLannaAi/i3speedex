@@ -75,7 +75,7 @@ async function handleDownload() {
           :disabled="generating"
           @click="handleGeneratePdf"
         >
-          <div :class="generating ? 'i-mdi-loading animate-spin' : 'i-mdi-file-pdf-box'" />
+          <i :class="generating ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-file-pdf'" />
           Genera PDF
         </button>
         <button
@@ -83,7 +83,7 @@ async function handleDownload() {
           :disabled="generating"
           @click="handleGenerateSdi"
         >
-          <div :class="generating ? 'i-mdi-loading animate-spin' : 'i-mdi-file-xml-box'" />
+          <i :class="generating ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-file-code'" />
           Genera XML SDI
         </button>
         <button
@@ -92,7 +92,7 @@ async function handleDownload() {
           :disabled="downloading"
           @click="handleDownload"
         >
-          <div :class="downloading ? 'i-mdi-loading animate-spin' : 'i-mdi-download'" />
+          <i :class="downloading ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-download'" />
           Scarica
         </button>
       </div>

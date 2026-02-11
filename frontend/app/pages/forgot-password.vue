@@ -67,7 +67,7 @@ async function handleResetPassword() {
       </div>
       <div v-if="errorMsg" class="text-sm text-danger-600 bg-danger-50 rounded-lg px-3 py-2">{{ errorMsg }}</div>
       <button type="submit" class="btn-primary w-full" :disabled="loading">
-        <div v-if="loading" class="i-mdi-loading animate-spin" />
+        <i v-if="loading" class="fa-solid fa-spinner fa-spin" />
         Invia codice
       </button>
     </form>
@@ -88,7 +88,7 @@ async function handleResetPassword() {
       </div>
       <div v-if="errorMsg" class="text-sm text-danger-600 bg-danger-50 rounded-lg px-3 py-2">{{ errorMsg }}</div>
       <button type="submit" class="btn-primary w-full" :disabled="loading">
-        <div v-if="loading" class="i-mdi-loading animate-spin" />
+        <i v-if="loading" class="fa-solid fa-spinner fa-spin" />
         Reimposta password
       </button>
     </form>

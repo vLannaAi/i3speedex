@@ -27,7 +27,7 @@ function clear() {
 
 <template>
   <div class="relative">
-    <div class="i-mdi-magnify absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
     <input
       :value="local"
       type="text"
@@ -37,8 +37,8 @@ function clear() {
     >
     <button
       v-if="local"
-      class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 i-mdi-close-circle text-sm"
+      class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-sm"
       @click="clear"
-    />
+    ><i class="fa-solid fa-circle-xmark" /></button>
   </div>
 </template>

@@ -153,7 +153,7 @@ onUnmounted(() => document.removeEventListener('keydown', onGlobalKeydown))
   <header class="fixed top-0 left-0 right-0 h-[var(--header-height)] bg-white border-b border-gray-200 z-40 flex items-center px-4 gap-4">
     <!-- Hamburger -->
     <button class="btn-ghost p-2" @click="emit('toggleSidebar')">
-      <div class="i-mdi-menu text-xl" />
+      <i class="fa-solid fa-bars text-xl" />
     </button>
 
     <!-- Logo (mobile) -->
@@ -164,7 +164,7 @@ onUnmounted(() => document.removeEventListener('keydown', onGlobalKeydown))
     <!-- Desktop Search -->
     <div class="flex-1 max-w-xl mx-auto hidden md:block relative">
       <div class="relative">
-        <div class="i-mdi-magnify absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
         <input
           ref="inputRef"
           v-model="searchQuery"
@@ -178,9 +178,9 @@ onUnmounted(() => document.removeEventListener('keydown', onGlobalKeydown))
         >
         <button
           v-if="searchQuery"
-          class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 i-mdi-close-circle text-sm"
+          class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-sm"
           @mousedown.prevent="clearSearch"
-        />
+        ><i class="fa-solid fa-circle-xmark" /></button>
       </div>
 
       <!-- Desktop Search Results -->
@@ -190,18 +190,18 @@ onUnmounted(() => document.removeEventListener('keydown', onGlobalKeydown))
         class="absolute top-full left-0 right-0 mt-1 bg-white rounded-lg border border-gray-200 shadow-lg max-h-96 overflow-y-auto z-50"
       >
         <div v-if="loading" class="px-4 py-3 flex items-center gap-2 text-sm text-gray-500">
-          <div class="i-mdi-loading animate-spin" />
+          <i class="fa-solid fa-spinner fa-spin" />
           Ricerca in corso...
         </div>
         <div v-else-if="totalCount === 0 && searchQuery.trim().length >= 2" class="px-4 py-6 text-center text-sm text-gray-500">
-          <div class="i-mdi-magnify-close text-2xl mx-auto mb-2 text-gray-300" />
+          <i class="fa-solid fa-magnifying-glass-minus text-2xl mx-auto mb-2 text-gray-300" />
           Nessun risultato per "{{ searchQuery }}"
         </div>
         <template v-else>
           <div v-if="results.sales.length > 0">
             <div class="px-3 py-1.5 text-xs font-medium text-gray-400 uppercase bg-gray-50 sticky top-0">Vendite ({{ results.sales.length }})</div>
             <button v-for="(sale, i) in results.sales" :key="sale.saleId" class="w-full px-3 py-2 flex items-center gap-3 text-left text-sm hover:bg-gray-50 transition-colors" :class="{ 'bg-primary-50': activeIndex === i }" :data-active="activeIndex === i" @mousedown.prevent="navigate({ type: 'sale', item: sale })" @mouseenter="activeIndex = i">
-              <div class="i-mdi-receipt-text-outline text-primary-500 shrink-0" />
+              <i class="fa-solid fa-file-invoice text-primary-500 shrink-0" />
               <div class="flex-1 min-w-0">
                 <div class="font-medium text-gray-900 truncate">#{{ sale.saleNumber }} — {{ sale.buyerName }}</div>
                 <div class="text-xs text-gray-500">{{ formatDate(sale.saleDate) }} · {{ formatCurrency(sale.total) }}</div>
@@ -212,7 +212,7 @@ onUnmounted(() => document.removeEventListener('keydown', onGlobalKeydown))
           <div v-if="results.buyers.length > 0">
             <div class="px-3 py-1.5 text-xs font-medium text-gray-400 uppercase bg-gray-50 sticky top-0">Acquirenti ({{ results.buyers.length }})</div>
             <button v-for="(buyer, i) in results.buyers" :key="buyer.buyerId" class="w-full px-3 py-2 flex items-center gap-3 text-left text-sm hover:bg-gray-50 transition-colors" :class="{ 'bg-primary-50': activeIndex === results.sales.length + i }" :data-active="activeIndex === results.sales.length + i" @mousedown.prevent="navigate({ type: 'buyer', item: buyer })" @mouseenter="activeIndex = results.sales.length + i">
-              <div class="i-mdi-domain text-blue-500 shrink-0" />
+              <i class="fa-solid fa-building text-blue-500 shrink-0" />
               <div class="flex-1 min-w-0">
                 <div class="font-medium text-gray-900 truncate">{{ buyer.companyName }}</div>
                 <div class="text-xs text-gray-500">{{ buyer.city }} · {{ buyer.country }}</div>
@@ -222,7 +222,7 @@ onUnmounted(() => document.removeEventListener('keydown', onGlobalKeydown))
           <div v-if="results.producers.length > 0">
             <div class="px-3 py-1.5 text-xs font-medium text-gray-400 uppercase bg-gray-50 sticky top-0">Produttori ({{ results.producers.length }})</div>
             <button v-for="(producer, i) in results.producers" :key="producer.producerId" class="w-full px-3 py-2 flex items-center gap-3 text-left text-sm hover:bg-gray-50 transition-colors" :class="{ 'bg-primary-50': activeIndex === results.sales.length + results.buyers.length + i }" :data-active="activeIndex === results.sales.length + results.buyers.length + i" @mousedown.prevent="navigate({ type: 'producer', item: producer })" @mouseenter="activeIndex = results.sales.length + results.buyers.length + i">
-              <div class="i-mdi-factory text-amber-500 shrink-0" />
+              <i class="fa-solid fa-industry text-amber-500 shrink-0" />
               <div class="flex-1 min-w-0">
                 <div class="font-medium text-gray-900 truncate">{{ producer.companyName }}</div>
                 <div class="text-xs text-gray-500">{{ producer.city }} · {{ producer.country }}</div>
@@ -236,7 +236,7 @@ onUnmounted(() => document.removeEventListener('keydown', onGlobalKeydown))
     <!-- Mobile spacer / search button -->
     <div class="flex-1 md:hidden" />
     <button class="btn-ghost p-2 md:hidden" @click="openMobileSearch">
-      <div class="i-mdi-magnify text-xl" />
+      <i class="fa-solid fa-magnifying-glass text-xl" />
     </button>
 
     <!-- User menu -->
@@ -247,10 +247,10 @@ onUnmounted(() => document.removeEventListener('keydown', onGlobalKeydown))
       <div v-if="mobileSearchOpen" class="fixed inset-0 z-50 bg-white md:hidden">
         <div class="flex items-center h-[var(--header-height)] px-4 gap-3 border-b border-gray-200">
           <button class="btn-ghost p-2 shrink-0" @click="closeMobileSearch">
-            <div class="i-mdi-arrow-left text-xl" />
+            <i class="fa-solid fa-arrow-left text-xl" />
           </button>
           <div class="flex-1 relative">
-            <div class="i-mdi-magnify absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
               ref="mobileInputRef"
               v-model="searchQuery"
@@ -262,20 +262,20 @@ onUnmounted(() => document.removeEventListener('keydown', onGlobalKeydown))
             >
             <button
               v-if="searchQuery"
-              class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 i-mdi-close-circle text-sm"
+              class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-sm"
               @click="clearSearch"
-            />
+            ><i class="fa-solid fa-circle-xmark" /></button>
           </div>
         </div>
 
         <!-- Mobile Search Results -->
         <div class="overflow-y-auto" style="max-height: calc(100vh - var(--header-height))">
           <div v-if="loading" class="px-4 py-6 flex items-center justify-center gap-2 text-sm text-gray-500">
-            <div class="i-mdi-loading animate-spin" />
+            <i class="fa-solid fa-spinner fa-spin" />
             Ricerca in corso...
           </div>
           <div v-else-if="totalCount === 0 && searchQuery.trim().length >= 2" class="px-4 py-12 text-center text-sm text-gray-500">
-            <div class="i-mdi-magnify-close text-3xl mx-auto mb-2 text-gray-300" />
+            <i class="fa-solid fa-magnifying-glass-minus text-3xl mx-auto mb-2 text-gray-300" />
             Nessun risultato per "{{ searchQuery }}"
           </div>
           <div v-else-if="searchQuery.trim().length < 2 && !loading" class="px-4 py-12 text-center text-sm text-gray-400">
@@ -285,7 +285,7 @@ onUnmounted(() => document.removeEventListener('keydown', onGlobalKeydown))
             <div v-if="results.sales.length > 0">
               <div class="px-4 py-2 text-xs font-medium text-gray-400 uppercase bg-gray-50 sticky top-0">Vendite ({{ results.sales.length }})</div>
               <button v-for="sale in results.sales" :key="sale.saleId" class="w-full px-4 py-3 flex items-center gap-3 text-left text-sm border-b border-gray-50 active:bg-gray-50" @click="navigate({ type: 'sale', item: sale })">
-                <div class="i-mdi-receipt-text-outline text-primary-500 shrink-0 text-lg" />
+                <i class="fa-solid fa-file-invoice text-primary-500 shrink-0 text-lg" />
                 <div class="flex-1 min-w-0">
                   <div class="font-medium text-gray-900 truncate">#{{ sale.saleNumber }} — {{ sale.buyerName }}</div>
                   <div class="text-xs text-gray-500">{{ formatDate(sale.saleDate) }} · {{ formatCurrency(sale.total) }}</div>
@@ -295,7 +295,7 @@ onUnmounted(() => document.removeEventListener('keydown', onGlobalKeydown))
             <div v-if="results.buyers.length > 0">
               <div class="px-4 py-2 text-xs font-medium text-gray-400 uppercase bg-gray-50 sticky top-0">Acquirenti ({{ results.buyers.length }})</div>
               <button v-for="buyer in results.buyers" :key="buyer.buyerId" class="w-full px-4 py-3 flex items-center gap-3 text-left text-sm border-b border-gray-50 active:bg-gray-50" @click="navigate({ type: 'buyer', item: buyer })">
-                <div class="i-mdi-domain text-blue-500 shrink-0 text-lg" />
+                <i class="fa-solid fa-building text-blue-500 shrink-0 text-lg" />
                 <div class="flex-1 min-w-0">
                   <div class="font-medium text-gray-900 truncate">{{ buyer.companyName }}</div>
                   <div class="text-xs text-gray-500">{{ buyer.city }} · {{ buyer.country }}</div>
@@ -305,7 +305,7 @@ onUnmounted(() => document.removeEventListener('keydown', onGlobalKeydown))
             <div v-if="results.producers.length > 0">
               <div class="px-4 py-2 text-xs font-medium text-gray-400 uppercase bg-gray-50 sticky top-0">Produttori ({{ results.producers.length }})</div>
               <button v-for="producer in results.producers" :key="producer.producerId" class="w-full px-4 py-3 flex items-center gap-3 text-left text-sm border-b border-gray-50 active:bg-gray-50" @click="navigate({ type: 'producer', item: producer })">
-                <div class="i-mdi-factory text-amber-500 shrink-0 text-lg" />
+                <i class="fa-solid fa-industry text-amber-500 shrink-0 text-lg" />
                 <div class="flex-1 min-w-0">
                   <div class="font-medium text-gray-900 truncate">{{ producer.companyName }}</div>
                   <div class="text-xs text-gray-500">{{ producer.city }} · {{ producer.country }}</div>

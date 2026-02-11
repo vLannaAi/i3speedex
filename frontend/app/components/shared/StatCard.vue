@@ -20,7 +20,7 @@ defineProps<{
         'bg-danger-100 text-danger-600': color === 'danger',
       }"
     >
-      <div :class="icon" class="text-2xl" />
+      <i :class="icon" class="text-2xl" />
     </div>
     <div class="flex-1 min-w-0">
       <p class="text-sm text-gray-500 truncate">{{ label }}</p>

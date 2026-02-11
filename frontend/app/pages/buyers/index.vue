@@ -60,7 +60,7 @@ function openBuyer(buyer: Buyer) {
         <p class="page-subtitle">Gestisci i tuoi acquirenti</p>
       </div>
       <NuxtLink v-if="canWrite" to="/buyers/new" class="btn-primary">
-        <div class="i-mdi-plus" /> Nuovo Acquirente
+        <i class="fa-solid fa-plus" /> Nuovo Acquirente
       </NuxtLink>
     </div>
 
@@ -89,7 +89,7 @@ function openBuyer(buyer: Buyer) {
           <EmptyState
             title="Nessun acquirente"
             description="Inizia aggiungendo il primo acquirente"
-            icon="i-mdi-account-group-outline"
+            icon="fa-solid fa-users"
             :action-to="canWrite ? '/buyers/new' : undefined"
             :action-label="canWrite ? 'Nuovo Acquirente' : undefined"
           />

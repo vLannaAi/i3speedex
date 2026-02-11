@@ -40,14 +40,14 @@ const to = computed(() => Math.min(props.page * props.pageSize, props.total > 0 
           :disabled="page <= 1"
           @click="emit('update:page', page - 1)"
         >
-          <div class="i-mdi-chevron-left" />
+          <i class="fa-solid fa-chevron-left" />
         </button>
         <button
           class="btn-ghost btn-sm"
           :disabled="!hasMore && page >= totalPages"
           @click="emit('update:page', page + 1)"
         >
-          <div class="i-mdi-chevron-right" />
+          <i class="fa-solid fa-chevron-right" />
         </button>
       </div>
     </div>

@@ -140,7 +140,7 @@ function onBuyerSelect(buyer: Buyer) {
       <div class="flex justify-end gap-3">
         <NuxtLink to="/sales" class="btn-secondary">Annulla</NuxtLink>
         <button type="submit" class="btn-primary" :disabled="saving">
-          <div v-if="saving" class="i-mdi-loading animate-spin" />
+          <i v-if="saving" class="fa-solid fa-spinner fa-spin" />
           Crea Vendita
         </button>
       </div>

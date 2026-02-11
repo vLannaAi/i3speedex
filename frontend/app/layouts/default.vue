@@ -51,7 +51,7 @@ watch(() => route.fullPath, () => {
         class="fixed top-[var(--header-height)] left-0 right-0 z-35 bg-warning-500 text-white text-sm text-center py-2 px-4"
       >
         <div class="inline-flex items-center gap-2">
-          <div class="i-mdi-wifi-off" />
+          <i class="fa-solid fa-wifi-slash" />
           Connessione assente — Le modifiche non verranno salvate
         </div>
       </div>

@@ -67,7 +67,7 @@ const sortedData = computed(() => {
             <span class="inline-flex items-center gap-1">
               {{ col.label }}
               <template v-if="col.sortable && sortKey === col.key">
-                <div :class="sortDir === 'asc' ? 'i-mdi-arrow-up' : 'i-mdi-arrow-down'" class="text-xs" />
+                <i :class="sortDir === 'asc' ? 'fa-solid fa-arrow-up' : 'fa-solid fa-arrow-down'" class="text-xs" />
               </template>
             </span>
           </th>
@@ -84,7 +84,7 @@ const sortedData = computed(() => {
         <tr>
           <td :colspan="columns.length" class="px-4 py-12 text-center text-sm text-gray-500">
             <slot name="empty">
-              <EmptyState title="Nessun risultato" icon="i-mdi-database-off-outline" />
+              <EmptyState title="Nessun risultato" icon="fa-solid fa-database" />
             </slot>
           </td>
         </tr>

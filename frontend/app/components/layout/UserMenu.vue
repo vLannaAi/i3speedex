@@ -24,7 +24,7 @@ const roleLabel = computed(() => {
         {{ user?.username?.charAt(0)?.toUpperCase() || '?' }}
       </div>
       <span class="hidden md:inline text-sm text-gray-700">{{ user?.username }}</span>
-      <div class="i-mdi-chevron-down text-gray-400 text-sm" />
+      <i class="fa-solid fa-chevron-down text-gray-400 text-sm" />
     </button>
 
     <!-- Dropdown -->
@@ -41,7 +41,7 @@ const roleLabel = computed(() => {
         class="w-full text-left px-4 py-2.5 text-sm text-danger-600 hover:bg-gray-50 flex items-center gap-2"
         @click="handleLogout"
       >
-        <div class="i-mdi-logout text-base" />
+        <i class="fa-solid fa-right-from-bracket text-base" />
         Esci
       </button>
     </div>

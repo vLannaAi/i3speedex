@@ -9,10 +9,10 @@ defineProps<{
 <template>
   <div>
     <button class="btn-ghost btn-sm" @click="open = !open">
-      <div class="i-mdi-filter-variant" />
+      <i class="fa-solid fa-filter" />
       Filtri
       <span v-if="hasFilters" class="w-2 h-2 rounded-full bg-primary-500" />
-      <div :class="open ? 'i-mdi-chevron-up' : 'i-mdi-chevron-down'" class="text-xs" />
+      <i :class="open ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down'" class="text-xs" />
     </button>
     <div v-if="open" class="mt-3">
       <slot />

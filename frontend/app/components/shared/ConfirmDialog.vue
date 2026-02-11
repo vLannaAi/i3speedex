@@ -33,7 +33,7 @@ const emit = defineEmits<{
             :disabled="loading"
             @click="emit('confirm')"
           >
-            <div v-if="loading" class="i-mdi-loading animate-spin" />
+            <i v-if="loading" class="fa-solid fa-spinner fa-spin" />
             {{ confirmLabel || 'Conferma' }}
           </button>
         </div>

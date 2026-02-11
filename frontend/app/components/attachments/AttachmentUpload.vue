@@ -48,14 +48,14 @@ function onFileSelect(e: Event) {
       @dragleave="dragging = false"
       @drop.prevent="onDrop"
     >
-      <div class="i-mdi-cloud-upload-outline text-3xl text-gray-400 mx-auto mb-2" />
+      <i class="fa-solid fa-cloud-arrow-up text-3xl text-gray-400 mx-auto mb-2" />
       <p class="text-sm text-gray-600">Trascina i file qui oppure</p>
       <label class="btn-secondary btn-sm mt-2 cursor-pointer">
         Sfoglia
         <input type="file" multiple class="hidden" @change="onFileSelect">
       </label>
       <div v-if="uploading" class="mt-3 flex items-center justify-center gap-2 text-sm text-primary-600">
-        <div class="i-mdi-loading animate-spin" /> Caricamento in corso...
+        <i class="fa-solid fa-spinner fa-spin" /> Caricamento in corso...
       </div>
     </div>
     <div class="mt-2">

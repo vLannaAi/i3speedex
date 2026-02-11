@@ -18,10 +18,10 @@ const statusBreakdown = computed(() => {
 
 // Map activity action to a displayable status
 const actionIcon: Record<string, string> = {
-  created: 'i-mdi-plus-circle-outline',
-  updated: 'i-mdi-pencil-outline',
-  confirmed: 'i-mdi-check-circle-outline',
-  invoiced: 'i-mdi-file-document-outline',
+  created: 'fa-regular fa-circle-plus',
+  updated: 'fa-solid fa-pen',
+  confirmed: 'fa-regular fa-circle-check',
+  invoiced: 'fa-regular fa-file-lines',
 }
 const actionColor: Record<string, string> = {
   created: 'text-primary-500',
@@ -48,27 +48,27 @@ const actionColor: Record<string, string> = {
       <StatCard
         label="Vendite Totali"
         :value="stats?.totalSales ?? 0"
-        icon="i-mdi-receipt-text-outline"
+        icon="fa-solid fa-file-invoice"
         color="primary"
         :trend="stats?.salesGrowth"
       />
       <StatCard
         label="Ricavi"
         :value="formatCurrency(stats?.totalRevenue ?? 0)"
-        icon="i-mdi-cash-multiple"
+        icon="fa-solid fa-money-bills"
         color="success"
         :trend="stats?.revenueGrowth"
       />
       <StatCard
         label="Acquirenti Attivi"
         :value="stats?.activeBuyers ?? 0"
-        icon="i-mdi-account-group-outline"
+        icon="fa-solid fa-users"
         color="warning"
       />
       <StatCard
         label="Produttori Attivi"
         :value="stats?.activeProducers ?? 0"
-        icon="i-mdi-factory"
+        icon="fa-solid fa-industry"
         color="danger"
       />
     </div>
@@ -129,9 +129,9 @@ const actionColor: Record<string, string> = {
             :key="`${item.id}-${item.timestamp}`"
             class="px-5 py-3 flex items-center gap-3"
           >
-            <div
+            <i
               class="text-lg shrink-0"
-              :class="[actionIcon[item.action] || 'i-mdi-circle-outline', actionColor[item.action] || 'text-gray-400']"
+              :class="[actionIcon[item.action] || 'fa-regular fa-circle', actionColor[item.action] || 'text-gray-400']"
             />
             <div class="flex-1 min-w-0">
               <p class="text-sm text-gray-900 truncate">{{ item.title }}</p>

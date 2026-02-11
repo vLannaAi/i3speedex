@@ -26,6 +26,9 @@ export default defineNuxtConfig({
         { name: 'description', content: 'Gestione vendite, acquirenti e produttori' },
       ],
       htmlAttrs: { lang: 'it' },
+      script: [
+        { src: 'https://kit.fontawesome.com/9ab53866ec.js', crossorigin: 'anonymous' },
+      ],
     },
   },
 

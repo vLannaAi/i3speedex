@@ -70,7 +70,7 @@ async function handleLogin() {
         class="btn-primary w-full"
         :disabled="loading"
       >
-        <div v-if="loading" class="i-mdi-loading animate-spin" />
+        <i v-if="loading" class="fa-solid fa-spinner fa-spin" />
         {{ loading ? 'Accesso...' : 'Accedi' }}
       </button>
     </form>

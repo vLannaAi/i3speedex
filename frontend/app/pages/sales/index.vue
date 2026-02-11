@@ -100,7 +100,7 @@ function openSale(sale: Sale) {
         <p class="page-subtitle">Gestisci le vendite</p>
       </div>
       <NuxtLink v-if="canWrite" to="/sales/new" class="btn-primary">
-        <div class="i-mdi-plus" /> Nuova Vendita
+        <i class="fa-solid fa-plus" /> Nuova Vendita
       </NuxtLink>
     </div>
 
@@ -137,7 +137,7 @@ function openSale(sale: Sale) {
           <EmptyState
             title="Nessuna vendita"
             description="Inizia creando la prima vendita"
-            icon="i-mdi-receipt-text-outline"
+            icon="fa-solid fa-file-invoice"
             :action-to="canWrite ? '/sales/new' : undefined"
             :action-label="canWrite ? 'Nuova Vendita' : undefined"
           />

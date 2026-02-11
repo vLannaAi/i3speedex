@@ -50,7 +50,7 @@ watch([status, buyerId, producerId, startDate, endDate], () => apply())
 <template>
   <div class="mb-4">
     <button class="btn-ghost btn-sm" @click="open = !open">
-      <div class="i-mdi-filter-variant" />
+      <i class="fa-solid fa-filter" />
       Filtri
       <span v-if="hasFilters" class="w-2 h-2 rounded-full bg-primary-500" />
     </button>
@@ -92,7 +92,7 @@ watch([status, buyerId, producerId, startDate, endDate], () => apply())
     </div>
 
     <button v-if="open && hasFilters" class="btn-ghost btn-sm mt-2 text-xs" @click="reset">
-      <div class="i-mdi-close" /> Resetta filtri
+      <i class="fa-solid fa-xmark" /> Resetta filtri
     </button>
   </div>
 </template>

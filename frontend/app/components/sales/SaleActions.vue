@@ -28,14 +28,14 @@ const canDelete = computed(() =>
       class="btn-primary btn-sm"
       @click="emit('confirm')"
     >
-      <div class="i-mdi-check-circle-outline" /> Conferma
+      <i class="fa-regular fa-circle-check" /> Conferma
     </button>
     <button
       v-if="canDelete"
       class="btn-danger btn-sm"
       @click="emit('delete')"
     >
-      <div class="i-mdi-delete-outline" /> Elimina
+      <i class="fa-regular fa-trash-can" /> Elimina
     </button>
   </div>
 </template>

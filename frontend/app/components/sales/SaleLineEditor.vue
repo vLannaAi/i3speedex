@@ -156,14 +156,14 @@ async function removeLine(lineId: string) {
             <td v-if="!readonly" class="px-3 py-2">
               <div class="flex gap-1">
                 <button class="btn-ghost btn-sm p-1" @click="editLine(line)">
-                  <div class="i-mdi-pencil-outline text-sm" />
+                  <i class="fa-solid fa-pen text-sm" />
                 </button>
                 <button
                   class="btn-ghost btn-sm p-1 text-danger-600"
                   :disabled="deleting === line.lineId"
                   @click="removeLine(line.lineId)"
                 >
-                  <div :class="deleting === line.lineId ? 'i-mdi-loading animate-spin' : 'i-mdi-delete-outline'" class="text-sm" />
+                  <i :class="deleting === line.lineId ? 'fa-solid fa-spinner fa-spin' : 'fa-regular fa-trash-can'" class="text-sm" />
                 </button>
               </div>
             </td>
@@ -175,7 +175,7 @@ async function removeLine(lineId: string) {
     <!-- Add/Edit form -->
     <div v-if="!readonly" class="mt-4">
       <button v-if="!showForm" class="btn-secondary btn-sm" @click="showForm = true">
-        <div class="i-mdi-plus" /> Aggiungi riga
+        <i class="fa-solid fa-plus" /> Aggiungi riga
       </button>
 
       <div v-if="showForm" class="border border-gray-200 rounded-lg p-4 bg-gray-50 mt-2">
@@ -222,7 +222,7 @@ async function removeLine(lineId: string) {
 
         <div class="mt-4 flex gap-2">
           <button class="btn-primary btn-sm" :disabled="saving" @click="save">
-            <div v-if="saving" class="i-mdi-loading animate-spin" />
+            <i v-if="saving" class="fa-solid fa-spinner fa-spin" />
             {{ editing ? 'Aggiorna' : 'Aggiungi' }}
           </button>
           <button class="btn-ghost btn-sm" @click="resetForm">Annulla</button>
