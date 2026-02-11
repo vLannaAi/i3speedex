@@ -1,20 +1,15 @@
 <script setup lang="ts">
-const sidebarOpen = ref(true)
+const sidebarMode = ref<'expanded' | 'collapsed' | 'hidden'>('expanded')
 const isOffline = ref(false)
 
-function toggleSidebar() {
-  sidebarOpen.value = !sidebarOpen.value
-}
-
-// Collapse sidebar on mobile
 const isMobile = ref(false)
 if (import.meta.client) {
   const mq = window.matchMedia('(max-width: 768px)')
   isMobile.value = mq.matches
-  sidebarOpen.value = !mq.matches
+  sidebarMode.value = mq.matches ? 'hidden' : 'expanded'
   mq.addEventListener('change', (e) => {
     isMobile.value = e.matches
-    sidebarOpen.value = !e.matches
+    sidebarMode.value = e.matches ? 'hidden' : 'expanded'
   })
 
   // Offline detection
@@ -23,24 +18,39 @@ if (import.meta.client) {
   window.addEventListener('offline', () => { isOffline.value = true })
 }
 
+function toggleSidebar() {
+  if (isMobile.value) {
+    sidebarMode.value = sidebarMode.value === 'hidden' ? 'expanded' : 'hidden'
+  } else {
+    sidebarMode.value = sidebarMode.value === 'expanded' ? 'collapsed' : 'expanded'
+  }
+}
+
 // Close sidebar on mobile after navigation
 const route = useRoute()
 watch(() => route.fullPath, () => {
-  if (isMobile.value) sidebarOpen.value = false
+  if (isMobile.value) sidebarMode.value = 'hidden'
+})
+
+const mainMargin = computed(() => {
+  if (isMobile.value) return 'ml-0'
+  if (sidebarMode.value === 'expanded') return 'ml-[var(--sidebar-width)]'
+  if (sidebarMode.value === 'collapsed') return 'ml-[var(--sidebar-width-collapsed)]'
+  return 'ml-0'
 })
 </script>
 
 <template>
   <div class="min-h-screen bg-gray-50">
-    <AppHeader :sidebar-open="sidebarOpen" @toggle-sidebar="toggleSidebar" />
-    <AppSidebar :open="sidebarOpen" @close="sidebarOpen = false" />
+    <AppHeader :sidebar-mode="sidebarMode" @toggle-sidebar="toggleSidebar" />
+    <AppSidebar :mode="sidebarMode" @toggle="toggleSidebar" />
 
     <!-- Overlay for mobile -->
     <Transition name="fade">
       <div
-        v-if="isMobile && sidebarOpen"
+        v-if="isMobile && sidebarMode !== 'hidden'"
         class="fixed inset-0 bg-black/30 z-30"
-        @click="sidebarOpen = false"
+        @click="sidebarMode = 'hidden'"
       />
     </Transition>
 
@@ -59,7 +69,7 @@ watch(() => route.fullPath, () => {
 
     <main
       class="pt-[var(--header-height)] transition-all duration-200"
-      :class="sidebarOpen && !isMobile ? 'ml-[var(--sidebar-width)]' : 'ml-0'"
+      :class="mainMargin"
     >
       <div class="p-4 sm:p-6 max-w-7xl mx-auto">
         <slot />

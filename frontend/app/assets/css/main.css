@@ -1,5 +1,6 @@
 :root {
   --sidebar-width: 256px;
+  --sidebar-width-collapsed: 64px;
   --header-height: 64px;
 }
 

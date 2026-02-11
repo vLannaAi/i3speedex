@@ -2,7 +2,7 @@
 import type { Sale, Buyer, Producer } from '~/types'
 
 defineProps<{
-  sidebarOpen: boolean
+  sidebarMode: string
 }>()
 
 const emit = defineEmits<{
