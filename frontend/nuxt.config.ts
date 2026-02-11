@@ -14,6 +14,10 @@ export default defineNuxtConfig({
     download: true,
   },
 
+  components: [
+    { path: '~/components', pathPrefix: false },
+  ],
+
   css: ['~/assets/css/main.css'],
 
   runtimeConfig: {
