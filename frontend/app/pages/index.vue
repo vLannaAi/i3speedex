@@ -1,8 +1,34 @@
 <script setup lang="ts">
 const { stats, topBuyers, recentActivity, loading, fetchAll } = useDashboard()
-const { formatCurrency, formatDate } = useFormatters()
+const { formatCurrency, formatDate, formatDateTime } = useFormatters()
 
 onMounted(() => fetchAll())
+
+// Construct status breakdown from individual stats fields
+const statusBreakdown = computed(() => {
+  if (!stats.value) return null
+  const breakdown: Record<string, number> = {}
+  if (stats.value.draftSales) breakdown['draft'] = stats.value.draftSales
+  if (stats.value.confirmedSales) breakdown['confirmed'] = stats.value.confirmedSales
+  if (stats.value.invoicedSales) breakdown['invoiced'] = stats.value.invoicedSales
+  if (stats.value.paidSales) breakdown['paid'] = stats.value.paidSales
+  if (stats.value.cancelledSales) breakdown['cancelled'] = stats.value.cancelledSales
+  return Object.keys(breakdown).length > 0 ? breakdown : null
+})
+
+// Map activity action to a displayable status
+const actionIcon: Record<string, string> = {
+  created: 'i-mdi-plus-circle-outline',
+  updated: 'i-mdi-pencil-outline',
+  confirmed: 'i-mdi-check-circle-outline',
+  invoiced: 'i-mdi-file-document-outline',
+}
+const actionColor: Record<string, string> = {
+  created: 'text-primary-500',
+  updated: 'text-gray-500',
+  confirmed: 'text-success-500',
+  invoiced: 'text-warning-500',
+}
 </script>
 
 <template>
@@ -48,9 +74,9 @@ onMounted(() => fetchAll())
     </div>
 
     <!-- Status breakdown -->
-    <div v-if="stats?.statusBreakdown" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
+    <div v-if="statusBreakdown" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
       <div
-        v-for="(count, status) in stats.statusBreakdown"
+        v-for="(count, status) in statusBreakdown"
         :key="status"
         class="card card-body text-center"
       >
@@ -100,17 +126,17 @@ onMounted(() => fetchAll())
         <ul v-else class="divide-y divide-gray-50">
           <li
             v-for="item in recentActivity"
-            :key="item.saleId"
+            :key="`${item.id}-${item.timestamp}`"
             class="px-5 py-3 flex items-center gap-3"
           >
-            <StatusBadge :status="item.status" size="sm" />
+            <div
+              class="text-lg shrink-0"
+              :class="[actionIcon[item.action] || 'i-mdi-circle-outline', actionColor[item.action] || 'text-gray-400']"
+            />
             <div class="flex-1 min-w-0">
-              <p class="text-sm text-gray-900 truncate">
-                Vendita #{{ item.saleNumber }} — {{ item.buyerName }}
-              </p>
-              <p class="text-xs text-gray-400">{{ formatDate(item.updatedAt || item.createdAt) }}</p>
+              <p class="text-sm text-gray-900 truncate">{{ item.title }}</p>
+              <p class="text-xs text-gray-400">{{ formatDateTime(item.timestamp) }}</p>
             </div>
-            <span class="text-sm font-medium text-gray-900 whitespace-nowrap">{{ formatCurrency(item.total) }}</span>
           </li>
         </ul>
       </div>

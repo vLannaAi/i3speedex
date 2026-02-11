@@ -8,30 +8,42 @@ export function useDashboard() {
   const loading = ref(false)
 
   async function fetchStats() {
-    const res = await get<any>('/api/dashboard/stats')
-    // Response: { data: { stats: {...}, period: {...} } }
-    if (res.success && res.data) stats.value = res.data.stats || res.data
+    try {
+      const res = await get<any>('/api/dashboard/stats')
+      if (res.success && res.data) stats.value = res.data.stats || res.data
+    } catch (e) {
+      console.error('Dashboard stats error:', e)
+    }
   }
 
   async function fetchTopBuyers(limit = 5) {
-    const res = await get<any>('/api/dashboard/top-buyers', { limit })
-    // Response: { data: { buyers: [...], summary: {...} } }
-    if (res.success && res.data) topBuyers.value = res.data.buyers || res.data
+    try {
+      const res = await get<any>('/api/dashboard/top-buyers', { limit })
+      if (res.success && res.data) topBuyers.value = res.data.buyers || res.data
+    } catch (e) {
+      console.error('Dashboard top-buyers error:', e)
+    }
   }
 
   async function fetchRecentActivity(limit = 10) {
-    const res = await get<any>('/api/dashboard/recent-activity', { limit })
-    // Response: { data: { activities: [...], count: N } }
-    if (res.success && res.data) recentActivity.value = res.data.activities || res.data
+    try {
+      const res = await get<any>('/api/dashboard/recent-activity', { limit })
+      if (res.success && res.data) recentActivity.value = res.data.activities || res.data
+    } catch (e) {
+      console.error('Dashboard recent-activity error:', e)
+    }
   }
 
   async function fetchSalesByDate(startDate?: string, endDate?: string) {
-    // Default to current year if no dates provided
-    const now = new Date()
-    const start = startDate || `${now.getFullYear()}-01-01`
-    const end = endDate || now.toISOString().split('T')[0]
-    const res = await get<any>('/api/dashboard/sales-by-date', { startDate: start, endDate: end })
-    if (res.success && res.data) salesByDate.value = res.data.salesByDate || res.data
+    try {
+      const now = new Date()
+      const start = startDate || `${now.getFullYear()}-01-01`
+      const end = endDate || now.toISOString().split('T')[0]
+      const res = await get<any>('/api/dashboard/sales-by-date', { startDate: start, endDate: end })
+      if (res.success && res.data) salesByDate.value = res.data.salesByDate || res.data
+    } catch (e) {
+      console.error('Dashboard sales-by-date error:', e)
+    }
   }
 
   async function fetchAll() {
