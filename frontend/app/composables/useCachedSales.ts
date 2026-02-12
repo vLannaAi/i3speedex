@@ -51,8 +51,14 @@ export function useCachedSales() {
       )
     }
 
-    // Sort by saleDate descending
-    items.sort((a, b) => (b.saleDate || '').localeCompare(a.saleDate || ''))
+    // Sort by saleDate descending, then saleId descending (numeric)
+    items.sort((a, b) => {
+      const dateCmp = (b.saleDate || '').localeCompare(a.saleDate || '')
+      if (dateCmp !== 0) return dateCmp
+      const idA = parseInt(a.saleId.replace('SALE', ''), 10) || 0
+      const idB = parseInt(b.saleId.replace('SALE', ''), 10) || 0
+      return idB - idA
+    })
 
     // Paginate
     const total = items.length

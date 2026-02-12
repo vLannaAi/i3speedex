@@ -20,7 +20,7 @@ const search = ref('')
 const filters = ref<Record<string, string | undefined>>({})
 
 const columns = [
-  { accessorKey: 'saleNumber', header: '#', size: 40 },
+  { accessorKey: 'saleId', header: '#', size: 60 },
   { accessorKey: 'saleDate', header: 'Date', size: 90 },
   { accessorKey: 'buyerName', header: 'Buyer', size: 200 },
   { accessorKey: 'producerName', header: 'Producer', size: 200 },
@@ -53,11 +53,7 @@ async function load() {
       ...filters.value,
     })
     if (res) {
-      sales.value = res.data.sort((a, b) => {
-        const dateA = a.saleDate || ''
-        const dateB = b.saleDate || ''
-        return dateB.localeCompare(dateA)
-      })
+      sales.value = res.data
       total.value = res.pagination.total
       totalPages.value = res.pagination.totalPages
     }
@@ -150,11 +146,11 @@ function onSelectSale(_e: Event, row: any) {
         }"
         @select="onSelectSale"
       >
-        <template #saleNumber-header>
+        <template #saleId-header>
           <div class="text-right w-full">#</div>
         </template>
-        <template #saleNumber-cell="{ row }">
-          <div class="text-right">{{ row.original.saleNumber }}</div>
+        <template #saleId-cell="{ row }">
+          <div class="text-right">{{ row.original.saleId.replace('SALE', '') }}</div>
         </template>
         <template #saleDate-cell="{ row }">
           {{ formatDate(row.original.saleDate) }}
