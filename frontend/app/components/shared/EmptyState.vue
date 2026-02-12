@@ -12,12 +12,12 @@ defineEmits<{ action: [] }>()
 
 <template>
   <div class="text-center py-12">
-    <i v-if="icon" :class="icon" class="text-4xl text-gray-300 mx-auto mb-3" />
-    <h3 class="text-base font-medium text-gray-900">{{ title }}</h3>
-    <p v-if="description" class="text-sm text-gray-500 mt-1 max-w-sm mx-auto">{{ description }}</p>
-    <div class="mt-4">
-      <NuxtLink v-if="actionTo" :to="actionTo" class="btn-primary btn-sm">{{ actionLabel }}</NuxtLink>
-      <button v-else-if="actionLabel" class="btn-primary btn-sm" @click="$emit('action')">{{ actionLabel }}</button>
+    <UIcon v-if="icon" :name="icon" class="size-10 text-muted mx-auto mb-3" />
+    <h3 class="text-base font-medium">{{ title }}</h3>
+    <p v-if="description" class="text-sm text-muted mt-1 max-w-sm mx-auto">{{ description }}</p>
+    <div v-if="actionLabel" class="mt-4">
+      <UButton v-if="actionTo" :to="actionTo" size="sm">{{ actionLabel }}</UButton>
+      <UButton v-else size="sm" @click="$emit('action')">{{ actionLabel }}</UButton>
     </div>
   </div>
 </template>

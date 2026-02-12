@@ -9,7 +9,7 @@ const producerId = route.params.id as string
 const { fetchProducer, updateProducer, deleteProducer } = useProducers()
 const { formatDate } = useFormatters()
 const { canWrite } = useAuth()
-const toast = useToast()
+const toast = useAppToast()
 
 const producer = ref<Producer | null>(null)
 const loading = ref(true)
@@ -117,7 +117,7 @@ onMounted(() => load())
     <div v-else-if="producer" class="flex items-start justify-between mb-6">
       <div class="flex items-center gap-3">
         <div>
-          <h1 class="page-title">{{ producer.companyName }}</h1>
+          <h1 class="text-2xl font-bold">{{ producer.companyName }}</h1>
           <div class="flex items-center gap-2 mt-1">
             <StatusBadge :status="producer.status" />
             <span v-if="producer.vatNumber" class="text-sm text-gray-500">VAT {{ producer.vatNumber }}</span>
@@ -125,98 +125,92 @@ onMounted(() => load())
         </div>
       </div>
       <div v-if="canWrite" class="flex gap-2">
-        <button v-if="!editing" class="btn-secondary btn-sm" @click="editing = true">
-          <i class="fa-solid fa-pen" /> Edit
-        </button>
-        <button class="btn-danger btn-sm" @click="showDeleteDialog = true">
-          <i class="fa-regular fa-trash-can" /> Delete
-        </button>
+        <UButton v-if="!editing" variant="outline" size="sm" icon="i-lucide-pen" @click="editing = true">Edit</UButton>
+        <UButton color="error" size="sm" icon="i-lucide-trash-2" @click="showDeleteDialog = true">Delete</UButton>
       </div>
     </div>
 
     <template v-if="!loading && producer">
       <template v-if="editing">
         <form @submit.prevent="save" class="space-y-6">
-          <div class="card card-body">
-            <h3 class="section-title mb-4">Company Details</h3>
+          <UCard>
+            <h3 class="text-lg font-semibold mb-4">Company Details</h3>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <FormField label="Company Name" required><FormInput v-model="form.companyName" /></FormField>
-              <FormField label="VAT No."><FormInput v-model="form.vatNumber" placeholder="IT12345678901" /></FormField>
-              <FormField label="Fiscal Code"><FormInput v-model="form.fiscalCode" /></FormField>
-              <FormField label="Status">
-                <FormSelect v-model="form.status" :options="[{ value: 'active', label: 'Active' }, { value: 'inactive', label: 'Inactive' }]" />
-              </FormField>
+              <UFormField label="Company Name" required><UInput v-model="form.companyName" /></UFormField>
+              <UFormField label="VAT No."><UInput v-model="form.vatNumber" placeholder="IT12345678901" /></UFormField>
+              <UFormField label="Fiscal Code"><UInput v-model="form.fiscalCode" /></UFormField>
+              <UFormField label="Status">
+                <USelect v-model="form.status" :items="[{ value: 'active', label: 'Active' }, { value: 'inactive', label: 'Inactive' }]" />
+              </UFormField>
             </div>
-          </div>
+          </UCard>
 
-          <div class="card card-body">
-            <h3 class="section-title mb-4">Address</h3>
+          <UCard>
+            <h3 class="text-lg font-semibold mb-4">Address</h3>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div class="sm:col-span-2 lg:col-span-3"><FormField label="Address" required><FormInput v-model="form.address" /></FormField></div>
-              <FormField label="City" required><FormInput v-model="form.city" /></FormField>
-              <FormField label="Province"><FormSelect v-model="form.province" :options="provinceOptions" placeholder="Select..." /></FormField>
-              <FormField label="Postal Code" required><FormInput v-model="form.postalCode" /></FormField>
-              <FormField label="Country" required><FormSelect v-model="form.country" :options="COUNTRIES" /></FormField>
+              <div class="sm:col-span-2 lg:col-span-3"><UFormField label="Address" required><UInput v-model="form.address" /></UFormField></div>
+              <UFormField label="City" required><UInput v-model="form.city" /></UFormField>
+              <UFormField label="Province"><USelect v-model="form.province" :items="provinceOptions" placeholder="Select..." /></UFormField>
+              <UFormField label="Postal Code" required><UInput v-model="form.postalCode" /></UFormField>
+              <UFormField label="Country" required><USelect v-model="form.country" :items="COUNTRIES" /></UFormField>
             </div>
-          </div>
+          </UCard>
 
-          <div class="card card-body">
-            <h3 class="section-title mb-4">Contacts</h3>
+          <UCard>
+            <h3 class="text-lg font-semibold mb-4">Contacts</h3>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <FormField label="Email"><FormInput v-model="form.email" type="email" /></FormField>
-              <FormField label="Phone"><FormInput v-model="form.phone" /></FormField>
-              <FormField label="Website"><FormInput v-model="form.website" placeholder="https://..." /></FormField>
+              <UFormField label="Email"><UInput v-model="form.email" type="email" /></UFormField>
+              <UFormField label="Phone"><UInput v-model="form.phone" /></UFormField>
+              <UFormField label="Website"><UInput v-model="form.website" placeholder="https://..." /></UFormField>
             </div>
-          </div>
+          </UCard>
 
-          <div class="card card-body">
-            <FormField label="Notes"><FormTextarea v-model="form.notes" :max-length="1000" /></FormField>
-          </div>
+          <UCard>
+            <UFormField label="Notes"><UTextarea v-model="form.notes" :rows="4" /></UFormField>
+          </UCard>
 
           <div class="flex justify-end gap-3">
-            <button type="button" class="btn-secondary" @click="editing = false; populateForm(producer!)">Cancel</button>
-            <button type="submit" class="btn-primary" :disabled="saving">
-              <i v-if="saving" class="fa-solid fa-spinner fa-spin" /> Save
-            </button>
+            <UButton type="button" variant="outline" @click="editing = false; populateForm(producer!)">Cancel</UButton>
+            <UButton type="submit" :disabled="saving" :loading="saving">Save</UButton>
           </div>
         </form>
       </template>
 
       <template v-else>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div class="card card-body">
-            <h3 class="section-title mb-3">Company Details</h3>
+          <UCard>
+            <h3 class="text-lg font-semibold mb-3">Company Details</h3>
             <dl class="space-y-2 text-sm">
               <div><dt class="text-gray-500 inline">VAT No.:</dt> <dd class="inline font-medium">{{ producer.vatNumber || '—' }}</dd></div>
               <div><dt class="text-gray-500 inline">Fiscal Code:</dt> <dd class="inline font-medium">{{ producer.fiscalCode || '—' }}</dd></div>
             </dl>
-          </div>
-          <div class="card card-body">
-            <h3 class="section-title mb-3">Address</h3>
+          </UCard>
+          <UCard>
+            <h3 class="text-lg font-semibold mb-3">Address</h3>
             <p class="text-sm">{{ producer.address }}</p>
             <p class="text-sm">{{ producer.postalCode }} {{ producer.city }} {{ producer.province ? `(${producer.province})` : '' }}</p>
             <p class="text-sm text-gray-500">{{ COUNTRIES.find(c => c.value === producer!.country)?.label || producer.country }}</p>
-          </div>
-          <div class="card card-body">
-            <h3 class="section-title mb-3">Contacts</h3>
+          </UCard>
+          <UCard>
+            <h3 class="text-lg font-semibold mb-3">Contacts</h3>
             <dl class="space-y-2 text-sm">
               <div><dt class="text-gray-500 inline">Email:</dt> <dd class="inline font-medium">{{ producer.email || '—' }}</dd></div>
               <div><dt class="text-gray-500 inline">Phone:</dt> <dd class="inline font-medium">{{ producer.phone || '—' }}</dd></div>
               <div><dt class="text-gray-500 inline">Website:</dt> <dd class="inline font-medium">{{ producer.website || '—' }}</dd></div>
             </dl>
-          </div>
-          <div class="card card-body">
-            <h3 class="section-title mb-3">Statistics</h3>
+          </UCard>
+          <UCard>
+            <h3 class="text-lg font-semibold mb-3">Statistics</h3>
             <dl class="space-y-2 text-sm">
               <div><dt class="text-gray-500 inline">Total sales:</dt> <dd class="inline font-medium">{{ producer.totalSales ?? 0 }}</dd></div>
               <div><dt class="text-gray-500 inline">Last sale:</dt> <dd class="inline font-medium">{{ formatDate(producer.lastSaleDate) }}</dd></div>
             </dl>
-          </div>
+          </UCard>
         </div>
-        <div v-if="producer.notes" class="card card-body mt-6">
-          <h3 class="section-title mb-2">Notes</h3>
+        <UCard v-if="producer.notes" class="mt-6">
+          <h3 class="text-lg font-semibold mb-2">Notes</h3>
           <p class="text-sm text-gray-600">{{ producer.notes }}</p>
-        </div>
+        </UCard>
       </template>
     </template>
 

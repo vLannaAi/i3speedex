@@ -9,7 +9,7 @@ const buyerId = route.params.id as string
 const { fetchBuyer, updateBuyer, deleteBuyer } = useBuyers()
 const { formatDate, formatCurrency } = useFormatters()
 const { canWrite } = useAuth()
-const toast = useToast()
+const toast = useAppToast()
 
 const buyer = ref<Buyer | null>(null)
 const loading = ref(true)
@@ -126,7 +126,7 @@ onMounted(() => load())
     <div v-else-if="buyer" class="flex items-start justify-between mb-6">
       <div class="flex items-center gap-3">
         <div>
-          <h1 class="page-title">{{ buyer.companyName }}</h1>
+          <h1 class="text-2xl font-bold">{{ buyer.companyName }}</h1>
           <div class="flex items-center gap-2 mt-1">
             <StatusBadge :status="buyer.status" />
             <span v-if="buyer.vatNumber" class="text-sm text-gray-500">VAT {{ buyer.vatNumber }}</span>
@@ -134,141 +134,135 @@ onMounted(() => load())
         </div>
       </div>
       <div v-if="canWrite" class="flex gap-2">
-        <button v-if="!editing" class="btn-secondary btn-sm" @click="editing = true">
-          <i class="fa-solid fa-pen" /> Edit
-        </button>
-        <button class="btn-danger btn-sm" @click="showDeleteDialog = true">
-          <i class="fa-regular fa-trash-can" /> Delete
-        </button>
+        <UButton v-if="!editing" variant="outline" size="sm" icon="i-lucide-pen" @click="editing = true">Edit</UButton>
+        <UButton color="error" size="sm" icon="i-lucide-trash-2" @click="showDeleteDialog = true">Delete</UButton>
       </div>
     </div>
 
     <template v-if="!loading && buyer">
       <template v-if="editing">
         <form @submit.prevent="save" class="space-y-6">
-          <div class="card card-body">
-            <h3 class="section-title mb-4">Company Details</h3>
+          <UCard>
+            <h3 class="text-lg font-semibold mb-4">Company Details</h3>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <FormField label="Company Name" required>
-                <FormInput v-model="form.companyName" />
-              </FormField>
-              <FormField label="VAT No.">
-                <FormInput v-model="form.vatNumber" placeholder="IT12345678901" />
-              </FormField>
-              <FormField label="Fiscal Code">
-                <FormInput v-model="form.fiscalCode" />
-              </FormField>
-              <FormField label="Status">
-                <FormSelect v-model="form.status" :options="[{ value: 'active', label: 'Active' }, { value: 'inactive', label: 'Inactive' }]" />
-              </FormField>
+              <UFormField label="Company Name" required>
+                <UInput v-model="form.companyName" />
+              </UFormField>
+              <UFormField label="VAT No.">
+                <UInput v-model="form.vatNumber" placeholder="IT12345678901" />
+              </UFormField>
+              <UFormField label="Fiscal Code">
+                <UInput v-model="form.fiscalCode" />
+              </UFormField>
+              <UFormField label="Status">
+                <USelect v-model="form.status" :items="[{ value: 'active', label: 'Active' }, { value: 'inactive', label: 'Inactive' }]" />
+              </UFormField>
             </div>
-          </div>
+          </UCard>
 
-          <div class="card card-body">
-            <h3 class="section-title mb-4">Address</h3>
+          <UCard>
+            <h3 class="text-lg font-semibold mb-4">Address</h3>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div class="sm:col-span-2 lg:col-span-3">
-                <FormField label="Address" required>
-                  <FormInput v-model="form.address" />
-                </FormField>
+                <UFormField label="Address" required>
+                  <UInput v-model="form.address" />
+                </UFormField>
               </div>
-              <FormField label="City" required>
-                <FormInput v-model="form.city" />
-              </FormField>
-              <FormField label="Province">
-                <FormSelect v-model="form.province" :options="provinceOptions" placeholder="Select..." />
-              </FormField>
-              <FormField label="Postal Code" required>
-                <FormInput v-model="form.postalCode" />
-              </FormField>
-              <FormField label="Country" required>
-                <FormSelect v-model="form.country" :options="COUNTRIES" />
-              </FormField>
+              <UFormField label="City" required>
+                <UInput v-model="form.city" />
+              </UFormField>
+              <UFormField label="Province">
+                <USelect v-model="form.province" :items="provinceOptions" placeholder="Select..." />
+              </UFormField>
+              <UFormField label="Postal Code" required>
+                <UInput v-model="form.postalCode" />
+              </UFormField>
+              <UFormField label="Country" required>
+                <USelect v-model="form.country" :items="COUNTRIES" />
+              </UFormField>
             </div>
-          </div>
+          </UCard>
 
-          <div class="card card-body">
-            <h3 class="section-title mb-4">Contacts</h3>
+          <UCard>
+            <h3 class="text-lg font-semibold mb-4">Contacts</h3>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <FormField label="Email">
-                <FormInput v-model="form.email" type="email" />
-              </FormField>
-              <FormField label="Phone">
-                <FormInput v-model="form.phone" />
-              </FormField>
-              <FormField label="PEC">
-                <FormInput v-model="form.pec" type="email" />
-              </FormField>
-              <FormField label="SDI Code" hint="7 alphanumeric characters">
-                <FormInput v-model="form.sdi" />
-              </FormField>
+              <UFormField label="Email">
+                <UInput v-model="form.email" type="email" />
+              </UFormField>
+              <UFormField label="Phone">
+                <UInput v-model="form.phone" />
+              </UFormField>
+              <UFormField label="PEC">
+                <UInput v-model="form.pec" type="email" />
+              </UFormField>
+              <UFormField label="SDI Code" hint="7 alphanumeric characters">
+                <UInput v-model="form.sdi" />
+              </UFormField>
             </div>
-          </div>
+          </UCard>
 
-          <div class="card card-body">
-            <h3 class="section-title mb-4">Default Payment</h3>
+          <UCard>
+            <h3 class="text-lg font-semibold mb-4">Default Payment</h3>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <FormField label="Payment method">
-                <FormSelect v-model="form.defaultPaymentMethod" :options="PAYMENT_METHODS" placeholder="Select..." />
-              </FormField>
-              <FormField label="Payment terms">
-                <FormSelect v-model="form.defaultPaymentTerms" :options="PAYMENT_TERMS" placeholder="Select..." />
-              </FormField>
+              <UFormField label="Payment method">
+                <USelect v-model="form.defaultPaymentMethod" :items="PAYMENT_METHODS" placeholder="Select..." />
+              </UFormField>
+              <UFormField label="Payment terms">
+                <USelect v-model="form.defaultPaymentTerms" :items="PAYMENT_TERMS" placeholder="Select..." />
+              </UFormField>
             </div>
-          </div>
+          </UCard>
 
-          <div class="card card-body">
-            <FormField label="Notes">
-              <FormTextarea v-model="form.notes" :max-length="1000" />
-            </FormField>
-          </div>
+          <UCard>
+            <UFormField label="Notes">
+              <UTextarea v-model="form.notes" :rows="4" />
+            </UFormField>
+          </UCard>
 
           <div class="flex justify-end gap-3">
-            <button type="button" class="btn-secondary" @click="editing = false; populateForm(buyer!)">Cancel</button>
-            <button type="submit" class="btn-primary" :disabled="saving">
-              <i v-if="saving" class="fa-solid fa-spinner fa-spin" /> Save
-            </button>
+            <UButton type="button" variant="outline" @click="editing = false; populateForm(buyer!)">Cancel</UButton>
+            <UButton type="submit" :disabled="saving" :loading="saving">Save</UButton>
           </div>
         </form>
       </template>
 
       <template v-else>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div class="card card-body">
-            <h3 class="section-title mb-3">Company Details</h3>
+          <UCard>
+            <h3 class="text-lg font-semibold mb-3">Company Details</h3>
             <dl class="space-y-2 text-sm">
               <div><dt class="text-gray-500 inline">VAT No.:</dt> <dd class="inline font-medium">{{ buyer.vatNumber || '—' }}</dd></div>
               <div><dt class="text-gray-500 inline">Fiscal Code:</dt> <dd class="inline font-medium">{{ buyer.fiscalCode || '—' }}</dd></div>
             </dl>
-          </div>
-          <div class="card card-body">
-            <h3 class="section-title mb-3">Address</h3>
+          </UCard>
+          <UCard>
+            <h3 class="text-lg font-semibold mb-3">Address</h3>
             <p class="text-sm">{{ buyer.address }}</p>
             <p class="text-sm">{{ buyer.postalCode }} {{ buyer.city }} {{ buyer.province ? `(${buyer.province})` : '' }}</p>
             <p class="text-sm text-gray-500">{{ COUNTRIES.find(c => c.value === buyer!.country)?.label || buyer.country }}</p>
-          </div>
-          <div class="card card-body">
-            <h3 class="section-title mb-3">Contacts</h3>
+          </UCard>
+          <UCard>
+            <h3 class="text-lg font-semibold mb-3">Contacts</h3>
             <dl class="space-y-2 text-sm">
               <div><dt class="text-gray-500 inline">Email:</dt> <dd class="inline font-medium">{{ buyer.email || '—' }}</dd></div>
               <div><dt class="text-gray-500 inline">Phone:</dt> <dd class="inline font-medium">{{ buyer.phone || '—' }}</dd></div>
               <div><dt class="text-gray-500 inline">PEC:</dt> <dd class="inline font-medium">{{ buyer.pec || '—' }}</dd></div>
               <div><dt class="text-gray-500 inline">SDI:</dt> <dd class="inline font-medium">{{ buyer.sdi || '—' }}</dd></div>
             </dl>
-          </div>
-          <div class="card card-body">
-            <h3 class="section-title mb-3">Statistics</h3>
+          </UCard>
+          <UCard>
+            <h3 class="text-lg font-semibold mb-3">Statistics</h3>
             <dl class="space-y-2 text-sm">
               <div><dt class="text-gray-500 inline">Total sales:</dt> <dd class="inline font-medium">{{ buyer.totalSales ?? 0 }}</dd></div>
               <div><dt class="text-gray-500 inline">Revenue:</dt> <dd class="inline font-medium">{{ formatCurrency(buyer.totalRevenue ?? 0) }}</dd></div>
               <div><dt class="text-gray-500 inline">Last sale:</dt> <dd class="inline font-medium">{{ formatDate(buyer.lastSaleDate) }}</dd></div>
             </dl>
-          </div>
+          </UCard>
         </div>
-        <div v-if="buyer.notes" class="card card-body mt-6">
-          <h3 class="section-title mb-2">Notes</h3>
+        <UCard v-if="buyer.notes" class="mt-6">
+          <h3 class="text-lg font-semibold mb-2">Notes</h3>
           <p class="text-sm text-gray-600">{{ buyer.notes }}</p>
-        </div>
+        </UCard>
       </template>
     </template>
 

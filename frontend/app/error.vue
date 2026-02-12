@@ -16,9 +16,9 @@ function handleError() {
         {{ error.statusCode === 404 ? 'Page not found' : 'An error occurred' }}
       </h1>
       <p class="text-gray-500 mb-6">{{ error.message }}</p>
-      <button class="btn-primary" @click="handleError">
+      <UButton @click="handleError">
         Back to dashboard
-      </button>
+      </UButton>
     </div>
   </div>
 </template>

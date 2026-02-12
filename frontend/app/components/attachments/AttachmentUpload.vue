@@ -6,7 +6,7 @@ const props = defineProps<{
 const emit = defineEmits<{ uploaded: [] }>()
 
 const { uploadFile } = useAttachments()
-const toast = useToast()
+const toast = useAppToast()
 
 const dragging = ref(false)
 const uploading = ref(false)
@@ -43,23 +43,25 @@ function onFileSelect(e: Event) {
   <div>
     <div
       class="border-2 border-dashed rounded-lg p-6 text-center transition-colors"
-      :class="dragging ? 'border-primary-400 bg-primary-50' : 'border-gray-300 hover:border-gray-400'"
+      :class="dragging ? 'border-(--ui-primary) bg-(--ui-bg-accented)' : 'border-(--ui-border) hover:border-(--ui-border-hover)'"
       @dragover.prevent="dragging = true"
       @dragleave="dragging = false"
       @drop.prevent="onDrop"
     >
-      <i class="fa-solid fa-cloud-arrow-up text-3xl text-gray-400 mx-auto mb-2" />
-      <p class="text-sm text-gray-600">Drag files here or</p>
-      <label class="btn-secondary btn-sm mt-2 cursor-pointer">
-        Browse
+      <UIcon name="i-lucide-upload" class="text-3xl text-(--ui-text-dimmed) mx-auto mb-2" />
+      <p class="text-sm text-(--ui-text-muted)">Drag files here or</p>
+      <label>
+        <UButton as="span" variant="outline" size="sm" class="mt-2 cursor-pointer">
+          Browse
+        </UButton>
         <input type="file" multiple class="hidden" @change="onFileSelect">
       </label>
-      <div v-if="uploading" class="mt-3 flex items-center justify-center gap-2 text-sm text-primary-600">
-        <i class="fa-solid fa-spinner fa-spin" /> Uploading...
+      <div v-if="uploading" class="mt-3 flex items-center justify-center gap-2 text-sm text-(--ui-primary)">
+        <UIcon name="i-lucide-loader-circle" class="animate-spin" /> Uploading...
       </div>
     </div>
     <div class="mt-2">
-      <FormInput v-model="description" placeholder="Description (optional)" />
+      <UInput v-model="description" placeholder="Description (optional)" />
     </div>
   </div>
 </template>

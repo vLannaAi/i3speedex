@@ -1,13 +1,13 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+  <div class="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950 px-4">
     <div class="w-full max-w-md">
       <div class="text-center mb-8">
-        <h1 class="text-3xl font-bold text-primary-700">i3speedex</h1>
-        <p class="text-gray-500 mt-1">Sales Management</p>
+        <h1 class="text-3xl font-bold text-primary-600">i3speedex</h1>
+        <p class="text-muted mt-1">Sales Management</p>
       </div>
-      <div class="card card-body">
+      <UCard>
         <slot />
-      </div>
+      </UCard>
     </div>
   </div>
 </template>

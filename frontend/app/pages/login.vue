@@ -2,7 +2,7 @@
 definePageMeta({ layout: 'auth' })
 
 const { login } = useAuth()
-const toast = useToast()
+const toast = useAppToast()
 
 const email = ref('')
 const password = ref('')
@@ -37,42 +37,37 @@ async function handleLogin() {
     <h2 class="text-xl font-semibold text-gray-900 mb-6">Sign In</h2>
 
     <form @submit.prevent="handleLogin" class="space-y-4">
-      <div>
-        <label class="label-base" for="email">Email</label>
-        <input
+      <UFormField label="Email" required>
+        <UInput
           id="email"
           v-model="email"
           type="email"
-          class="input-base"
           placeholder="name@company.com"
           autocomplete="email"
-        >
-      </div>
+        />
+      </UFormField>
 
-      <div>
-        <label class="label-base" for="password">Password</label>
-        <input
+      <UFormField label="Password" required>
+        <UInput
           id="password"
           v-model="password"
           type="password"
-          class="input-base"
           placeholder="••••••••"
           autocomplete="current-password"
-        >
-      </div>
+        />
+      </UFormField>
 
       <div v-if="errorMsg" class="text-sm text-danger-600 bg-danger-50 rounded-lg px-3 py-2">
         {{ errorMsg }}
       </div>
 
-      <button
+      <UButton
         type="submit"
-        class="btn-primary w-full"
-        :disabled="loading"
+        block
+        :loading="loading"
       >
-        <i v-if="loading" class="fa-solid fa-spinner fa-spin" />
         {{ loading ? 'Signing in...' : 'Sign In' }}
-      </button>
+      </UButton>
     </form>
 
     <div class="mt-4 text-center">

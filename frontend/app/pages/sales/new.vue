@@ -5,13 +5,13 @@ import { PAYMENT_METHODS, PAYMENT_TERMS } from '~/utils/constants'
 definePageMeta({ middleware: ['role'] })
 
 const { createSale } = useSales()
-const toast = useToast()
+const toast = useAppToast()
 const router = useRouter()
 
 const saving = ref(false)
 
 const form = reactive({
-  saleDate: new Date().toISOString().split('T')[0],
+  saleDate: new Date().toISOString().slice(0, 10),
   buyerId: '',
   producerId: '',
   paymentMethod: '',
@@ -80,69 +80,105 @@ function onBuyerSelect(buyer: Buyer) {
       { label: 'New Sale' },
     ]" />
     <div class="mb-6">
-      <h1 class="page-title">New Sale</h1>
-      <p class="page-subtitle">Fill in the details to create a new sale</p>
+      <h1 class="text-2xl font-bold">New Sale</h1>
+      <p class="text-sm text-muted mt-1">Fill in the details to create a new sale</p>
     </div>
 
     <form @submit.prevent="handleSubmit" class="space-y-6">
       <!-- Main info -->
-      <div class="card card-body">
-        <h3 class="section-title mb-4">Main Information</h3>
+      <UCard>
+        <h3 class="text-lg font-semibold mb-4">Main Information</h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <FormField label="Sale date" required :error="errors.saleDate">
-            <FormDatePicker v-model="form.saleDate" :error="!!errors.saleDate" />
-          </FormField>
-          <FormField label="Buyer" required :error="errors.buyerId">
-            <BuyerSelect v-model="form.buyerId" :error="!!errors.buyerId" @select="onBuyerSelect" />
-          </FormField>
-          <FormField label="Producer" required :error="errors.producerId">
-            <ProducerSelect v-model="form.producerId" :error="!!errors.producerId" />
-          </FormField>
+          <UFormField label="Sale date" required :error="errors.saleDate">
+            <UInput
+              v-model="form.saleDate"
+              type="date"
+              :color="errors.saleDate ? 'error' : undefined"
+              highlight
+            />
+          </UFormField>
+          <UFormField label="Buyer" required :error="errors.buyerId">
+            <BuyerSelect
+              v-model="form.buyerId"
+              :error="!!errors.buyerId"
+              @select="onBuyerSelect"
+            />
+          </UFormField>
+          <UFormField label="Producer" required :error="errors.producerId">
+            <ProducerSelect
+              v-model="form.producerId"
+              :error="!!errors.producerId"
+            />
+          </UFormField>
         </div>
-      </div>
+      </UCard>
 
       <!-- Payment & delivery -->
-      <div class="card card-body">
-        <h3 class="section-title mb-4">Payment & Delivery</h3>
+      <UCard>
+        <h3 class="text-lg font-semibold mb-4">Payment & Delivery</h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <FormField label="Payment method">
-            <FormSelect v-model="form.paymentMethod" :options="PAYMENT_METHODS" placeholder="Select..." />
-          </FormField>
-          <FormField label="Payment terms">
-            <FormSelect v-model="form.paymentTerms" :options="PAYMENT_TERMS" placeholder="Select..." />
-          </FormField>
-          <FormField label="Delivery method">
-            <FormInput v-model="form.deliveryMethod" placeholder="e.g. Courier, Pickup..." />
-          </FormField>
-          <FormField label="Delivery date">
-            <FormDatePicker v-model="form.deliveryDate" />
-          </FormField>
-          <FormField label="Reference">
-            <FormInput v-model="form.referenceNumber" placeholder="Order ref., DDT..." />
-          </FormField>
+          <UFormField label="Payment method">
+            <USelect
+              v-model="form.paymentMethod"
+              :items="PAYMENT_METHODS"
+              placeholder="Select..."
+            />
+          </UFormField>
+          <UFormField label="Payment terms">
+            <USelect
+              v-model="form.paymentTerms"
+              :items="PAYMENT_TERMS"
+              placeholder="Select..."
+            />
+          </UFormField>
+          <UFormField label="Delivery method">
+            <UInput
+              v-model="form.deliveryMethod"
+              placeholder="e.g. Courier, Pickup..."
+            />
+          </UFormField>
+          <UFormField label="Delivery date">
+            <UInput
+              v-model="form.deliveryDate"
+              type="date"
+            />
+          </UFormField>
+          <UFormField label="Reference">
+            <UInput
+              v-model="form.referenceNumber"
+              placeholder="Order ref., DDT..."
+            />
+          </UFormField>
         </div>
-      </div>
+      </UCard>
 
       <!-- Notes -->
-      <div class="card card-body">
-        <h3 class="section-title mb-4">Notes</h3>
+      <UCard>
+        <h3 class="text-lg font-semibold mb-4">Notes</h3>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <FormField label="Notes">
-            <FormTextarea v-model="form.notes" placeholder="Notes visible on invoice" :max-length="1000" />
-          </FormField>
-          <FormField label="Internal notes">
-            <FormTextarea v-model="form.internalNotes" placeholder="Internal use only" :max-length="1000" />
-          </FormField>
+          <UFormField label="Notes">
+            <UTextarea
+              v-model="form.notes"
+              placeholder="Notes visible on invoice"
+              :rows="4"
+            />
+          </UFormField>
+          <UFormField label="Internal notes">
+            <UTextarea
+              v-model="form.internalNotes"
+              placeholder="Internal use only"
+              :rows="4"
+            />
+          </UFormField>
         </div>
-      </div>
+      </UCard>
 
       <!-- Submit -->
       <div class="flex justify-end gap-3">
-        <NuxtLink to="/sales" class="btn-secondary">Cancel</NuxtLink>
-        <button type="submit" class="btn-primary" :disabled="saving">
-          <i v-if="saving" class="fa-solid fa-spinner fa-spin" />
+        <UButton to="/sales" variant="outline">Cancel</UButton>
+        <UButton type="submit" :loading="saving">
           Create Sale
-        </button>
+        </UButton>
       </div>
     </form>
   </div>

@@ -3,12 +3,12 @@ import type { SaleStatus } from '~/types'
 
 defineProps<{ status: SaleStatus }>()
 
-const colorMap: Record<SaleStatus, string> = {
-  draft: 'bg-gray-100 text-gray-700',
-  confirmed: 'bg-primary-100 text-primary-700',
-  invoiced: 'bg-warning-100 text-warning-700',
-  paid: 'bg-success-100 text-success-700',
-  cancelled: 'bg-danger-100 text-danger-700',
+const colorMap: Record<SaleStatus, 'neutral' | 'primary' | 'warning' | 'success' | 'error'> = {
+  draft: 'neutral',
+  confirmed: 'primary',
+  invoiced: 'warning',
+  paid: 'success',
+  cancelled: 'error',
 }
 
 const labelMap: Record<SaleStatus, string> = {
@@ -21,5 +21,10 @@ const labelMap: Record<SaleStatus, string> = {
 </script>
 
 <template>
-  <span class="badge" :class="colorMap[status]">{{ labelMap[status] }}</span>
+  <UBadge
+    :label="labelMap[status]"
+    :color="colorMap[status]"
+    variant="subtle"
+    size="sm"
+  />
 </template>

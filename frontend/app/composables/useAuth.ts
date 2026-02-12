@@ -37,7 +37,7 @@ function getUserPool(): CognitoUserPool {
 }
 
 function parseIdToken(idToken: string): UserContext {
-  const payload = JSON.parse(atob(idToken.split('.')[1]))
+  const payload = JSON.parse(atob(idToken.split('.')[1]!))
   const rawGroups = payload['cognito:groups'] || []
   let groups: string[]
   if (Array.isArray(rawGroups)) {

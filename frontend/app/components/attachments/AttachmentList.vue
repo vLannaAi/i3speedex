@@ -11,7 +11,7 @@ const emit = defineEmits<{ refresh: [] }>()
 
 const { deleteAttachment } = useAttachments()
 const { formatFileSize, formatDate } = useFormatters()
-const toast = useToast()
+const toast = useAppToast()
 
 const deleting = ref<string | null>(null)
 
@@ -29,41 +29,48 @@ async function remove(attachmentId: string) {
 }
 
 const iconMap: Record<string, string> = {
-  'application/pdf': 'fa-solid fa-file-pdf text-danger-500',
-  'image/jpeg': 'fa-regular fa-file-image text-primary-500',
-  'image/png': 'fa-regular fa-file-image text-primary-500',
-  'text/plain': 'fa-regular fa-file-lines text-gray-500',
+  'application/pdf': 'i-lucide-file-text',
+  'image/jpeg': 'i-lucide-image',
+  'image/png': 'i-lucide-image',
+  'text/plain': 'i-lucide-file-text',
 }
 
 function fileIcon(type: string) {
-  return iconMap[type] || 'fa-regular fa-file text-gray-400'
+  return iconMap[type] || 'i-lucide-file'
+}
+
+function fileIconColor(type: string): string {
+  if (type === 'application/pdf') return 'text-(--ui-error)'
+  if (type.startsWith('image/')) return 'text-(--ui-primary)'
+  return 'text-(--ui-text-dimmed)'
 }
 </script>
 
 <template>
-  <div v-if="attachments.length === 0" class="text-sm text-gray-500 text-center py-6">
+  <div v-if="attachments.length === 0" class="text-sm text-(--ui-text-muted) text-center py-6">
     No attachments
   </div>
-  <ul v-else class="divide-y divide-gray-100">
+  <ul v-else class="divide-y divide-(--ui-border-muted)">
     <li
       v-for="att in attachments"
       :key="att.attachmentId"
       class="flex items-center gap-3 py-3"
     >
-      <i :class="fileIcon(att.fileType)" class="text-xl shrink-0" />
+      <UIcon :name="fileIcon(att.fileType)" :class="fileIconColor(att.fileType)" class="text-xl shrink-0" />
       <div class="flex-1 min-w-0">
-        <p class="text-sm font-medium text-gray-900 truncate">{{ att.fileName }}</p>
-        <p class="text-xs text-gray-400">{{ formatFileSize(att.fileSize) }} — {{ formatDate(att.createdAt) }}</p>
-        <p v-if="att.description" class="text-xs text-gray-500">{{ att.description }}</p>
+        <p class="text-sm font-medium text-(--ui-text) truncate">{{ att.fileName }}</p>
+        <p class="text-xs text-(--ui-text-dimmed)">{{ formatFileSize(att.fileSize) }} — {{ formatDate(att.createdAt) }}</p>
+        <p v-if="att.description" class="text-xs text-(--ui-text-muted)">{{ att.description }}</p>
       </div>
-      <button
+      <UButton
         v-if="!readonly"
-        class="btn-ghost btn-sm text-danger-600 p-1"
+        variant="ghost"
+        size="xs"
+        color="error"
+        :icon="deleting === att.attachmentId ? 'i-lucide-loader-circle' : 'i-lucide-trash-2'"
         :disabled="deleting === att.attachmentId"
         @click="remove(att.attachmentId)"
-      >
-        <i :class="deleting === att.attachmentId ? 'fa-solid fa-spinner fa-spin' : 'fa-regular fa-trash-can'" />
-      </button>
+      />
     </li>
   </ul>
 </template>

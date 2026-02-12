@@ -1,38 +1,9 @@
-export interface Toast {
-  id: number
-  message: string
-  type: 'success' | 'error' | 'warning' | 'info'
-  duration?: number
-}
-
-const toasts = ref<Toast[]>([])
-let nextId = 0
-
-export function useToast() {
-  function add(message: string, type: Toast['type'] = 'info', duration = 4000) {
-    const id = nextId++
-    toasts.value.push({ id, message, type, duration })
-    if (duration > 0) {
-      setTimeout(() => remove(id), duration)
-    }
-  }
-
-  function remove(id: number) {
-    toasts.value = toasts.value.filter(t => t.id !== id)
-  }
-
-  function success(message: string) { add(message, 'success') }
-  function error(message: string) { add(message, 'error', 6000) }
-  function warning(message: string) { add(message, 'warning') }
-  function info(message: string) { add(message, 'info') }
-
+export function useAppToast() {
+  const toast = useToast()
   return {
-    toasts: computed(() => toasts.value),
-    add,
-    remove,
-    success,
-    error,
-    warning,
-    info,
+    success: (title: string) => toast.add({ title, color: 'success' as const, icon: 'i-lucide-check-circle' }),
+    error: (title: string) => toast.add({ title, color: 'error' as const, icon: 'i-lucide-alert-circle', duration: 6000 }),
+    warning: (title: string) => toast.add({ title, color: 'warning' as const, icon: 'i-lucide-alert-triangle' }),
+    info: (title: string) => toast.add({ title, color: 'info' as const, icon: 'i-lucide-info' }),
   }
 }

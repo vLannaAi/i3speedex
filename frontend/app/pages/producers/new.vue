@@ -4,7 +4,7 @@ import { COUNTRIES, ITALIAN_PROVINCES } from '~/utils/constants'
 definePageMeta({ middleware: ['role'] })
 
 const { createProducer } = useProducers()
-const toast = useToast()
+const toast = useAppToast()
 const router = useRouter()
 
 const saving = ref(false)
@@ -75,67 +75,67 @@ async function handleSubmit() {
       { label: 'New Producer' },
     ]" />
     <div class="mb-6">
-      <h1 class="page-title">New Producer</h1>
-      <p class="page-subtitle">Enter the new producer details</p>
+      <h1 class="text-2xl font-bold">New Producer</h1>
+      <p class="text-sm text-muted mt-1">Enter the new producer details</p>
     </div>
 
     <form @submit.prevent="handleSubmit" class="space-y-6">
-      <div class="card card-body">
-        <h3 class="section-title mb-4">Company Details</h3>
+      <UCard>
+        <h3 class="text-lg font-semibold mb-4">Company Details</h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <FormField label="Company Name" required :error="errors.companyName">
-            <FormInput v-model="form.companyName" :error="!!errors.companyName" />
-          </FormField>
-          <FormField label="VAT No." hint="e.g. IT12345678901">
-            <FormInput v-model="form.vatNumber" />
-          </FormField>
-          <FormField label="Fiscal Code">
-            <FormInput v-model="form.fiscalCode" />
-          </FormField>
+          <UFormField label="Company Name" required :error="errors.companyName">
+            <UInput v-model="form.companyName" :color="errors.companyName ? 'error' : undefined" highlight />
+          </UFormField>
+          <UFormField label="VAT No." hint="e.g. IT12345678901">
+            <UInput v-model="form.vatNumber" />
+          </UFormField>
+          <UFormField label="Fiscal Code">
+            <UInput v-model="form.fiscalCode" />
+          </UFormField>
         </div>
-      </div>
+      </UCard>
 
-      <div class="card card-body">
-        <h3 class="section-title mb-4">Address</h3>
+      <UCard>
+        <h3 class="text-lg font-semibold mb-4">Address</h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <div class="sm:col-span-2 lg:col-span-3">
-            <FormField label="Address" required :error="errors.address">
-              <FormInput v-model="form.address" :error="!!errors.address" />
-            </FormField>
+            <UFormField label="Address" required :error="errors.address">
+              <UInput v-model="form.address" :color="errors.address ? 'error' : undefined" highlight />
+            </UFormField>
           </div>
-          <FormField label="City" required :error="errors.city">
-            <FormInput v-model="form.city" :error="!!errors.city" />
-          </FormField>
-          <FormField label="Province">
-            <FormSelect v-model="form.province" :options="provinceOptions" placeholder="Select..." />
-          </FormField>
-          <FormField label="Postal Code" required :error="errors.postalCode">
-            <FormInput v-model="form.postalCode" :error="!!errors.postalCode" />
-          </FormField>
-          <FormField label="Country" required>
-            <FormSelect v-model="form.country" :options="COUNTRIES" />
-          </FormField>
+          <UFormField label="City" required :error="errors.city">
+            <UInput v-model="form.city" :color="errors.city ? 'error' : undefined" highlight />
+          </UFormField>
+          <UFormField label="Province">
+            <USelect v-model="form.province" :items="provinceOptions" placeholder="Select..." />
+          </UFormField>
+          <UFormField label="Postal Code" required :error="errors.postalCode">
+            <UInput v-model="form.postalCode" :color="errors.postalCode ? 'error' : undefined" highlight />
+          </UFormField>
+          <UFormField label="Country" required>
+            <USelect v-model="form.country" :items="COUNTRIES" />
+          </UFormField>
         </div>
-      </div>
+      </UCard>
 
-      <div class="card card-body">
-        <h3 class="section-title mb-4">Contacts</h3>
+      <UCard>
+        <h3 class="text-lg font-semibold mb-4">Contacts</h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <FormField label="Email"><FormInput v-model="form.email" type="email" /></FormField>
-          <FormField label="Phone"><FormInput v-model="form.phone" /></FormField>
-          <FormField label="Website"><FormInput v-model="form.website" placeholder="https://..." /></FormField>
+          <UFormField label="Email"><UInput v-model="form.email" type="email" /></UFormField>
+          <UFormField label="Phone"><UInput v-model="form.phone" /></UFormField>
+          <UFormField label="Website"><UInput v-model="form.website" placeholder="https://..." /></UFormField>
         </div>
-      </div>
+      </UCard>
 
-      <div class="card card-body">
-        <FormField label="Notes"><FormTextarea v-model="form.notes" :max-length="1000" /></FormField>
-      </div>
+      <UCard>
+        <UFormField label="Notes"><UTextarea v-model="form.notes" :rows="4" /></UFormField>
+      </UCard>
 
       <div class="flex justify-end gap-3">
-        <NuxtLink to="/producers" class="btn-secondary">Cancel</NuxtLink>
-        <button type="submit" class="btn-primary" :disabled="saving">
-          <i v-if="saving" class="fa-solid fa-spinner fa-spin" /> Create Producer
-        </button>
+        <NuxtLink to="/producers">
+          <UButton variant="outline">Cancel</UButton>
+        </NuxtLink>
+        <UButton type="submit" :disabled="saving" :loading="saving">Create Producer</UButton>
       </div>
     </form>
   </div>

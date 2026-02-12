@@ -1,5 +1,5 @@
 <script setup lang="ts">
-defineProps<{
+const props = defineProps<{
   open: boolean
   title?: string
   message: string
@@ -13,31 +13,31 @@ const emit = defineEmits<{
   confirm: []
   cancel: []
 }>()
+
+const isOpen = computed({
+  get: () => props.open,
+  set: (v) => { if (!v) emit('cancel') },
+})
 </script>
 
 <template>
-  <Teleport to="body">
-    <div v-if="open" class="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <!-- Backdrop -->
-      <div class="fixed inset-0 bg-black/40" @click="emit('cancel')" />
-      <!-- Dialog -->
-      <div class="bg-white rounded-xl shadow-xl max-w-md w-full relative z-10 p-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ title || 'Confirm' }}</h3>
-        <p class="text-sm text-gray-600 mb-6">{{ message }}</p>
-        <div class="flex justify-end gap-3">
-          <button class="btn-secondary" :disabled="loading" @click="emit('cancel')">
-            {{ cancelLabel || 'Cancel' }}
-          </button>
-          <button
-            :class="variant === 'danger' ? 'btn-danger' : 'btn-primary'"
-            :disabled="loading"
-            @click="emit('confirm')"
-          >
-            <i v-if="loading" class="fa-solid fa-spinner fa-spin" />
-            {{ confirmLabel || 'Confirm' }}
-          </button>
-        </div>
+  <UModal v-model:open="isOpen" :title="title || 'Confirm'">
+    <template #body>
+      <p class="text-sm text-muted">{{ message }}</p>
+    </template>
+    <template #footer>
+      <div class="flex justify-end gap-3">
+        <UButton variant="outline" :disabled="loading" @click="emit('cancel')">
+          {{ cancelLabel || 'Cancel' }}
+        </UButton>
+        <UButton
+          :color="variant === 'danger' ? 'error' : 'primary'"
+          :loading="loading"
+          @click="emit('confirm')"
+        >
+          {{ confirmLabel || 'Confirm' }}
+        </UButton>
       </div>
-    </div>
-  </Teleport>
+    </template>
+  </UModal>
 </template>

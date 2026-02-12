@@ -23,19 +23,22 @@ const canDelete = computed(() =>
 
 <template>
   <div class="flex gap-2 flex-wrap">
-    <button
+    <UButton
       v-if="canConfirm"
-      class="btn-primary btn-sm"
+      size="sm"
+      icon="i-lucide-check-circle"
       @click="emit('confirm')"
     >
-      <i class="fa-regular fa-circle-check" /> Confirm
-    </button>
-    <button
+      Confirm
+    </UButton>
+    <UButton
       v-if="canDelete"
-      class="btn-danger btn-sm"
+      color="error"
+      size="sm"
+      icon="i-lucide-trash-2"
       @click="emit('delete')"
     >
-      <i class="fa-regular fa-trash-can" /> Delete
-    </button>
+      Delete
+    </UButton>
   </div>
 </template>

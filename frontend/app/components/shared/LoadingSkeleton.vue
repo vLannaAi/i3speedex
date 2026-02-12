@@ -7,10 +7,9 @@ defineProps<{
 
 <template>
   <div class="space-y-3">
-    <div
+    <USkeleton
       v-for="i in (lines || 3)"
       :key="i"
-      class="skeleton"
       :style="{ height: height || '20px', width: i === (lines || 3) ? '60%' : '100%' }"
     />
   </div>

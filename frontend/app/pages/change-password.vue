@@ -2,7 +2,7 @@
 definePageMeta({ layout: 'auth' })
 
 const { completeNewPassword } = useAuth()
-const toast = useToast()
+const toast = useAppToast()
 
 const newPassword = ref('')
 const confirmPassword = ref('')
@@ -41,20 +41,37 @@ async function handleChange() {
     <p class="text-sm text-gray-500 mb-6">You must set a new password to continue.</p>
 
     <form @submit.prevent="handleChange" class="space-y-4">
-      <div>
-        <label class="label-base" for="newPw">New password</label>
-        <input id="newPw" v-model="newPassword" type="password" class="input-base" placeholder="••••••••" autocomplete="new-password">
-      </div>
-      <div>
-        <label class="label-base" for="confirmPw">Confirm password</label>
-        <input id="confirmPw" v-model="confirmPassword" type="password" class="input-base" placeholder="••••••••" autocomplete="new-password">
-      </div>
+      <UFormField label="New password" required>
+        <UInput
+          id="newPw"
+          v-model="newPassword"
+          type="password"
+          placeholder="••••••••"
+          autocomplete="new-password"
+        />
+      </UFormField>
+
+      <UFormField label="Confirm password" required>
+        <UInput
+          id="confirmPw"
+          v-model="confirmPassword"
+          type="password"
+          placeholder="••••••••"
+          autocomplete="new-password"
+        />
+      </UFormField>
+
       <p class="text-xs text-gray-400">Minimum 8 characters, with uppercase, lowercase and numbers.</p>
+
       <div v-if="errorMsg" class="text-sm text-danger-600 bg-danger-50 rounded-lg px-3 py-2">{{ errorMsg }}</div>
-      <button type="submit" class="btn-primary w-full" :disabled="loading">
-        <i v-if="loading" class="fa-solid fa-spinner fa-spin" />
+
+      <UButton
+        type="submit"
+        block
+        :loading="loading"
+      >
         Set password
-      </button>
+      </UButton>
     </form>
   </div>
 </template>

@@ -18,10 +18,10 @@ const statusBreakdown = computed(() => {
 
 // Map activity action to a displayable status
 const actionIcon: Record<string, string> = {
-  created: 'fa-regular fa-circle-plus',
-  updated: 'fa-solid fa-pen',
-  confirmed: 'fa-regular fa-circle-check',
-  invoiced: 'fa-regular fa-file-lines',
+  created: 'i-lucide-circle-plus',
+  updated: 'i-lucide-pencil',
+  confirmed: 'i-lucide-circle-check',
+  invoiced: 'i-lucide-file-text',
 }
 const actionColor: Record<string, string> = {
   created: 'text-primary-500',
@@ -34,72 +34,74 @@ const actionColor: Record<string, string> = {
 <template>
   <div>
     <div class="mb-6">
-      <h1 class="page-title">Dashboard</h1>
-      <p class="page-subtitle">Sales overview</p>
+      <h1 class="text-2xl font-bold">Dashboard</h1>
+      <p class="text-sm text-muted mt-1">Sales overview</p>
     </div>
 
     <!-- Stat cards -->
     <div v-if="loading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-      <div v-for="i in 4" :key="i" class="card card-body">
+      <UCard v-for="i in 4" :key="i">
         <LoadingSkeleton :lines="2" height="24px" />
-      </div>
+      </UCard>
     </div>
     <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
       <StatCard
         label="Total Sales"
         :value="stats?.totalSales ?? 0"
-        icon="fa-solid fa-file-invoice"
+        icon="i-lucide-receipt"
         color="primary"
         :trend="stats?.salesGrowth"
       />
       <StatCard
         label="Revenue"
         :value="formatCurrency(stats?.totalRevenue ?? 0)"
-        icon="fa-solid fa-money-bills"
+        icon="i-lucide-banknote"
         color="success"
         :trend="stats?.revenueGrowth"
       />
       <StatCard
         label="Active Buyers"
         :value="stats?.activeBuyers ?? 0"
-        icon="fa-solid fa-users"
+        icon="i-lucide-users"
         color="warning"
       />
       <StatCard
         label="Active Producers"
         :value="stats?.activeProducers ?? 0"
-        icon="fa-solid fa-industry"
-        color="danger"
+        icon="i-lucide-factory"
+        color="error"
       />
     </div>
 
     <!-- Status breakdown -->
     <div v-if="statusBreakdown" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
-      <div
+      <UCard
         v-for="(count, status) in statusBreakdown"
         :key="status"
-        class="card card-body text-center"
       >
-        <StatusBadge :status="String(status)" class="mb-2" />
-        <p class="text-2xl font-bold text-gray-900">{{ count }}</p>
-      </div>
+        <div class="text-center">
+          <StatusBadge :status="String(status)" class="mb-2" />
+          <p class="text-2xl font-bold text-gray-900">{{ count }}</p>
+        </div>
+      </UCard>
     </div>
 
     <!-- Bottom row -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- Top Buyers -->
-      <div class="card">
-        <div class="px-5 py-4 border-b border-gray-100">
-          <h3 class="section-title">Top 5 Buyers</h3>
-        </div>
-        <div v-if="loading" class="p-5"><LoadingSkeleton :lines="5" /></div>
-        <div v-else-if="topBuyers.length === 0" class="p-5 text-center text-sm text-gray-500">No data</div>
+      <UCard>
+        <template #header>
+          <h3 class="text-lg font-semibold">Top 5 Buyers</h3>
+        </template>
+
+        <div v-if="loading"><LoadingSkeleton :lines="5" /></div>
+        <div v-else-if="topBuyers.length === 0" class="text-center text-sm text-gray-500">No data</div>
         <table v-else class="w-full">
           <thead>
             <tr class="border-b border-gray-100 text-left text-xs text-gray-500 uppercase">
-              <th class="px-5 py-2.5">Buyer</th>
-              <th class="px-5 py-2.5 text-right">Sales</th>
-              <th class="px-5 py-2.5 text-right">Total</th>
+              <th class="px-2 py-2.5">Buyer</th>
+              <th class="px-2 py-2.5 text-right">Sales</th>
+              <th class="px-2 py-2.5 text-right">Total</th>
             </tr>
           </thead>
           <tbody>
@@ -108,30 +110,32 @@ const actionColor: Record<string, string> = {
               :key="buyer.buyerId"
               class="border-b border-gray-50 last:border-0"
             >
-              <td class="px-5 py-3 text-sm font-medium text-gray-900">{{ buyer.buyerName || buyer.companyName }}</td>
-              <td class="px-5 py-3 text-sm text-gray-600 text-right">{{ buyer.totalSales }}</td>
-              <td class="px-5 py-3 text-sm font-medium text-gray-900 text-right">{{ formatCurrency(buyer.totalRevenue) }}</td>
+              <td class="px-2 py-3 text-sm font-medium text-gray-900">{{ buyer.buyerName || buyer.companyName }}</td>
+              <td class="px-2 py-3 text-sm text-gray-600 text-right">{{ buyer.totalSales }}</td>
+              <td class="px-2 py-3 text-sm font-medium text-gray-900 text-right">{{ formatCurrency(buyer.totalRevenue) }}</td>
             </tr>
           </tbody>
         </table>
-      </div>
+      </UCard>
 
       <!-- Recent Activity -->
-      <div class="card">
-        <div class="px-5 py-4 border-b border-gray-100">
-          <h3 class="section-title">Recent Activity</h3>
-        </div>
-        <div v-if="loading" class="p-5"><LoadingSkeleton :lines="5" /></div>
-        <div v-else-if="recentActivity.length === 0" class="p-5 text-center text-sm text-gray-500">No recent activity</div>
+      <UCard>
+        <template #header>
+          <h3 class="text-lg font-semibold">Recent Activity</h3>
+        </template>
+
+        <div v-if="loading"><LoadingSkeleton :lines="5" /></div>
+        <div v-else-if="recentActivity.length === 0" class="text-center text-sm text-gray-500">No recent activity</div>
         <ul v-else class="divide-y divide-gray-50">
           <li
             v-for="item in recentActivity"
             :key="`${item.id}-${item.timestamp}`"
-            class="px-5 py-3 flex items-center gap-3"
+            class="py-3 flex items-center gap-3"
           >
-            <i
+            <UIcon
+              :name="actionIcon[item.action] || 'i-lucide-circle'"
               class="text-lg shrink-0"
-              :class="[actionIcon[item.action] || 'fa-regular fa-circle', actionColor[item.action] || 'text-gray-400']"
+              :class="actionColor[item.action] || 'text-gray-400'"
             />
             <div class="flex-1 min-w-0">
               <p class="text-sm text-gray-900 truncate">{{ item.title }}</p>
@@ -139,7 +143,7 @@ const actionColor: Record<string, string> = {
             </div>
           </li>
         </ul>
-      </div>
+      </UCard>
     </div>
   </div>
 </template>

@@ -7,7 +7,7 @@ const props = defineProps<{
 }>()
 
 const { generatePdf, generateSdi, downloadInvoice } = useInvoices()
-const toast = useToast()
+const toast = useAppToast()
 
 const language = ref('it')
 const generating = ref(false)
@@ -58,46 +58,48 @@ async function handleDownload() {
 
 <template>
   <div class="space-y-4">
-    <div v-if="!canGenerate" class="text-sm text-gray-500">
+    <div v-if="!canGenerate" class="text-sm text-(--ui-text-muted)">
       The sale must be confirmed before generating invoices.
     </div>
 
     <template v-else>
       <div class="flex items-center gap-3">
-        <FormField label="Language">
-          <FormSelect v-model="language" :options="INVOICE_LANGUAGES" />
-        </FormField>
+        <UFormField label="Language">
+          <USelect v-model="language" :items="INVOICE_LANGUAGES" />
+        </UFormField>
       </div>
 
       <div class="flex gap-2 flex-wrap">
-        <button
-          class="btn-primary btn-sm"
-          :disabled="generating"
+        <UButton
+          size="sm"
+          icon="i-lucide-file-text"
+          :loading="generating"
           @click="handleGeneratePdf"
         >
-          <i :class="generating ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-file-pdf'" />
           Generate PDF
-        </button>
-        <button
-          class="btn-secondary btn-sm"
-          :disabled="generating"
+        </UButton>
+        <UButton
+          variant="outline"
+          size="sm"
+          icon="i-lucide-file-code"
+          :loading="generating"
           @click="handleGenerateSdi"
         >
-          <i :class="generating ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-file-code'" />
           Generate SDI XML
-        </button>
-        <button
+        </UButton>
+        <UButton
           v-if="sale.invoiceGenerated"
-          class="btn-ghost btn-sm"
-          :disabled="downloading"
+          variant="ghost"
+          size="sm"
+          icon="i-lucide-download"
+          :loading="downloading"
           @click="handleDownload"
         >
-          <i :class="downloading ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-download'" />
           Download
-        </button>
+        </UButton>
       </div>
 
-      <div v-if="sale.invoiceGenerated" class="text-xs text-gray-400">
+      <div v-if="sale.invoiceGenerated" class="text-xs text-(--ui-text-dimmed)">
         Invoice generated on {{ sale.invoiceGeneratedAt }}
         <span v-if="sale.invoiceNumber"> — No. {{ sale.invoiceNumber }}</span>
       </div>

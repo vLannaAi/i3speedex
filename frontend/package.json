@@ -12,16 +12,17 @@
     "typecheck": "nuxt typecheck"
   },
   "dependencies": {
+    "@iconify-json/lucide": "^1.2.90",
+    "@nuxt/ui": "^4.4.0",
     "@nuxtjs/google-fonts": "^3.2.0",
     "@vueuse/core": "^11.3.0",
     "amazon-cognito-identity-js": "^6.3.12",
-    "nuxt": "^3.16.0",
+    "nuxt": "^4.3.1",
+    "tailwindcss": "^4.1.18",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0"
   },
   "devDependencies": {
-    "@unocss/nuxt": "^66.6.0",
-    "@unocss/preset-uno": "^66.6.0",
     "typescript": "^5.7.0"
   }
 }

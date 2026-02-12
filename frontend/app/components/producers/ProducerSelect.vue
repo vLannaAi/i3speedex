@@ -15,13 +15,16 @@ const emit = defineEmits<{
 const { fetchProducers } = useProducers()
 const producers = ref<Producer[]>([])
 const search = ref('')
-const open = ref(false)
 const loading = ref(false)
 
-const selectedName = computed(() => {
-  const p = producers.value.find(p => p.producerId === props.modelValue)
-  return p?.companyName || ''
-})
+const items = computed(() =>
+  producers.value.map(p => ({
+    label: p.companyName,
+    value: p.producerId,
+    description: `${p.city}${p.province ? ` (${p.province})` : ''}`,
+    _producer: p,
+  })),
+)
 
 async function loadProducers() {
   loading.value = true
@@ -30,11 +33,10 @@ async function loadProducers() {
   loading.value = false
 }
 
-function select(producer: Producer) {
-  emit('update:modelValue', producer.producerId)
-  emit('select', producer)
-  search.value = ''
-  open.value = false
+function onUpdate(value: string) {
+  emit('update:modelValue', value)
+  const producer = producers.value.find(p => p.producerId === value)
+  if (producer) emit('select', producer)
 }
 
 watch(search, () => loadProducers())
@@ -42,47 +44,25 @@ onMounted(() => loadProducers())
 </script>
 
 <template>
-  <div class="relative">
-    <div
-      class="input-base cursor-pointer flex items-center justify-between"
-      :class="{ 'input-error': error }"
-      @click="open = !open"
-    >
-      <span :class="selectedName ? 'text-gray-900' : 'text-gray-400'">
-        {{ selectedName || 'Select producer...' }}
-      </span>
-      <i class="fa-solid fa-chevron-down text-gray-400" />
-    </div>
-
-    <div v-if="open" class="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-20 max-h-64 overflow-hidden">
-      <div class="p-2 border-b border-gray-100">
-        <input
-          v-model="search"
-          type="text"
-          placeholder="Search producer..."
-          class="input-base text-sm"
-          @click.stop
-        >
+  <USelectMenu
+    :model-value="modelValue"
+    :items="items"
+    value-key="value"
+    label-key="label"
+    :search-input="{ placeholder: 'Search producer...' }"
+    :disabled="disabled"
+    :color="error ? 'error' : undefined"
+    :highlight="error"
+    :loading="loading"
+    placeholder="Select producer..."
+    @update:model-value="onUpdate"
+    @update:search-term="search = $event"
+  >
+    <template #item="{ item }">
+      <div>
+        <div class="font-medium">{{ item.label }}</div>
+        <div class="text-xs text-muted">{{ item.description }}</div>
       </div>
-      <div class="overflow-y-auto max-h-48">
-        <div v-if="loading" class="p-3 text-sm text-gray-500 text-center">Loading...</div>
-        <div v-else-if="producers.length === 0" class="p-3 text-sm text-gray-500 text-center">No results</div>
-        <button
-          v-for="p in producers"
-          :key="p.producerId"
-          class="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 flex items-center justify-between"
-          :class="p.producerId === modelValue ? 'bg-primary-50 text-primary-700' : 'text-gray-700'"
-          @click="select(p)"
-        >
-          <div>
-            <p class="font-medium">{{ p.companyName }}</p>
-            <p class="text-xs text-gray-400">{{ p.city }}{{ p.province ? ` (${p.province})` : '' }}</p>
-          </div>
-          <i v-if="p.producerId === modelValue" class="fa-solid fa-check text-primary-600" />
-        </button>
-      </div>
-    </div>
-
-    <div v-if="open" class="fixed inset-0 z-10" @click="open = false" />
-  </div>
+    </template>
+  </USelectMenu>
 </template>

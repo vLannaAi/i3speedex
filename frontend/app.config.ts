@@ -1,6 +1,15 @@
 export default defineAppConfig({
-  locale: 'it-IT',
+  locale: 'en-US',
   currency: 'EUR',
   appName: 'i3speedex',
-  appTitle: 'Gestione Vendite',
+  appTitle: 'Sales Management',
+  ui: {
+    colors: {
+      primary: 'blue',
+      success: 'green',
+      warning: 'amber',
+      error: 'red',
+      neutral: 'gray',
+    },
+  },
 })

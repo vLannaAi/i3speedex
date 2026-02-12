@@ -10,7 +10,7 @@ const { fetchSale, updateSale, confirmSale, deleteSale, fetchSaleLines } = useSa
 const { fetchAttachments } = useAttachments()
 const { formatDate, formatCurrency, formatDateTime } = useFormatters()
 const { canWrite } = useAuth()
-const toast = useToast()
+const toast = useAppToast()
 
 const sale = ref<Sale | null>(null)
 const lines = ref<SaleLine[]>([])
@@ -22,12 +22,12 @@ const saving = ref(false)
 const showDeleteDialog = ref(false)
 const showConfirmDialog = ref(false)
 
-const tabs = [
-  { key: 'details', label: 'Details', icon: 'fa-regular fa-circle-info' },
-  { key: 'lines', label: 'Lines', icon: 'fa-solid fa-list-ol' },
-  { key: 'invoice', label: 'Invoice', icon: 'fa-regular fa-file-lines' },
-  { key: 'attachments', label: 'Attachments', icon: 'fa-solid fa-paperclip' },
-]
+const tabs = computed(() => [
+  { key: 'details', label: 'Details', icon: 'i-lucide-info', slot: 'details' },
+  { key: 'lines', label: 'Lines', icon: 'i-lucide-list-ordered', slot: 'lines', badge: lines.value.length || undefined },
+  { key: 'invoice', label: 'Invoice', icon: 'i-lucide-file-text', slot: 'invoice' },
+  { key: 'attachments', label: 'Attachments', icon: 'i-lucide-paperclip', slot: 'attachments', badge: attachments.value.length || undefined },
+])
 
 // Edit form
 const form = reactive({
@@ -154,10 +154,10 @@ onMounted(() => load())
     <div v-else-if="sale" class="flex items-start justify-between mb-6">
       <div>
         <div class="flex items-center gap-3">
-          <h1 class="page-title">Sale #{{ sale.saleNumber }}</h1>
+          <h1 class="text-2xl font-bold">Sale #{{ sale.saleNumber }}</h1>
           <SaleStatusBadge :status="sale.status" />
         </div>
-        <p class="page-subtitle">
+        <p class="text-sm text-muted mt-1">
           {{ sale.buyerName }} — {{ formatDate(sale.saleDate) }}
         </p>
       </div>
@@ -169,161 +169,147 @@ onMounted(() => load())
     </div>
 
     <!-- Tabs -->
-    <div class="border-b border-gray-200 mb-6">
-      <nav class="flex gap-0 -mb-px">
-        <button
-          v-for="tab in tabs"
-          :key="tab.key"
-          class="px-4 py-3 text-sm font-medium border-b-2 transition-colors"
-          :class="activeTab === tab.key
-            ? 'border-primary-600 text-primary-600'
-            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
-          @click="activeTab = tab.key"
-        >
-          <div class="inline-flex items-center gap-1.5">
-            <i :class="tab.icon" />
-            {{ tab.label }}
-            <span v-if="tab.key === 'lines' && lines.length" class="text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded-full">{{ lines.length }}</span>
-            <span v-if="tab.key === 'attachments' && attachments.length" class="text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded-full">{{ attachments.length }}</span>
-          </div>
-        </button>
-      </nav>
-    </div>
-
-    <!-- Tab content -->
-    <div v-if="loading">
-      <div class="card card-body"><LoadingSkeleton :lines="6" /></div>
-    </div>
-    <template v-else-if="sale">
+    <UTabs v-model="activeTab" :items="tabs" class="mb-6">
       <!-- Details tab -->
-      <div v-if="activeTab === 'details'" class="space-y-6">
-        <div class="card card-body">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="section-title">Sale Information</h3>
-            <button v-if="isEditable && !editing" class="btn-ghost btn-sm" @click="editing = true">
-              <i class="fa-solid fa-pen" /> Edit
-            </button>
+      <template #details>
+        <div v-if="loading">
+          <UCard><LoadingSkeleton :lines="6" /></UCard>
+        </div>
+        <div v-else-if="sale" class="space-y-6">
+          <UCard>
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-lg font-semibold">Sale Information</h3>
+              <UButton v-if="isEditable && !editing" variant="ghost" size="sm" icon="i-lucide-pen" @click="editing = true">
+                Edit
+              </UButton>
+            </div>
+
+            <template v-if="editing">
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <UFormField label="Sale date" required>
+                  <UInput v-model="form.saleDate" type="date" />
+                </UFormField>
+                <UFormField label="Payment method">
+                  <USelect v-model="form.paymentMethod" :items="PAYMENT_METHODS" placeholder="Select..." />
+                </UFormField>
+                <UFormField label="Payment terms">
+                  <USelect v-model="form.paymentTerms" :items="PAYMENT_TERMS" placeholder="Select..." />
+                </UFormField>
+                <UFormField label="Delivery method">
+                  <UInput v-model="form.deliveryMethod" />
+                </UFormField>
+                <UFormField label="Delivery date">
+                  <UInput v-model="form.deliveryDate" type="date" />
+                </UFormField>
+                <UFormField label="Reference">
+                  <UInput v-model="form.referenceNumber" />
+                </UFormField>
+                <div class="sm:col-span-2 lg:col-span-3">
+                  <UFormField label="Notes">
+                    <UTextarea v-model="form.notes" :rows="3" />
+                  </UFormField>
+                </div>
+                <div class="sm:col-span-2 lg:col-span-3">
+                  <UFormField label="Internal notes">
+                    <UTextarea v-model="form.internalNotes" :rows="3" />
+                  </UFormField>
+                </div>
+              </div>
+              <div class="flex gap-2 mt-4">
+                <UButton size="sm" :loading="saving" @click="saveDetails">
+                  Save
+                </UButton>
+                <UButton variant="ghost" size="sm" @click="editing = false; populateForm(sale!)">Cancel</UButton>
+              </div>
+            </template>
+
+            <template v-else>
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
+                <div><span class="text-gray-500">Date:</span> <span class="font-medium">{{ formatDate(sale.saleDate) }}</span></div>
+                <div><span class="text-gray-500">Payment:</span> <span class="font-medium">{{ sale.paymentMethod || '—' }}</span></div>
+                <div><span class="text-gray-500">Terms:</span> <span class="font-medium">{{ sale.paymentTerms || '—' }}</span></div>
+                <div><span class="text-gray-500">Delivery:</span> <span class="font-medium">{{ sale.deliveryMethod || '—' }}</span></div>
+                <div><span class="text-gray-500">Delivery date:</span> <span class="font-medium">{{ formatDate(sale.deliveryDate) }}</span></div>
+                <div><span class="text-gray-500">Reference:</span> <span class="font-medium">{{ sale.referenceNumber || '—' }}</span></div>
+                <div v-if="sale.notes" class="sm:col-span-2 lg:col-span-3">
+                  <span class="text-gray-500">Notes:</span>
+                  <p class="font-medium mt-1">{{ sale.notes }}</p>
+                </div>
+                <div v-if="sale.internalNotes" class="sm:col-span-2 lg:col-span-3">
+                  <span class="text-gray-500">Internal notes:</span>
+                  <p class="font-medium mt-1">{{ sale.internalNotes }}</p>
+                </div>
+              </div>
+            </template>
+          </UCard>
+
+          <!-- Buyer & Producer info -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <UCard>
+              <h3 class="text-lg font-semibold mb-3">Buyer</h3>
+              <div class="space-y-1 text-sm">
+                <p class="font-medium text-gray-900">{{ sale.buyerName }}</p>
+                <p v-if="sale.buyerVatNumber" class="text-gray-500">VAT: {{ sale.buyerVatNumber }}</p>
+                <p v-if="sale.buyerAddress" class="text-gray-500">{{ sale.buyerAddress }}, {{ sale.buyerCity }} {{ sale.buyerProvince ? `(${sale.buyerProvince})` : '' }} {{ sale.buyerPostalCode }}</p>
+              </div>
+            </UCard>
+            <UCard>
+              <h3 class="text-lg font-semibold mb-3">Producer</h3>
+              <div class="space-y-1 text-sm">
+                <p class="font-medium text-gray-900">{{ sale.producerName }}</p>
+                <p v-if="sale.producerVatNumber" class="text-gray-500">VAT: {{ sale.producerVatNumber }}</p>
+                <p v-if="sale.producerAddress" class="text-gray-500">{{ sale.producerAddress }}, {{ sale.producerCity }} {{ sale.producerProvince ? `(${sale.producerProvince})` : '' }} {{ sale.producerPostalCode }}</p>
+              </div>
+            </UCard>
           </div>
 
-          <template v-if="editing">
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <FormField label="Sale date" required>
-                <FormDatePicker v-model="form.saleDate" />
-              </FormField>
-              <FormField label="Payment method">
-                <FormSelect v-model="form.paymentMethod" :options="PAYMENT_METHODS" placeholder="Select..." />
-              </FormField>
-              <FormField label="Payment terms">
-                <FormSelect v-model="form.paymentTerms" :options="PAYMENT_TERMS" placeholder="Select..." />
-              </FormField>
-              <FormField label="Delivery method">
-                <FormInput v-model="form.deliveryMethod" />
-              </FormField>
-              <FormField label="Delivery date">
-                <FormDatePicker v-model="form.deliveryDate" />
-              </FormField>
-              <FormField label="Reference">
-                <FormInput v-model="form.referenceNumber" />
-              </FormField>
-              <div class="sm:col-span-2 lg:col-span-3">
-                <FormField label="Notes">
-                  <FormTextarea v-model="form.notes" :max-length="1000" />
-                </FormField>
-              </div>
-              <div class="sm:col-span-2 lg:col-span-3">
-                <FormField label="Internal notes">
-                  <FormTextarea v-model="form.internalNotes" :max-length="1000" />
-                </FormField>
-              </div>
-            </div>
-            <div class="flex gap-2 mt-4">
-              <button class="btn-primary btn-sm" :disabled="saving" @click="saveDetails">
-                <i v-if="saving" class="fa-solid fa-spinner fa-spin" /> Save
-              </button>
-              <button class="btn-ghost btn-sm" @click="editing = false; populateForm(sale!)">Cancel</button>
-            </div>
-          </template>
-
-          <template v-else>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
-              <div><span class="text-gray-500">Date:</span> <span class="font-medium">{{ formatDate(sale.saleDate) }}</span></div>
-              <div><span class="text-gray-500">Payment:</span> <span class="font-medium">{{ sale.paymentMethod || '—' }}</span></div>
-              <div><span class="text-gray-500">Terms:</span> <span class="font-medium">{{ sale.paymentTerms || '—' }}</span></div>
-              <div><span class="text-gray-500">Delivery:</span> <span class="font-medium">{{ sale.deliveryMethod || '—' }}</span></div>
-              <div><span class="text-gray-500">Delivery date:</span> <span class="font-medium">{{ formatDate(sale.deliveryDate) }}</span></div>
-              <div><span class="text-gray-500">Reference:</span> <span class="font-medium">{{ sale.referenceNumber || '—' }}</span></div>
-              <div v-if="sale.notes" class="sm:col-span-2 lg:col-span-3">
-                <span class="text-gray-500">Notes:</span>
-                <p class="font-medium mt-1">{{ sale.notes }}</p>
-              </div>
-              <div v-if="sale.internalNotes" class="sm:col-span-2 lg:col-span-3">
-                <span class="text-gray-500">Internal notes:</span>
-                <p class="font-medium mt-1">{{ sale.internalNotes }}</p>
-              </div>
-            </div>
-          </template>
-        </div>
-
-        <!-- Buyer & Producer info -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div class="card card-body">
-            <h3 class="section-title mb-3">Buyer</h3>
-            <div class="space-y-1 text-sm">
-              <p class="font-medium text-gray-900">{{ sale.buyerName }}</p>
-              <p v-if="sale.buyerVatNumber" class="text-gray-500">VAT: {{ sale.buyerVatNumber }}</p>
-              <p v-if="sale.buyerAddress" class="text-gray-500">{{ sale.buyerAddress }}, {{ sale.buyerCity }} {{ sale.buyerProvince ? `(${sale.buyerProvince})` : '' }} {{ sale.buyerPostalCode }}</p>
-            </div>
+          <!-- Totals -->
+          <div class="max-w-sm ml-auto">
+            <SaleTotals :lines="lines" />
           </div>
-          <div class="card card-body">
-            <h3 class="section-title mb-3">Producer</h3>
-            <div class="space-y-1 text-sm">
-              <p class="font-medium text-gray-900">{{ sale.producerName }}</p>
-              <p v-if="sale.producerVatNumber" class="text-gray-500">VAT: {{ sale.producerVatNumber }}</p>
-              <p v-if="sale.producerAddress" class="text-gray-500">{{ sale.producerAddress }}, {{ sale.producerCity }} {{ sale.producerProvince ? `(${sale.producerProvince})` : '' }} {{ sale.producerPostalCode }}</p>
-            </div>
+
+          <!-- Metadata -->
+          <div class="text-xs text-gray-400 space-y-1">
+            <p>Created on {{ formatDateTime(sale.createdAt) }} by {{ sale.createdBy }}</p>
+            <p>Updated on {{ formatDateTime(sale.updatedAt) }} by {{ sale.updatedBy }}</p>
           </div>
         </div>
-
-        <!-- Totals -->
-        <div class="max-w-sm ml-auto">
-          <SaleTotals :lines="lines" />
-        </div>
-
-        <!-- Metadata -->
-        <div class="text-xs text-gray-400 space-y-1">
-          <p>Created on {{ formatDateTime(sale.createdAt) }} by {{ sale.createdBy }}</p>
-          <p>Updated on {{ formatDateTime(sale.updatedAt) }} by {{ sale.updatedBy }}</p>
-        </div>
-      </div>
+      </template>
 
       <!-- Lines tab -->
-      <div v-if="activeTab === 'lines'" class="card card-body">
-        <SaleLineEditor
-          :sale-id="saleId"
-          :lines="lines"
-          :readonly="!isEditable"
-          @refresh="refreshLines"
-        />
-        <div class="mt-4 max-w-sm ml-auto">
-          <SaleTotals :lines="lines" />
-        </div>
-      </div>
+      <template #lines>
+        <UCard>
+          <SaleLineEditor
+            :sale-id="saleId"
+            :lines="lines"
+            :readonly="!isEditable"
+            @refresh="refreshLines"
+          />
+          <div class="mt-4 max-w-sm ml-auto">
+            <SaleTotals :lines="lines" />
+          </div>
+        </UCard>
+      </template>
 
       <!-- Invoice tab -->
-      <div v-if="activeTab === 'invoice'" class="card card-body">
-        <h3 class="section-title mb-4">Invoice Generation</h3>
-        <InvoiceActions :sale="sale" />
-      </div>
+      <template #invoice>
+        <UCard>
+          <h3 class="text-lg font-semibold mb-4">Invoice Generation</h3>
+          <InvoiceActions v-if="sale" :sale="sale" />
+        </UCard>
+      </template>
 
       <!-- Attachments tab -->
-      <div v-if="activeTab === 'attachments'" class="card card-body">
-        <h3 class="section-title mb-4">Attachments</h3>
-        <AttachmentUpload v-if="canWrite" :sale-id="saleId" @uploaded="refreshAttachments" />
-        <div class="mt-4">
-          <AttachmentList :sale-id="saleId" :attachments="attachments" :readonly="!canWrite" @refresh="refreshAttachments" />
-        </div>
-      </div>
-    </template>
+      <template #attachments>
+        <UCard>
+          <h3 class="text-lg font-semibold mb-4">Attachments</h3>
+          <AttachmentUpload v-if="canWrite" :sale-id="saleId" @uploaded="refreshAttachments" />
+          <div class="mt-4">
+            <AttachmentList :sale-id="saleId" :attachments="attachments" :readonly="!canWrite" @refresh="refreshAttachments" />
+          </div>
+        </UCard>
+      </template>
+    </UTabs>
 
     <!-- Dialogs -->
     <ConfirmDialog

@@ -1,9 +1,8 @@
 export default defineNuxtConfig({
   compatibilityDate: '2025-05-15',
-  future: { compatibilityVersion: 4 },
   ssr: false,
 
-  modules: ['@unocss/nuxt', '@nuxtjs/google-fonts'],
+  modules: ['@nuxt/ui', '@nuxtjs/google-fonts'],
 
   googleFonts: {
     families: {
@@ -39,9 +38,6 @@ export default defineNuxtConfig({
         { name: 'description', content: 'Sales, buyers and producers management' },
       ],
       htmlAttrs: { lang: 'en' },
-      script: [
-        { src: 'https://kit.fontawesome.com/9ab53866ec.js', crossorigin: 'anonymous' },
-      ],
     },
   },
 

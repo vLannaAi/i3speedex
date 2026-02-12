@@ -15,7 +15,7 @@ const emit = defineEmits<{
 
 const { createSaleLine, updateSaleLine, deleteSaleLine } = useSales()
 const { formatCurrency } = useFormatters()
-const toast = useToast()
+const toast = useAppToast()
 
 const showForm = ref(false)
 const editing = ref<string | null>(null)
@@ -119,7 +119,7 @@ async function removeLine(lineId: string) {
     <div class="overflow-x-auto">
       <table class="w-full text-sm">
         <thead>
-          <tr class="border-b border-gray-200 bg-gray-50/50 text-xs text-gray-500 uppercase">
+          <tr class="border-b border-(--ui-border) bg-(--ui-bg-muted) text-xs text-(--ui-text-muted) uppercase">
             <th class="px-3 py-2 text-left">#</th>
             <th class="px-3 py-2 text-left">Description</th>
             <th class="px-3 py-2 text-right">Qty</th>
@@ -133,19 +133,19 @@ async function removeLine(lineId: string) {
         </thead>
         <tbody>
           <tr v-if="lines.length === 0">
-            <td :colspan="readonly ? 8 : 9" class="px-3 py-8 text-center text-gray-400">
+            <td :colspan="readonly ? 8 : 9" class="px-3 py-8 text-center text-(--ui-text-dimmed)">
               No lines
             </td>
           </tr>
           <tr
             v-for="line in lines"
             :key="line.lineId"
-            class="border-b border-gray-50"
+            class="border-b border-(--ui-border-muted)"
           >
-            <td class="px-3 py-2 text-gray-400">{{ line.lineNumber }}</td>
+            <td class="px-3 py-2 text-(--ui-text-dimmed)">{{ line.lineNumber }}</td>
             <td class="px-3 py-2">
-              <p class="font-medium text-gray-900">{{ line.productDescription }}</p>
-              <p v-if="line.productCode" class="text-xs text-gray-400">{{ line.productCode }}</p>
+              <p class="font-medium text-(--ui-text)">{{ line.productDescription }}</p>
+              <p v-if="line.productCode" class="text-xs text-(--ui-text-dimmed)">{{ line.productCode }}</p>
             </td>
             <td class="px-3 py-2 text-right">{{ line.quantity }} {{ line.unitOfMeasure }}</td>
             <td class="px-3 py-2 text-right">{{ formatCurrency(line.unitPrice) }}</td>
@@ -155,16 +155,20 @@ async function removeLine(lineId: string) {
             <td class="px-3 py-2 text-right font-medium">{{ formatCurrency(line.totalAmount) }}</td>
             <td v-if="!readonly" class="px-3 py-2">
               <div class="flex gap-1">
-                <button class="btn-ghost btn-sm p-1" @click="editLine(line)">
-                  <i class="fa-solid fa-pen text-sm" />
-                </button>
-                <button
-                  class="btn-ghost btn-sm p-1 text-danger-600"
+                <UButton
+                  variant="ghost"
+                  size="xs"
+                  icon="i-lucide-pencil"
+                  @click="editLine(line)"
+                />
+                <UButton
+                  variant="ghost"
+                  size="xs"
+                  color="error"
+                  :icon="deleting === line.lineId ? 'i-lucide-loader-circle' : 'i-lucide-trash-2'"
                   :disabled="deleting === line.lineId"
                   @click="removeLine(line.lineId)"
-                >
-                  <i :class="deleting === line.lineId ? 'fa-solid fa-spinner fa-spin' : 'fa-regular fa-trash-can'" class="text-sm" />
-                </button>
+                />
               </div>
             </td>
           </tr>
@@ -174,58 +178,57 @@ async function removeLine(lineId: string) {
 
     <!-- Add/Edit form -->
     <div v-if="!readonly" class="mt-4">
-      <button v-if="!showForm" class="btn-secondary btn-sm" @click="showForm = true">
-        <i class="fa-solid fa-plus" /> Add line
-      </button>
+      <UButton v-if="!showForm" variant="outline" size="sm" icon="i-lucide-plus" @click="showForm = true">
+        Add line
+      </UButton>
 
-      <div v-if="showForm" class="border border-gray-200 rounded-lg p-4 bg-gray-50 mt-2">
-        <h4 class="text-sm font-semibold text-gray-900 mb-3">
+      <div v-if="showForm" class="border border-(--ui-border) rounded-lg p-4 bg-(--ui-bg-muted) mt-2">
+        <h4 class="text-sm font-semibold text-(--ui-text) mb-3">
           {{ editing ? 'Edit line' : 'New line' }}
         </h4>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <div class="sm:col-span-2">
-            <FormField label="Description" required>
-              <FormInput v-model="form.productDescription" placeholder="Product/service description" />
-            </FormField>
+            <UFormField label="Description" required>
+              <UInput v-model="form.productDescription" placeholder="Product/service description" />
+            </UFormField>
           </div>
-          <FormField label="Code">
-            <FormInput v-model="form.productCode" placeholder="COD001" />
-          </FormField>
-          <FormField label="Unit of measure">
-            <FormSelect v-model="form.unitOfMeasure" :options="UNITS_OF_MEASURE" />
-          </FormField>
-          <FormField label="Quantity" required>
-            <FormInput v-model="form.quantity" type="number" />
-          </FormField>
-          <FormField label="Unit price" required>
+          <UFormField label="Code">
+            <UInput v-model="form.productCode" placeholder="COD001" />
+          </UFormField>
+          <UFormField label="Unit of measure">
+            <USelect v-model="form.unitOfMeasure" :items="UNITS_OF_MEASURE" />
+          </UFormField>
+          <UFormField label="Quantity" required>
+            <UInput v-model="form.quantity" type="number" />
+          </UFormField>
+          <UFormField label="Unit price" required>
             <FormCurrency v-model="form.unitPrice" />
-          </FormField>
-          <FormField label="Discount %">
-            <FormInput v-model="form.discount" type="number" placeholder="0" />
-          </FormField>
-          <FormField label="VAT rate" required>
-            <FormSelect v-model="form.taxRate" :options="TAX_RATES" />
-          </FormField>
+          </UFormField>
+          <UFormField label="Discount %">
+            <UInput v-model="form.discount" type="number" placeholder="0" />
+          </UFormField>
+          <UFormField label="VAT rate" required>
+            <USelect v-model="form.taxRate" :items="TAX_RATES" />
+          </UFormField>
           <div class="sm:col-span-2 lg:col-span-4">
-            <FormField label="Notes">
-              <FormInput v-model="form.notes" placeholder="Line notes" />
-            </FormField>
+            <UFormField label="Notes">
+              <UInput v-model="form.notes" placeholder="Line notes" />
+            </UFormField>
           </div>
         </div>
 
         <!-- Preview -->
-        <div class="mt-3 flex items-center gap-4 text-sm text-gray-600">
+        <div class="mt-3 flex items-center gap-4 text-sm text-(--ui-text-muted)">
           <span>Net: <strong>{{ formatCurrency(preview.netAmount) }}</strong></span>
           <span>VAT: <strong>{{ formatCurrency(preview.taxAmount) }}</strong></span>
-          <span>Total: <strong class="text-gray-900">{{ formatCurrency(preview.totalAmount) }}</strong></span>
+          <span>Total: <strong class="text-(--ui-text)">{{ formatCurrency(preview.totalAmount) }}</strong></span>
         </div>
 
         <div class="mt-4 flex gap-2">
-          <button class="btn-primary btn-sm" :disabled="saving" @click="save">
-            <i v-if="saving" class="fa-solid fa-spinner fa-spin" />
+          <UButton size="sm" :loading="saving" @click="save">
             {{ editing ? 'Update' : 'Add' }}
-          </button>
-          <button class="btn-ghost btn-sm" @click="resetForm">Cancel</button>
+          </UButton>
+          <UButton variant="ghost" size="sm" @click="resetForm">Cancel</UButton>
         </div>
       </div>
     </div>

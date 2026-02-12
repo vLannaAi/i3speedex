@@ -31,25 +31,22 @@ function onFocus() {
     display.value = props.modelValue.toString()
   }
 }
-
-function onInput(e: Event) {
-  display.value = (e.target as HTMLInputElement).value
-}
 </script>
 
 <template>
-  <div class="relative">
-    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">EUR</span>
-    <input
-      :value="display"
-      type="text"
-      inputmode="decimal"
-      :disabled="disabled"
-      class="input-base pl-12"
-      :class="{ 'input-error': error }"
-      @input="onInput"
-      @focus="onFocus"
-      @blur="onBlur"
-    >
-  </div>
+  <UInput
+    :model-value="display"
+    type="text"
+    inputmode="decimal"
+    :disabled="disabled"
+    :color="error ? 'error' : undefined"
+    :highlight="error"
+    @update:model-value="display = $event as string"
+    @focus="onFocus"
+    @blur="onBlur"
+  >
+    <template #leading>
+      <span class="text-muted text-sm">EUR</span>
+    </template>
+  </UInput>
 </template>
