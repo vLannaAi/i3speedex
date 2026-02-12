@@ -15,7 +15,18 @@ export function useSales() {
     startDate?: string
     endDate?: string
   }) {
-    return getList<Sale>('/api/sales', params as Record<string, string | number | undefined>)
+    // Map frontend param names to backend query param names
+    const query: Record<string, string | number | undefined> = {
+      page: params?.page,
+      pageSize: params?.pageSize,
+      status: params?.status,
+      buyerId: params?.buyerId,
+      producerId: params?.producerId,
+      search: params?.search,
+      dateFrom: params?.startDate,
+      dateTo: params?.endDate,
+    }
+    return getList<Sale>('/api/sales', query)
   }
 
   async function fetchSale(id: string) {

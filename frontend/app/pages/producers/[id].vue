@@ -1,13 +1,15 @@
 <script setup lang="ts">
-import type { Producer } from '~/types'
+import type { Producer, Sale } from '~/types'
 import { COUNTRIES, ITALIAN_PROVINCES } from '~/utils/constants'
+import { getCountryDisplay } from '~/utils/display-helpers'
 
 const route = useRoute()
 const router = useRouter()
 const producerId = route.params.id as string
 
 const { fetchProducer, updateProducer, deleteProducer } = useProducers()
-const { formatDate } = useFormatters()
+const { fetchSales } = useSales()
+const { formatDate, formatCurrency, formatDateTime } = useFormatters()
 const { canWrite } = useAuth()
 const toast = useAppToast()
 
@@ -17,7 +19,53 @@ const editing = ref(false)
 const saving = ref(false)
 const showDeleteDialog = ref(false)
 
-const provinceOptions = ITALIAN_PROVINCES.map(p => ({ value: p, label: p }))
+// Sales history state (paginated table)
+const producerSales = ref<Sale[]>([])
+const salesLoading = ref(false)
+const salesPage = ref(1)
+const salesPageSize = ref(10)
+const salesTotal = ref(0)
+const selectedYear = ref('all')
+
+// All sales for stats (loaded once)
+const allSales = ref<Sale[]>([])
+const chartsLoading = ref(false)
+
+// Sorting state for sales table
+const sorting = ref([{ id: 'saleDate', desc: true }])
+
+// Computed stats from actual sales data
+const computedTotalSales = computed(() => allSales.value.length)
+const computedTotalRevenue = computed(() =>
+  allSales.value.reduce((sum, s) => sum + (s.total || s.subtotal || 0), 0),
+)
+const computedLastSaleDate = computed(() => {
+  if (allSales.value.length === 0) return null
+  return allSales.value[0]?.saleDate || null
+})
+
+// Available years for filter (derived from all sales)
+const availableYears = computed(() => {
+  const years = new Set<string>()
+  for (const sale of allSales.value) {
+    if (sale.saleDate) {
+      years.add(sale.saleDate.slice(0, 4))
+    }
+  }
+  return Array.from(years)
+    .sort((a, b) => b.localeCompare(a))
+    .map(y => ({ value: y, label: y }))
+})
+
+// Sales table columns
+const salesColumns = [
+  { accessorKey: 'saleDate', header: 'Date', enableSorting: true, size: 120 },
+  { accessorKey: 'saleNumber', header: 'Sale #', enableSorting: true, size: 100 },
+  { accessorKey: 'buyerName', header: 'Buyer', enableSorting: true, size: 200 },
+  { accessorKey: 'status', header: 'Status', enableSorting: true, size: 110 },
+  { accessorKey: 'total', header: 'Total', enableSorting: true, size: 120 },
+  { accessorKey: 'actions', header: '', enableSorting: false, size: 50 },
+]
 
 const form = reactive({
   companyName: '',
@@ -103,7 +151,75 @@ async function handleDelete() {
   }
 }
 
-onMounted(() => load())
+async function loadSales() {
+  salesLoading.value = true
+  try {
+    const startDate = selectedYear.value && selectedYear.value !== 'all' ? `${selectedYear.value}-01-01` : undefined
+    const endDate = selectedYear.value && selectedYear.value !== 'all' ? `${selectedYear.value}-12-31` : undefined
+    const res = await fetchSales({
+      producerId,
+      page: salesPage.value,
+      pageSize: salesPageSize.value,
+      startDate,
+      endDate,
+    })
+    if (res) {
+      producerSales.value = res.data || []
+      salesTotal.value = res.pagination?.total || 0
+    }
+  } catch (e: any) {
+    toast.error(e.message)
+  } finally {
+    salesLoading.value = false
+  }
+}
+
+async function loadAllSales() {
+  chartsLoading.value = true
+  try {
+    const allData: Sale[] = []
+    let page = 1
+    const limit = 100
+    while (true) {
+      const res = await fetchSales({ producerId, page, pageSize: limit })
+      if (res?.data?.length) {
+        allData.push(...res.data)
+        if (res.data.length < limit) break
+        page++
+      } else {
+        break
+      }
+    }
+    allSales.value = allData
+  } catch {
+    // Stats are optional, fail silently
+  } finally {
+    chartsLoading.value = false
+  }
+}
+
+function onSalesPageChange(p: number) {
+  salesPage.value = p
+  loadSales()
+}
+
+function filterByYear() {
+  salesPage.value = 1
+  loadSales()
+}
+
+function onSelectSale(_e: Event, row: any) {
+  router.push(`/sales/${row.original.saleId}`)
+}
+
+function getSaleTotal(sale: Sale): number {
+  return sale.total || sale.subtotal || 0
+}
+
+onMounted(async () => {
+  await load()
+  await Promise.all([loadAllSales(), loadSales()])
+})
 </script>
 
 <template>
@@ -124,9 +240,8 @@ onMounted(() => load())
           </div>
         </div>
       </div>
-      <div v-if="canWrite" class="flex gap-2">
-        <UButton v-if="!editing" variant="outline" size="sm" icon="i-lucide-pen" @click="editing = true">Edit</UButton>
-        <UButton color="error" size="sm" icon="i-lucide-trash-2" @click="showDeleteDialog = true">Delete</UButton>
+      <div v-if="canWrite && !editing">
+        <UButton variant="outline" size="sm" icon="i-lucide-pen" @click="editing = true">Edit</UButton>
       </div>
     </div>
 
@@ -150,9 +265,14 @@ onMounted(() => load())
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div class="sm:col-span-2 lg:col-span-3"><UFormField label="Address" required><UInput v-model="form.address" /></UFormField></div>
               <UFormField label="City" required><UInput v-model="form.city" /></UFormField>
-              <UFormField label="Province"><USelect v-model="form.province" :items="provinceOptions" placeholder="Select..." /></UFormField>
+              <UFormField label="Province"><USelect v-model="form.province" :items="ITALIAN_PROVINCES" placeholder="Select..." /></UFormField>
               <UFormField label="Postal Code" required><UInput v-model="form.postalCode" /></UFormField>
-              <UFormField label="Country" required><USelect v-model="form.country" :items="COUNTRIES" /></UFormField>
+              <UFormField label="Country" required>
+                <div class="flex items-center gap-2">
+                  <UIcon v-if="getCountryDisplay(form.country).flag" :name="getCountryDisplay(form.country).flag" class="size-5 shrink-0" mode="svg" />
+                  <USelect v-model="form.country" :items="COUNTRIES" class="flex-1" />
+                </div>
+              </UFormField>
             </div>
           </UCard>
 
@@ -169,9 +289,12 @@ onMounted(() => load())
             <UFormField label="Notes"><UTextarea v-model="form.notes" :rows="4" /></UFormField>
           </UCard>
 
-          <div class="flex justify-end gap-3">
-            <UButton type="button" variant="outline" @click="editing = false; populateForm(producer!)">Cancel</UButton>
-            <UButton type="submit" :disabled="saving" :loading="saving">Save</UButton>
+          <div class="flex justify-between">
+            <UButton type="button" color="error" variant="outline" icon="i-lucide-trash-2" @click="showDeleteDialog = true">Delete</UButton>
+            <div class="flex gap-3">
+              <UButton type="button" variant="outline" @click="editing = false; populateForm(producer!)">Cancel</UButton>
+              <UButton type="submit" :disabled="saving" :loading="saving">Save</UButton>
+            </div>
           </div>
         </form>
       </template>
@@ -188,8 +311,14 @@ onMounted(() => load())
           <UCard>
             <h3 class="text-lg font-semibold mb-3">Address</h3>
             <p class="text-sm">{{ producer.address }}</p>
-            <p class="text-sm">{{ producer.postalCode }} {{ producer.city }} {{ producer.province ? `(${producer.province})` : '' }}</p>
-            <p class="text-sm text-gray-500">{{ COUNTRIES.find(c => c.value === producer!.country)?.label || producer.country }}</p>
+            <p class="text-sm">
+              {{ producer.postalCode }} {{ producer.city }}
+              <span v-if="producer.province"> ({{ getCountryDisplay(producer.country).code === 'IT' ? (ITALIAN_PROVINCES.find(p => p.value === producer!.province)?.label || producer.province) : producer.province }})</span>
+            </p>
+            <p class="text-sm flex items-center gap-1.5">
+              <UIcon v-if="getCountryDisplay(producer.country).flag" :name="getCountryDisplay(producer.country).flag" class="size-5 shrink-0" mode="svg" />
+              <span>{{ getCountryDisplay(producer.country).label }}</span>
+            </p>
           </UCard>
           <UCard>
             <h3 class="text-lg font-semibold mb-3">Contacts</h3>
@@ -199,18 +328,110 @@ onMounted(() => load())
               <div><dt class="text-gray-500 inline">Website:</dt> <dd class="inline font-medium">{{ producer.website || '—' }}</dd></div>
             </dl>
           </UCard>
-          <UCard>
-            <h3 class="text-lg font-semibold mb-3">Statistics</h3>
-            <dl class="space-y-2 text-sm">
-              <div><dt class="text-gray-500 inline">Total sales:</dt> <dd class="inline font-medium">{{ producer.totalSales ?? 0 }}</dd></div>
-              <div><dt class="text-gray-500 inline">Last sale:</dt> <dd class="inline font-medium">{{ formatDate(producer.lastSaleDate) }}</dd></div>
-            </dl>
-          </UCard>
         </div>
+
+        <!-- Quick Stats -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
+          <StatCard
+            label="Total Sales"
+            :value="chartsLoading ? '...' : computedTotalSales"
+            icon="i-lucide-receipt"
+            color="primary"
+          />
+          <StatCard
+            label="Revenue"
+            :value="chartsLoading ? '...' : formatCurrency(computedTotalRevenue)"
+            icon="i-lucide-banknote"
+            color="success"
+          />
+          <StatCard
+            label="Last Sale"
+            :value="chartsLoading ? '...' : formatDate(computedLastSaleDate)"
+            icon="i-lucide-calendar"
+            color="warning"
+          />
+        </div>
+
+        <!-- Sales History -->
+        <UCard class="mt-6">
+          <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
+            <h3 class="text-lg font-semibold">Sales History</h3>
+            <div class="flex items-center gap-2">
+              <USelect
+                v-model="selectedYear"
+                :items="[{ value: 'all', label: 'All years' }, ...availableYears]"
+                size="sm"
+                class="w-32"
+                @update:model-value="filterByYear"
+              />
+            </div>
+          </div>
+
+          <div v-if="salesLoading" class="py-8">
+            <LoadingSkeleton :lines="5" />
+          </div>
+          <template v-else-if="producerSales.length > 0">
+            <p class="text-sm text-gray-500 mb-3">{{ salesTotal }} sale{{ salesTotal !== 1 ? 's' : '' }}</p>
+            <UTable
+              :data="producerSales"
+              :columns="salesColumns"
+              v-model:sorting="sorting"
+              :ui="{ base: 'table-fixed w-full', tr: 'even:bg-(--ui-bg-elevated)/50 hover:bg-(--ui-bg-accented) transition-colors cursor-pointer' }"
+              @select="onSelectSale"
+            >
+              <template #saleNumber-header>
+                <div class="text-right w-full">Sale #</div>
+              </template>
+              <template #saleDate-cell="{ row }">
+                {{ formatDate(row.original.saleDate) }}
+              </template>
+              <template #saleNumber-cell="{ row }">
+                <div class="text-right font-medium">#{{ row.original.saleNumber }}</div>
+              </template>
+              <template #buyerName-cell="{ row }">
+                <span class="truncate block">{{ row.original.buyerName }}</span>
+              </template>
+              <template #status-cell="{ row }">
+                <SaleStatusBadge :status="row.original.status" />
+              </template>
+              <template #total-header>
+                <div class="text-right w-full">Total</div>
+              </template>
+              <template #total-cell="{ row }">
+                <div class="text-right font-medium">{{ formatCurrency(getSaleTotal(row.original)) }}</div>
+              </template>
+              <template #actions-cell="{ row }">
+                <UButton variant="ghost" size="xs" icon="i-lucide-arrow-right" :to="`/sales/${row.original.saleId}`" />
+              </template>
+            </UTable>
+            <div v-if="salesTotal > salesPageSize" class="flex justify-center mt-4">
+              <UPagination
+                :page="salesPage"
+                :total="salesTotal"
+                :items-per-page="salesPageSize"
+                @update:page="onSalesPageChange"
+              />
+            </div>
+          </template>
+          <EmptyState
+            v-else
+            title="No sales found"
+            description="No sales recorded for this producer yet."
+            icon="i-lucide-receipt"
+          />
+        </UCard>
+
+        <!-- Notes -->
         <UCard v-if="producer.notes" class="mt-6">
           <h3 class="text-lg font-semibold mb-2">Notes</h3>
           <p class="text-sm text-gray-600">{{ producer.notes }}</p>
         </UCard>
+
+        <!-- Metadata -->
+        <div class="text-xs text-gray-400 space-y-1 mt-6">
+          <p>Created on {{ formatDateTime(producer.createdAt) }} by {{ producer.createdBy }}</p>
+          <p>Updated on {{ formatDateTime(producer.updatedAt) }} by {{ producer.updatedBy }}</p>
+        </div>
       </template>
     </template>
 

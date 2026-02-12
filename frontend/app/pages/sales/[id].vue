@@ -16,18 +16,10 @@ const sale = ref<Sale | null>(null)
 const lines = ref<SaleLine[]>([])
 const attachments = ref<Attachment[]>([])
 const loading = ref(true)
-const activeTab = ref('details')
 const editing = ref(false)
 const saving = ref(false)
 const showDeleteDialog = ref(false)
 const showConfirmDialog = ref(false)
-
-const tabs = computed(() => [
-  { key: 'details', label: 'Details', icon: 'i-lucide-info', slot: 'details' },
-  { key: 'lines', label: 'Lines', icon: 'i-lucide-list-ordered', slot: 'lines', badge: lines.value.length || undefined },
-  { key: 'invoice', label: 'Invoice', icon: 'i-lucide-file-text', slot: 'invoice' },
-  { key: 'attachments', label: 'Attachments', icon: 'i-lucide-paperclip', slot: 'attachments', badge: attachments.value.length || undefined },
-])
 
 // Edit form
 const form = reactive({
@@ -164,152 +156,138 @@ onMounted(() => load())
       <SaleActions
         :sale="sale"
         @confirm="showConfirmDialog = true"
-        @delete="showDeleteDialog = true"
       />
     </div>
 
-    <!-- Tabs -->
-    <UTabs v-model="activeTab" :items="tabs" class="mb-6">
-      <!-- Details tab -->
-      <template #details>
-        <div v-if="loading">
-          <UCard><LoadingSkeleton :lines="6" /></UCard>
+    <!-- Content -->
+    <div v-if="loading">
+      <UCard><LoadingSkeleton :lines="6" /></UCard>
+    </div>
+    <div v-else-if="sale" class="space-y-6">
+      <!-- Sale Information -->
+      <UCard>
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-semibold">Sale Information</h3>
+          <UButton v-if="isEditable && !editing" variant="ghost" size="sm" icon="i-lucide-pen" @click="editing = true">
+            Edit
+          </UButton>
         </div>
-        <div v-else-if="sale" class="space-y-6">
-          <UCard>
-            <div class="flex items-center justify-between mb-4">
-              <h3 class="text-lg font-semibold">Sale Information</h3>
-              <UButton v-if="isEditable && !editing" variant="ghost" size="sm" icon="i-lucide-pen" @click="editing = true">
-                Edit
-              </UButton>
+
+        <template v-if="editing">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <UFormField label="Sale date" required>
+              <UInput v-model="form.saleDate" type="date" />
+            </UFormField>
+            <UFormField label="Payment method">
+              <USelect v-model="form.paymentMethod" :items="PAYMENT_METHODS" placeholder="Select..." />
+            </UFormField>
+            <UFormField label="Payment terms">
+              <USelect v-model="form.paymentTerms" :items="PAYMENT_TERMS" placeholder="Select..." />
+            </UFormField>
+            <UFormField label="Delivery method">
+              <UInput v-model="form.deliveryMethod" />
+            </UFormField>
+            <UFormField label="Delivery date">
+              <UInput v-model="form.deliveryDate" type="date" />
+            </UFormField>
+            <UFormField label="Reference">
+              <UInput v-model="form.referenceNumber" />
+            </UFormField>
+            <div class="sm:col-span-2 lg:col-span-3">
+              <UFormField label="Notes">
+                <UTextarea v-model="form.notes" :rows="3" />
+              </UFormField>
             </div>
-
-            <template v-if="editing">
-              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <UFormField label="Sale date" required>
-                  <UInput v-model="form.saleDate" type="date" />
-                </UFormField>
-                <UFormField label="Payment method">
-                  <USelect v-model="form.paymentMethod" :items="PAYMENT_METHODS" placeholder="Select..." />
-                </UFormField>
-                <UFormField label="Payment terms">
-                  <USelect v-model="form.paymentTerms" :items="PAYMENT_TERMS" placeholder="Select..." />
-                </UFormField>
-                <UFormField label="Delivery method">
-                  <UInput v-model="form.deliveryMethod" />
-                </UFormField>
-                <UFormField label="Delivery date">
-                  <UInput v-model="form.deliveryDate" type="date" />
-                </UFormField>
-                <UFormField label="Reference">
-                  <UInput v-model="form.referenceNumber" />
-                </UFormField>
-                <div class="sm:col-span-2 lg:col-span-3">
-                  <UFormField label="Notes">
-                    <UTextarea v-model="form.notes" :rows="3" />
-                  </UFormField>
-                </div>
-                <div class="sm:col-span-2 lg:col-span-3">
-                  <UFormField label="Internal notes">
-                    <UTextarea v-model="form.internalNotes" :rows="3" />
-                  </UFormField>
-                </div>
-              </div>
-              <div class="flex gap-2 mt-4">
-                <UButton size="sm" :loading="saving" @click="saveDetails">
-                  Save
-                </UButton>
-                <UButton variant="ghost" size="sm" @click="editing = false; populateForm(sale!)">Cancel</UButton>
-              </div>
-            </template>
-
-            <template v-else>
-              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
-                <div><span class="text-gray-500">Date:</span> <span class="font-medium">{{ formatDate(sale.saleDate) }}</span></div>
-                <div><span class="text-gray-500">Payment:</span> <span class="font-medium">{{ sale.paymentMethod || '—' }}</span></div>
-                <div><span class="text-gray-500">Terms:</span> <span class="font-medium">{{ sale.paymentTerms || '—' }}</span></div>
-                <div><span class="text-gray-500">Delivery:</span> <span class="font-medium">{{ sale.deliveryMethod || '—' }}</span></div>
-                <div><span class="text-gray-500">Delivery date:</span> <span class="font-medium">{{ formatDate(sale.deliveryDate) }}</span></div>
-                <div><span class="text-gray-500">Reference:</span> <span class="font-medium">{{ sale.referenceNumber || '—' }}</span></div>
-                <div v-if="sale.notes" class="sm:col-span-2 lg:col-span-3">
-                  <span class="text-gray-500">Notes:</span>
-                  <p class="font-medium mt-1">{{ sale.notes }}</p>
-                </div>
-                <div v-if="sale.internalNotes" class="sm:col-span-2 lg:col-span-3">
-                  <span class="text-gray-500">Internal notes:</span>
-                  <p class="font-medium mt-1">{{ sale.internalNotes }}</p>
-                </div>
-              </div>
-            </template>
-          </UCard>
-
-          <!-- Buyer & Producer info -->
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <UCard>
-              <h3 class="text-lg font-semibold mb-3">Buyer</h3>
-              <div class="space-y-1 text-sm">
-                <p class="font-medium text-gray-900">{{ sale.buyerName }}</p>
-                <p v-if="sale.buyerVatNumber" class="text-gray-500">VAT: {{ sale.buyerVatNumber }}</p>
-                <p v-if="sale.buyerAddress" class="text-gray-500">{{ sale.buyerAddress }}, {{ sale.buyerCity }} {{ sale.buyerProvince ? `(${sale.buyerProvince})` : '' }} {{ sale.buyerPostalCode }}</p>
-              </div>
-            </UCard>
-            <UCard>
-              <h3 class="text-lg font-semibold mb-3">Producer</h3>
-              <div class="space-y-1 text-sm">
-                <p class="font-medium text-gray-900">{{ sale.producerName }}</p>
-                <p v-if="sale.producerVatNumber" class="text-gray-500">VAT: {{ sale.producerVatNumber }}</p>
-                <p v-if="sale.producerAddress" class="text-gray-500">{{ sale.producerAddress }}, {{ sale.producerCity }} {{ sale.producerProvince ? `(${sale.producerProvince})` : '' }} {{ sale.producerPostalCode }}</p>
-              </div>
-            </UCard>
+            <div class="sm:col-span-2 lg:col-span-3">
+              <UFormField label="Internal notes">
+                <UTextarea v-model="form.internalNotes" :rows="3" />
+              </UFormField>
+            </div>
           </div>
-
-          <!-- Totals -->
-          <div class="max-w-sm ml-auto">
-            <SaleTotals :lines="lines" />
+          <div class="flex justify-between mt-4">
+            <UButton color="error" variant="outline" size="sm" icon="i-lucide-trash-2" @click="showDeleteDialog = true">Delete</UButton>
+            <div class="flex gap-2">
+              <UButton variant="ghost" size="sm" @click="editing = false; populateForm(sale!)">Cancel</UButton>
+              <UButton size="sm" :loading="saving" @click="saveDetails">Save</UButton>
+            </div>
           </div>
+        </template>
 
-          <!-- Metadata -->
-          <div class="text-xs text-gray-400 space-y-1">
-            <p>Created on {{ formatDateTime(sale.createdAt) }} by {{ sale.createdBy }}</p>
-            <p>Updated on {{ formatDateTime(sale.updatedAt) }} by {{ sale.updatedBy }}</p>
+        <template v-else>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
+            <div><span class="text-gray-500">Date:</span> <span class="font-medium">{{ formatDate(sale.saleDate) }}</span></div>
+            <div><span class="text-gray-500">Payment:</span> <span class="font-medium">{{ sale.paymentMethod || '—' }}</span></div>
+            <div><span class="text-gray-500">Terms:</span> <span class="font-medium">{{ sale.paymentTerms || '—' }}</span></div>
+            <div><span class="text-gray-500">Delivery:</span> <span class="font-medium">{{ sale.deliveryMethod || '—' }}</span></div>
+            <div><span class="text-gray-500">Delivery date:</span> <span class="font-medium">{{ formatDate(sale.deliveryDate) }}</span></div>
+            <div><span class="text-gray-500">Reference:</span> <span class="font-medium">{{ sale.referenceNumber || '—' }}</span></div>
+            <div v-if="sale.notes" class="sm:col-span-2 lg:col-span-3">
+              <span class="text-gray-500">Notes:</span>
+              <p class="font-medium mt-1">{{ sale.notes }}</p>
+            </div>
+            <div v-if="sale.internalNotes" class="sm:col-span-2 lg:col-span-3">
+              <span class="text-gray-500">Internal notes:</span>
+              <p class="font-medium mt-1">{{ sale.internalNotes }}</p>
+            </div>
           </div>
+        </template>
+      </UCard>
+
+      <!-- Buyer & Producer -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <UCard>
+          <h3 class="text-lg font-semibold mb-3">Buyer</h3>
+          <div class="space-y-1 text-sm">
+            <p class="font-medium text-gray-900">{{ sale.buyerName }}</p>
+            <p v-if="sale.buyerVatNumber" class="text-gray-500">VAT: {{ sale.buyerVatNumber }}</p>
+            <p v-if="sale.buyerAddress" class="text-gray-500">{{ sale.buyerAddress }}, {{ sale.buyerCity }} {{ sale.buyerProvince ? `(${sale.buyerProvince})` : '' }} {{ sale.buyerPostalCode }}</p>
+          </div>
+        </UCard>
+        <UCard>
+          <h3 class="text-lg font-semibold mb-3">Producer</h3>
+          <div class="space-y-1 text-sm">
+            <p class="font-medium text-gray-900">{{ sale.producerName }}</p>
+            <p v-if="sale.producerVatNumber" class="text-gray-500">VAT: {{ sale.producerVatNumber }}</p>
+            <p v-if="sale.producerAddress" class="text-gray-500">{{ sale.producerAddress }}, {{ sale.producerCity }} {{ sale.producerProvince ? `(${sale.producerProvince})` : '' }} {{ sale.producerPostalCode }}</p>
+          </div>
+        </UCard>
+      </div>
+
+      <!-- Lines -->
+      <UCard>
+        <h3 class="text-lg font-semibold mb-4">Lines</h3>
+        <SaleLineEditor
+          :sale-id="saleId"
+          :lines="lines"
+          :readonly="!isEditable"
+          @refresh="refreshLines"
+        />
+        <div class="mt-4 max-w-sm ml-auto">
+          <SaleTotals :lines="lines" />
         </div>
-      </template>
+      </UCard>
 
-      <!-- Lines tab -->
-      <template #lines>
-        <UCard>
-          <SaleLineEditor
-            :sale-id="saleId"
-            :lines="lines"
-            :readonly="!isEditable"
-            @refresh="refreshLines"
-          />
-          <div class="mt-4 max-w-sm ml-auto">
-            <SaleTotals :lines="lines" />
-          </div>
-        </UCard>
-      </template>
+      <!-- Invoice -->
+      <UCard>
+        <h3 class="text-lg font-semibold mb-4">Invoice</h3>
+        <InvoiceActions :sale="sale" />
+      </UCard>
 
-      <!-- Invoice tab -->
-      <template #invoice>
-        <UCard>
-          <h3 class="text-lg font-semibold mb-4">Invoice Generation</h3>
-          <InvoiceActions v-if="sale" :sale="sale" />
-        </UCard>
-      </template>
+      <!-- Attachments -->
+      <UCard>
+        <h3 class="text-lg font-semibold mb-4">Attachments</h3>
+        <AttachmentUpload v-if="canWrite" :sale-id="saleId" @uploaded="refreshAttachments" />
+        <div class="mt-4">
+          <AttachmentList :sale-id="saleId" :attachments="attachments" :readonly="!canWrite" @refresh="refreshAttachments" />
+        </div>
+      </UCard>
 
-      <!-- Attachments tab -->
-      <template #attachments>
-        <UCard>
-          <h3 class="text-lg font-semibold mb-4">Attachments</h3>
-          <AttachmentUpload v-if="canWrite" :sale-id="saleId" @uploaded="refreshAttachments" />
-          <div class="mt-4">
-            <AttachmentList :sale-id="saleId" :attachments="attachments" :readonly="!canWrite" @refresh="refreshAttachments" />
-          </div>
-        </UCard>
-      </template>
-    </UTabs>
+      <!-- Metadata -->
+      <div class="text-xs text-gray-400 space-y-1">
+        <p>Created on {{ formatDateTime(sale.createdAt) }} by {{ sale.createdBy }}</p>
+        <p>Updated on {{ formatDateTime(sale.updatedAt) }} by {{ sale.updatedBy }}</p>
+      </div>
+    </div>
 
     <!-- Dialogs -->
     <ConfirmDialog

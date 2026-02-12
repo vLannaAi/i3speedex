@@ -7,18 +7,14 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   confirm: []
-  delete: []
 }>()
 
-const { canWrite, isAdmin } = useAuth()
+const { canWrite } = useAuth()
 
 const canConfirm = computed(() =>
   canWrite.value && props.sale.status === 'draft'
 )
 
-const canDelete = computed(() =>
-  canWrite.value && (props.sale.status === 'draft' || isAdmin.value)
-)
 </script>
 
 <template>
@@ -30,15 +26,6 @@ const canDelete = computed(() =>
       @click="emit('confirm')"
     >
       Confirm
-    </UButton>
-    <UButton
-      v-if="canDelete"
-      color="error"
-      size="sm"
-      icon="i-lucide-trash-2"
-      @click="emit('delete')"
-    >
-      Delete
     </UButton>
   </div>
 </template>

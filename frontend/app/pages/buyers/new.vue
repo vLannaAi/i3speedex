@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { PAYMENT_METHODS, PAYMENT_TERMS, COUNTRIES, ITALIAN_PROVINCES } from '~/utils/constants'
+import { getCountryDisplay } from '~/utils/display-helpers'
 
 definePageMeta({ middleware: ['role'] })
 
@@ -8,7 +9,8 @@ const toast = useAppToast()
 const router = useRouter()
 
 const saving = ref(false)
-const provinceOptions = ITALIAN_PROVINCES.map(p => ({ value: p, label: p }))
+
+const selectedCountry = computed(() => getCountryDisplay(form.country))
 
 const form = reactive({
   companyName: '',
@@ -113,13 +115,16 @@ async function handleSubmit() {
             <UInput v-model="form.city" :color="errors.city ? 'error' : undefined" highlight />
           </UFormField>
           <UFormField label="Province">
-            <USelect v-model="form.province" :items="provinceOptions" placeholder="Select..." />
+            <USelect v-model="form.province" :items="ITALIAN_PROVINCES" placeholder="Select..." />
           </UFormField>
           <UFormField label="Postal Code" required :error="errors.postalCode">
             <UInput v-model="form.postalCode" :color="errors.postalCode ? 'error' : undefined" highlight />
           </UFormField>
           <UFormField label="Country" required>
-            <USelect v-model="form.country" :items="COUNTRIES" />
+            <div class="flex items-center gap-2">
+              <UIcon v-if="selectedCountry.flag" :name="selectedCountry.flag" class="size-5 shrink-0" mode="svg" />
+              <USelect v-model="form.country" :items="COUNTRIES" class="flex-1" />
+            </div>
           </UFormField>
         </div>
       </UCard>

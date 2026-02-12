@@ -10,13 +10,13 @@ import * as dynamodb from '../../../src/common/clients/dynamodb';
 // Mock DynamoDB client - partial mock to preserve utility functions
 jest.mock('../../../src/common/clients/dynamodb', () => ({
   ...jest.requireActual('../../../src/common/clients/dynamodb'),
-  queryItems: jest.fn(),
-  scanItems: jest.fn(),
+  queryAllItems: jest.fn(),
+  scanAllItems: jest.fn(),
 }));
 
 describe('List Sales Handler', () => {
-  const mockQueryItems = dynamodb.queryItems as jest.MockedFunction<typeof dynamodb.queryItems>;
-  const mockScanItems = dynamodb.scanItems as jest.MockedFunction<typeof dynamodb.scanItems>;
+  const mockQueryAllItems = dynamodb.queryAllItems as jest.MockedFunction<typeof dynamodb.queryAllItems>;
+  const mockScanAllItems = dynamodb.scanAllItems as jest.MockedFunction<typeof dynamodb.scanAllItems>;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -24,11 +24,7 @@ describe('List Sales Handler', () => {
 
   it('should list sales with default pagination', async () => {
     // Arrange
-    mockScanItems.mockResolvedValueOnce({
-      items: [mockSale],
-      lastEvaluatedKey: undefined,
-      count: 1,
-    });
+    mockScanAllItems.mockResolvedValueOnce([mockSale]);
 
     const event = createAuthenticatedEvent('admin@i2speedex.com');
 
@@ -46,16 +42,12 @@ describe('List Sales Handler', () => {
     expect(body.pagination.pageSize).toBe(20);
 
     // Verify scan was called
-    expect(mockScanItems).toHaveBeenCalled();
+    expect(mockScanAllItems).toHaveBeenCalled();
   });
 
   it('should list sales with custom pagination', async () => {
     // Arrange
-    mockScanItems.mockResolvedValueOnce({
-      items: [mockSale, { ...mockSale, saleId: 'SALE002' }],
-      lastEvaluatedKey: undefined,
-      count: 2,
-    });
+    mockScanAllItems.mockResolvedValueOnce([mockSale, { ...mockSale, saleId: 'SALE002' }]);
 
 
     const event = createEventWithQueryParams(
@@ -80,11 +72,7 @@ describe('List Sales Handler', () => {
       { ...mockSale, saleId: 'SALE002', status: 'confirmed' },
     ];
 
-    mockQueryItems.mockResolvedValueOnce({
-      items: confirmedSales,
-      lastEvaluatedKey: undefined,
-      count: 2,
-    });
+    mockQueryAllItems.mockResolvedValueOnce(confirmedSales);
 
 
     const event = createEventWithQueryParams(
@@ -99,9 +87,9 @@ describe('List Sales Handler', () => {
     expect(response.statusCode).toBe(200);
 
     // Verify GSI1 query was used
-    expect(mockQueryItems).toHaveBeenCalledWith(
+    expect(mockQueryAllItems).toHaveBeenCalledWith(
       expect.objectContaining({
-        IndexName: 'GSI1',
+        IndexName: expect.stringContaining('GSI1'),
         KeyConditionExpression: 'GSI1PK = :gsi1pk',
         ExpressionAttributeValues: expect.objectContaining({
           ':gsi1pk': 'STATUS#confirmed',
@@ -112,11 +100,7 @@ describe('List Sales Handler', () => {
 
   it('should filter by buyerId using GSI2', async () => {
     // Arrange
-    mockQueryItems.mockResolvedValueOnce({
-      items: [mockSale],
-      lastEvaluatedKey: undefined,
-      count: 1,
-    });
+    mockQueryAllItems.mockResolvedValueOnce([mockSale]);
 
     const event = createEventWithQueryParams(
       { buyerId: 'BUYER001' },
@@ -130,9 +114,9 @@ describe('List Sales Handler', () => {
     expect(response.statusCode).toBe(200);
 
     // Verify GSI2 query was used
-    expect(mockQueryItems).toHaveBeenCalledWith(
+    expect(mockQueryAllItems).toHaveBeenCalledWith(
       expect.objectContaining({
-        IndexName: 'GSI2',
+        IndexName: expect.stringContaining('GSI2'),
         KeyConditionExpression: 'GSI2PK = :gsi2pk',
         ExpressionAttributeValues: expect.objectContaining({
           ':gsi2pk': 'BUYER#BUYER001',
@@ -143,11 +127,7 @@ describe('List Sales Handler', () => {
 
   it('should filter by producerId using GSI3', async () => {
     // Arrange
-    mockQueryItems.mockResolvedValueOnce({
-      items: [mockSale],
-      lastEvaluatedKey: undefined,
-      count: 1,
-    });
+    mockQueryAllItems.mockResolvedValueOnce([mockSale]);
 
     const event = createEventWithQueryParams(
       { producerId: 'PROD001' },
@@ -161,9 +141,9 @@ describe('List Sales Handler', () => {
     expect(response.statusCode).toBe(200);
 
     // Verify GSI3 query was used
-    expect(mockQueryItems).toHaveBeenCalledWith(
+    expect(mockQueryAllItems).toHaveBeenCalledWith(
       expect.objectContaining({
-        IndexName: 'GSI3',
+        IndexName: expect.stringContaining('GSI3'),
         KeyConditionExpression: 'GSI3PK = :gsi3pk',
         ExpressionAttributeValues: expect.objectContaining({
           ':gsi3pk': 'PRODUCER#PROD001',
@@ -174,11 +154,7 @@ describe('List Sales Handler', () => {
 
   it('should filter by date range', async () => {
     // Arrange
-    mockScanItems.mockResolvedValueOnce({
-      items: [mockSale],
-      lastEvaluatedKey: undefined,
-      count: 1,
-    });
+    mockScanAllItems.mockResolvedValueOnce([mockSale]);
 
     const event = createEventWithQueryParams(
       { dateFrom: '2026-01-01', dateTo: '2026-01-31' },
@@ -192,7 +168,7 @@ describe('List Sales Handler', () => {
     expect(response.statusCode).toBe(200);
 
     // Verify scan was called with date filters
-    expect(mockScanItems).toHaveBeenCalledWith(
+    expect(mockScanAllItems).toHaveBeenCalledWith(
       expect.objectContaining({
         ExpressionAttributeValues: expect.objectContaining({
           ':dateFrom': '2026-01-01',
@@ -209,11 +185,7 @@ describe('List Sales Handler', () => {
       createdBy: 'operator@i2speedex.com',
     };
 
-    mockScanItems.mockResolvedValueOnce({
-      items: [operatorSale],
-      lastEvaluatedKey: undefined,
-      count: 1,
-    });
+    mockScanAllItems.mockResolvedValueOnce([operatorSale]);
 
 
     const event = createAuthenticatedEvent('operator@i2speedex.com', ['operator']);
@@ -225,7 +197,7 @@ describe('List Sales Handler', () => {
     expect(response.statusCode).toBe(200);
 
     // Verify createdBy filter was added
-    expect(mockScanItems).toHaveBeenCalledWith(
+    expect(mockScanAllItems).toHaveBeenCalledWith(
       expect.objectContaining({
         ExpressionAttributeValues: expect.objectContaining({
           ':createdBy': 'operator@i2speedex.com',
@@ -236,14 +208,10 @@ describe('List Sales Handler', () => {
 
   it('should allow admins to see all sales', async () => {
     // Arrange
-    mockScanItems.mockResolvedValueOnce({
-      items: [
-        mockSale,
-        { ...mockSale, saleId: 'SALE002', createdBy: 'other@i2speedex.com' },
-      ],
-      lastEvaluatedKey: undefined,
-      count: 2,
-    });
+    mockScanAllItems.mockResolvedValueOnce([
+      mockSale,
+      { ...mockSale, saleId: 'SALE002', createdBy: 'other@i2speedex.com' },
+    ]);
 
 
     const event = createAuthenticatedEvent('admin@i2speedex.com', ['admin']);
@@ -258,7 +226,7 @@ describe('List Sales Handler', () => {
     expect(body.data).toHaveLength(2);
 
     // Verify NO createdBy filter was added for admin
-    const callArgs = mockScanItems.mock.calls[0][0];
+    const callArgs = mockScanAllItems.mock.calls[0][0];
     if (callArgs.ExpressionAttributeValues) {
       expect(callArgs.ExpressionAttributeValues[':createdBy']).toBeUndefined();
     }
@@ -266,11 +234,7 @@ describe('List Sales Handler', () => {
 
   it('should allow admin to filter by specific creator', async () => {
     // Arrange
-    mockScanItems.mockResolvedValueOnce({
-      items: [mockSale],
-      lastEvaluatedKey: undefined,
-      count: 1,
-    });
+    mockScanAllItems.mockResolvedValueOnce([mockSale]);
 
     const event = createEventWithQueryParams(
       { createdBy: 'operator@i2speedex.com' },
@@ -284,7 +248,7 @@ describe('List Sales Handler', () => {
     expect(response.statusCode).toBe(200);
 
     // Verify createdBy filter was added
-    expect(mockScanItems).toHaveBeenCalledWith(
+    expect(mockScanAllItems).toHaveBeenCalledWith(
       expect.objectContaining({
         ExpressionAttributeValues: expect.objectContaining({
           ':createdBy': 'operator@i2speedex.com',
@@ -295,11 +259,7 @@ describe('List Sales Handler', () => {
 
   it('should return empty list when no sales found', async () => {
     // Arrange
-    mockScanItems.mockResolvedValueOnce({
-      items: [],
-      lastEvaluatedKey: undefined,
-      count: 0,
-    });
+    mockScanAllItems.mockResolvedValueOnce([]);
 
 
     const event = createAuthenticatedEvent('admin@i2speedex.com');
@@ -318,7 +278,7 @@ describe('List Sales Handler', () => {
 
   it('should handle DynamoDB error', async () => {
     // Arrange
-    mockScanItems.mockRejectedValueOnce(new Error('DynamoDB error'));
+    mockScanAllItems.mockRejectedValueOnce(new Error('DynamoDB error'));
 
     const event = createAuthenticatedEvent('admin@i2speedex.com');
 

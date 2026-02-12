@@ -9,7 +9,7 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { getUserContext, isAdmin, getQueryParameter } from '../../common/middleware/auth';
 import { paginatedResponse, handleError } from '../../common/utils/response';
 import { validatePaginationParams } from '../../common/utils/validation';
-import { queryItems, scanItems, decodeNextToken, calculatePagination, TableNames } from '../../common/clients/dynamodb';
+import { queryAllItems, scanAllItems, TableNames } from '../../common/clients/dynamodb';
 import { Sale } from '../../common/types';
 
 /**
@@ -24,10 +24,9 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
     const user = getUserContext(event);
 
     // 2. Parse pagination parameters
-    const { page, pageSize, nextToken } = validatePaginationParams({
+    const { page, pageSize } = validatePaginationParams({
       page: event.queryStringParameters?.page,
       pageSize: event.queryStringParameters?.pageSize,
-      nextToken: event.queryStringParameters?.nextToken,
     });
 
     // 3. Parse filter parameters
@@ -90,14 +89,12 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
       filterExpression = filters.join(' AND ');
     }
 
-    // 5. Query or scan based on filters
-    // We'll use the GSI1 (by status and date) if filtering by status, otherwise scan
-    let items: Sale[] = [];
-    let lastEvaluatedKey: Record<string, any> | undefined;
+    // 5. Query or scan ALL matching items based on filters
+    let allItems: Sale[] = [];
 
     if (status && !buyerId && !producerId) {
       // Use GSI1 (status index) for efficient querying
-      const result = await queryItems<Sale>({
+      allItems = await queryAllItems<Sale>({
         TableName: TableNames.Sales,
         IndexName: 'GSI1-QueryByBuyer',
         KeyConditionExpression: 'GSI1PK = :gsi1pk',
@@ -109,16 +106,11 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
         ExpressionAttributeNames: Object.keys(expressionAttributeNames).length > 0
           ? expressionAttributeNames
           : undefined,
-        Limit: pageSize,
-        ExclusiveStartKey: decodeNextToken(nextToken),
         ScanIndexForward: false, // Most recent first
       });
-
-      items = result.items;
-      lastEvaluatedKey = result.lastEvaluatedKey;
     } else if (buyerId) {
       // Use GSI2 (buyer index)
-      const result = await queryItems<Sale>({
+      allItems = await queryAllItems<Sale>({
         TableName: TableNames.Sales,
         IndexName: 'GSI2-QueryByProducer',
         KeyConditionExpression: 'GSI2PK = :gsi2pk',
@@ -130,16 +122,11 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
         ExpressionAttributeNames: Object.keys(expressionAttributeNames).length > 0
           ? expressionAttributeNames
           : undefined,
-        Limit: pageSize,
-        ExclusiveStartKey: decodeNextToken(nextToken),
         ScanIndexForward: false,
       });
-
-      items = result.items;
-      lastEvaluatedKey = result.lastEvaluatedKey;
     } else if (producerId) {
       // Use GSI3 (producer index)
-      const result = await queryItems<Sale>({
+      allItems = await queryAllItems<Sale>({
         TableName: TableNames.Sales,
         IndexName: 'GSI3-QueryByStatus',
         KeyConditionExpression: 'GSI3PK = :gsi3pk',
@@ -151,16 +138,11 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
         ExpressionAttributeNames: Object.keys(expressionAttributeNames).length > 0
           ? expressionAttributeNames
           : undefined,
-        Limit: pageSize,
-        ExclusiveStartKey: decodeNextToken(nextToken),
         ScanIndexForward: false,
       });
-
-      items = result.items;
-      lastEvaluatedKey = result.lastEvaluatedKey;
     } else {
-      // Scan with filters (less efficient, but necessary for complex filters)
-      const result = await scanItems<Sale>({
+      // Scan with filters
+      const scanned = await scanAllItems<Sale>({
         TableName: TableNames.Sales,
         FilterExpression: filterExpression,
         ExpressionAttributeValues: Object.keys(expressionAttributeValues).length > 0
@@ -169,32 +151,28 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
         ExpressionAttributeNames: Object.keys(expressionAttributeNames).length > 0
           ? expressionAttributeNames
           : undefined,
-        Limit: pageSize,
-        ExclusiveStartKey: decodeNextToken(nextToken),
       });
 
-      items = result.items.filter((item) => item.SK === 'METADATA');
-      lastEvaluatedKey = result.lastEvaluatedKey;
+      allItems = scanned.filter((item) => item.SK === 'METADATA');
     }
 
-    // 6. Calculate total count (for pagination)
-    // Note: For production, consider caching this or using DynamoDB Streams to maintain a counter
-    const totalCount = items.length; // Simplified for now
+    // 6. Sort by saleDate descending
+    allItems.sort((a, b) => (b.saleDate || '').localeCompare(a.saleDate || ''));
 
-    // 7. Calculate pagination info
-    const paginatedResult = calculatePagination(
-      items,
-      totalCount,
-      page,
-      pageSize,
-      lastEvaluatedKey
-    );
+    // 7. Paginate in-memory
+    const totalCount = allItems.length;
+    const totalPages = Math.ceil(totalCount / pageSize);
+    const start = (page - 1) * pageSize;
+    const pageItems = allItems.slice(start, start + pageSize);
 
     // 8. Return paginated response
-    return paginatedResponse(
-      paginatedResult.items,
-      paginatedResult.pagination
-    );
+    return paginatedResponse(pageItems, {
+      total: totalCount,
+      page,
+      pageSize,
+      totalPages,
+      hasMore: page < totalPages,
+    });
 
   } catch (error) {
     return handleError(error, requestId, path);

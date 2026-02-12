@@ -17,14 +17,14 @@ const emit = defineEmits<{
 }>()
 
 const open = ref(false)
-const status = ref('')
-const buyerId = ref('')
-const producerId = ref('')
+const status = ref('all')
+const buyerId = ref('all')
+const producerId = ref('all')
 const startDate = ref('')
 const endDate = ref('')
 
 const statusOptions = [
-  { label: 'All', value: '' },
+  { label: 'All', value: 'all' },
   { label: 'Draft', value: 'draft' },
   { label: 'Confirmed', value: 'confirmed' },
   { label: 'Invoiced', value: 'invoiced' },
@@ -33,35 +33,35 @@ const statusOptions = [
 ]
 
 const buyerOptions = computed(() => [
-  { label: 'All', value: '' },
+  { label: 'All', value: 'all' },
   ...props.buyers.map(b => ({ label: b.companyName, value: b.buyerId }))
 ])
 
 const producerOptions = computed(() => [
-  { label: 'All', value: '' },
+  { label: 'All', value: 'all' },
   ...props.producers.map(p => ({ label: p.companyName, value: p.producerId }))
 ])
 
 function apply() {
   emit('filter', {
-    status: status.value || undefined,
-    buyerId: buyerId.value || undefined,
-    producerId: producerId.value || undefined,
+    status: status.value && status.value !== 'all' ? status.value : undefined,
+    buyerId: buyerId.value && buyerId.value !== 'all' ? buyerId.value : undefined,
+    producerId: producerId.value && producerId.value !== 'all' ? producerId.value : undefined,
     startDate: startDate.value || undefined,
     endDate: endDate.value || undefined,
   })
 }
 
 function reset() {
-  status.value = ''
-  buyerId.value = ''
-  producerId.value = ''
+  status.value = 'all'
+  buyerId.value = 'all'
+  producerId.value = 'all'
   startDate.value = ''
   endDate.value = ''
   apply()
 }
 
-const hasFilters = computed(() => status.value || buyerId.value || producerId.value || startDate.value || endDate.value)
+const hasFilters = computed(() => (status.value && status.value !== 'all') || (buyerId.value && buyerId.value !== 'all') || (producerId.value && producerId.value !== 'all') || startDate.value || endDate.value)
 
 watch([status, buyerId, producerId, startDate, endDate], () => apply())
 </script>

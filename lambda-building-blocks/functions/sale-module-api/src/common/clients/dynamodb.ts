@@ -138,6 +138,48 @@ export async function scanItems<T>(params: ScanCommandInput): Promise<{
 }
 
 /**
+ * Scan ALL matching items from DynamoDB, paginating through results automatically.
+ * Use for list endpoints that need accurate total counts.
+ */
+export async function scanAllItems<T>(params: Omit<ScanCommandInput, 'Limit' | 'ExclusiveStartKey'>): Promise<T[]> {
+  const allItems: T[] = [];
+  let lastKey: Record<string, any> | undefined;
+
+  do {
+    const command = new ScanCommand({
+      ...params,
+      ExclusiveStartKey: lastKey,
+    });
+    const result = await dynamoDb.send(command);
+    allItems.push(...((result.Items as T[]) || []));
+    lastKey = result.LastEvaluatedKey;
+  } while (lastKey);
+
+  return allItems;
+}
+
+/**
+ * Query ALL matching items from DynamoDB, paginating through results automatically.
+ * Use for list endpoints that need accurate total counts.
+ */
+export async function queryAllItems<T>(params: Omit<QueryCommandInput, 'Limit' | 'ExclusiveStartKey'>): Promise<T[]> {
+  const allItems: T[] = [];
+  let lastKey: Record<string, any> | undefined;
+
+  do {
+    const command = new QueryCommand({
+      ...params,
+      ExclusiveStartKey: lastKey,
+    });
+    const result = await dynamoDb.send(command);
+    allItems.push(...((result.Items as T[]) || []));
+    lastKey = result.LastEvaluatedKey;
+  } while (lastKey);
+
+  return allItems;
+}
+
+/**
  * Batch get items from DynamoDB
  */
 export async function batchGetItems<T>(

@@ -9,7 +9,7 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { getUserContext, getQueryParameter } from '../../common/middleware/auth';
 import { paginatedResponse, handleError } from '../../common/utils/response';
 import { validatePaginationParams } from '../../common/utils/validation';
-import { scanItems, decodeNextToken, calculatePagination, TableNames } from '../../common/clients/dynamodb';
+import { scanAllItems, TableNames } from '../../common/clients/dynamodb';
 import { Buyer } from '../../common/types';
 
 /**
@@ -24,10 +24,9 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
     getUserContext(event);
 
     // 2. Parse pagination parameters
-    const { page, pageSize, nextToken } = validatePaginationParams({
+    const { page, pageSize } = validatePaginationParams({
       page: event.queryStringParameters?.page,
       pageSize: event.queryStringParameters?.pageSize,
-      nextToken: event.queryStringParameters?.nextToken,
     });
 
     // 3. Parse filter parameters
@@ -63,38 +62,33 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
     const filterExpression = filters.join(' AND ');
 
-    // 5. Scan buyers table
-    const { items, lastEvaluatedKey } = await scanItems<Buyer>({
+    // 5. Scan ALL buyers (for accurate total count)
+    const allItems = await scanAllItems<Buyer>({
       TableName: TableNames.Buyers,
       FilterExpression: filterExpression,
       ExpressionAttributeNames: Object.keys(expressionAttributeNames).length > 0
         ? expressionAttributeNames
         : undefined,
       ExpressionAttributeValues: expressionAttributeValues,
-      Limit: pageSize,
-      ExclusiveStartKey: decodeNextToken(nextToken),
     });
 
     // 6. Sort by company name
-    items.sort((a, b) => a.companyName.localeCompare(b.companyName));
+    allItems.sort((a, b) => a.companyName.localeCompare(b.companyName));
 
-    // 7. Calculate total count
-    const totalCount = items.length;
+    // 7. Paginate in-memory
+    const totalCount = allItems.length;
+    const totalPages = Math.ceil(totalCount / pageSize);
+    const start = (page - 1) * pageSize;
+    const pageItems = allItems.slice(start, start + pageSize);
 
-    // 8. Calculate pagination info
-    const paginatedResult = calculatePagination(
-      items,
-      totalCount,
+    // 8. Return paginated response
+    return paginatedResponse(pageItems, {
+      total: totalCount,
       page,
       pageSize,
-      lastEvaluatedKey
-    );
-
-    // 9. Return paginated response
-    return paginatedResponse(
-      paginatedResult.items,
-      paginatedResult.pagination
-    );
+      totalPages,
+      hasMore: page < totalPages,
+    });
 
   } catch (error) {
     return handleError(error, requestId, path);

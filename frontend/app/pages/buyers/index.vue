@@ -3,7 +3,6 @@ import type { Buyer } from '~/types'
 import { useDebounceFn } from '@vueuse/core'
 
 const { fetchBuyers } = useBuyers()
-const { formatCurrency } = useFormatters()
 const { canWrite } = useAuth()
 
 const buyers = ref<Buyer[]>([])
@@ -15,13 +14,11 @@ const totalPages = ref(0)
 const search = ref('')
 
 const columns = [
-  { accessorKey: 'companyName', header: 'Company Name' },
-  { accessorKey: 'city', header: 'City' },
-  { accessorKey: 'province', header: 'Prov.' },
-  { accessorKey: 'vatNumber', header: 'VAT No.' },
-  { accessorKey: 'status', header: 'Status' },
-  { accessorKey: 'totalSales', header: 'Sales' },
-  { accessorKey: 'totalRevenue', header: 'Revenue' },
+  { accessorKey: 'companyName', header: 'Company Name', size: 300 },
+  { accessorKey: 'city', header: 'City', size: 150 },
+  { accessorKey: 'province', header: 'Prov.', size: 80 },
+  { accessorKey: 'vatNumber', header: 'VAT No.', size: 150 },
+  { accessorKey: 'status', header: 'Status', size: 100 },
 ]
 
 const pageSizeOptions = [
@@ -101,8 +98,8 @@ function onSelectBuyer(_e: Event, row: any) {
         <template #status-cell="{ row }">
           <StatusBadge :status="row.original.status" />
         </template>
-        <template #totalRevenue-cell="{ row }">
-          <span class="font-medium">{{ formatCurrency(row.original.totalRevenue) }}</span>
+        <template #companyName-cell="{ row }">
+          <span class="font-medium truncate block max-w-56">{{ row.original.companyName }}</span>
         </template>
         <template #empty>
           <EmptyState

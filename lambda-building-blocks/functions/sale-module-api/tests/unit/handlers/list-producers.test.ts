@@ -10,11 +10,11 @@ import * as dynamodb from '../../../src/common/clients/dynamodb';
 // Mock DynamoDB client - partial mock to preserve utility functions
 jest.mock('../../../src/common/clients/dynamodb', () => ({
   ...jest.requireActual('../../../src/common/clients/dynamodb'),
-  scanItems: jest.fn(),
+  scanAllItems: jest.fn(),
 }));
 
 describe('List Producers Handler', () => {
-  const mockScanItems = dynamodb.scanItems as jest.MockedFunction<typeof dynamodb.scanItems>;
+  const mockScanAllItems = dynamodb.scanAllItems as jest.MockedFunction<typeof dynamodb.scanAllItems>;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -22,11 +22,7 @@ describe('List Producers Handler', () => {
 
   it('should list producers with default pagination', async () => {
     // Arrange
-    mockScanItems.mockResolvedValueOnce({
-      items: [mockProducer],
-      lastEvaluatedKey: undefined,
-      count: 1,
-    });
+    mockScanAllItems.mockResolvedValueOnce([mockProducer]);
 
     const event = createAuthenticatedEvent('admin@i2speedex.com');
 
@@ -42,7 +38,7 @@ describe('List Producers Handler', () => {
     expect(body.pagination).toBeDefined();
 
     // Verify scan was called with correct filters
-    expect(mockScanItems).toHaveBeenCalledWith(
+    expect(mockScanAllItems).toHaveBeenCalledWith(
       expect.objectContaining({
         TableName: expect.any(String),
         FilterExpression: expect.stringContaining('attribute_not_exists(deletedAt)'),
@@ -60,11 +56,7 @@ describe('List Producers Handler', () => {
       { ...mockProducer, producerId: 'PROD002', companyName: 'Producer 2' },
     ];
 
-    mockScanItems.mockResolvedValueOnce({
-      items: producers,
-      lastEvaluatedKey: undefined,
-      count: 2,
-    });
+    mockScanAllItems.mockResolvedValueOnce(producers);
 
     const event = createEventWithQueryParams(
       { page: '1', pageSize: '50' },
@@ -87,11 +79,7 @@ describe('List Producers Handler', () => {
       { ...mockProducer, status: 'active' },
     ];
 
-    mockScanItems.mockResolvedValueOnce({
-      items: activeProducers,
-      lastEvaluatedKey: undefined,
-      count: 1,
-    });
+    mockScanAllItems.mockResolvedValueOnce(activeProducers);
 
     const event = createEventWithQueryParams(
       { status: 'active' },
@@ -105,7 +93,7 @@ describe('List Producers Handler', () => {
     expect(response.statusCode).toBe(200);
 
     // Verify status filter was applied
-    expect(mockScanItems).toHaveBeenCalledWith(
+    expect(mockScanAllItems).toHaveBeenCalledWith(
       expect.objectContaining({
         ExpressionAttributeNames: expect.objectContaining({
           '#status': 'status',
@@ -119,11 +107,7 @@ describe('List Producers Handler', () => {
 
   it('should filter by country', async () => {
     // Arrange
-    mockScanItems.mockResolvedValueOnce({
-      items: [mockProducer],
-      lastEvaluatedKey: undefined,
-      count: 1,
-    });
+    mockScanAllItems.mockResolvedValueOnce([mockProducer]);
 
     const event = createEventWithQueryParams(
       { country: 'IT' },
@@ -137,7 +121,7 @@ describe('List Producers Handler', () => {
     expect(response.statusCode).toBe(200);
 
     // Verify country filter was applied
-    expect(mockScanItems).toHaveBeenCalledWith(
+    expect(mockScanAllItems).toHaveBeenCalledWith(
       expect.objectContaining({
         ExpressionAttributeValues: expect.objectContaining({
           ':country': 'IT',
@@ -148,11 +132,7 @@ describe('List Producers Handler', () => {
 
   it('should search by company name', async () => {
     // Arrange
-    mockScanItems.mockResolvedValueOnce({
-      items: [mockProducer],
-      lastEvaluatedKey: undefined,
-      count: 1,
-    });
+    mockScanAllItems.mockResolvedValueOnce([mockProducer]);
 
     const event = createEventWithQueryParams(
       { search: 'Factory' },
@@ -166,7 +146,7 @@ describe('List Producers Handler', () => {
     expect(response.statusCode).toBe(200);
 
     // Verify search filter was applied
-    expect(mockScanItems).toHaveBeenCalledWith(
+    expect(mockScanAllItems).toHaveBeenCalledWith(
       expect.objectContaining({
         FilterExpression: expect.stringContaining('contains(companyName, :search)'),
         ExpressionAttributeValues: expect.objectContaining({
@@ -184,11 +164,7 @@ describe('List Producers Handler', () => {
       { ...mockProducer, producerId: 'PROD003', companyName: 'Beta Factory' },
     ];
 
-    mockScanItems.mockResolvedValueOnce({
-      items: unsortedProducers,
-      lastEvaluatedKey: undefined,
-      count: 3,
-    });
+    mockScanAllItems.mockResolvedValueOnce(unsortedProducers);
 
     const event = createAuthenticatedEvent('admin@i2speedex.com');
 
@@ -209,11 +185,7 @@ describe('List Producers Handler', () => {
 
   it('should return empty list when no producers found', async () => {
     // Arrange
-    mockScanItems.mockResolvedValueOnce({
-      items: [],
-      lastEvaluatedKey: undefined,
-      count: 0,
-    });
+    mockScanAllItems.mockResolvedValueOnce([]);
 
     const event = createAuthenticatedEvent('admin@i2speedex.com');
 
@@ -230,7 +202,7 @@ describe('List Producers Handler', () => {
 
   it('should handle DynamoDB error', async () => {
     // Arrange
-    mockScanItems.mockRejectedValueOnce(new Error('DynamoDB error'));
+    mockScanAllItems.mockRejectedValueOnce(new Error('DynamoDB error'));
 
     const event = createAuthenticatedEvent('admin@i2speedex.com');
 

@@ -20,13 +20,13 @@ const search = ref('')
 const filters = ref<Record<string, string | undefined>>({})
 
 const columns = [
-  { accessorKey: 'saleNumber', header: '#' },
-  { accessorKey: 'saleDate', header: 'Date' },
-  { accessorKey: 'buyerName', header: 'Buyer' },
-  { accessorKey: 'producerName', header: 'Producer' },
-  { accessorKey: 'total', header: 'Total' },
-  { accessorKey: 'status', header: 'Status' },
-  { accessorKey: 'linesCount', header: 'Lines' },
+  { accessorKey: 'saleNumber', header: '#', size: 40 },
+  { accessorKey: 'saleDate', header: 'Date', size: 90 },
+  { accessorKey: 'buyerName', header: 'Buyer', size: 200 },
+  { accessorKey: 'producerName', header: 'Producer', size: 200 },
+  { accessorKey: 'total', header: 'Total', size: 100 },
+  { accessorKey: 'status', header: 'Status', size: 90 },
+  { accessorKey: 'linesCount', header: 'Lines', size: 40 },
 ]
 
 const pageSizeOptions = [
@@ -53,7 +53,11 @@ async function load() {
       ...filters.value,
     })
     if (res) {
-      sales.value = res.data
+      sales.value = res.data.sort((a, b) => {
+        const dateA = a.saleDate || ''
+        const dateB = b.saleDate || ''
+        return dateB.localeCompare(dateA)
+      })
       total.value = res.pagination.total
       totalPages.value = res.pagination.totalPages
     }
@@ -146,11 +150,26 @@ function onSelectSale(_e: Event, row: any) {
         }"
         @select="onSelectSale"
       >
+        <template #saleNumber-header>
+          <div class="text-right w-full">#</div>
+        </template>
+        <template #saleNumber-cell="{ row }">
+          <div class="text-right">{{ row.original.saleNumber }}</div>
+        </template>
         <template #saleDate-cell="{ row }">
           {{ formatDate(row.original.saleDate) }}
         </template>
+        <template #buyerName-cell="{ row }">
+          <span class="truncate block">{{ row.original.buyerName }}</span>
+        </template>
+        <template #producerName-cell="{ row }">
+          <span class="truncate block">{{ row.original.producerName }}</span>
+        </template>
+        <template #total-header>
+          <div class="text-right w-full">Total</div>
+        </template>
         <template #total-cell="{ row }">
-          <span class="font-medium">{{ formatCurrency(row.original.total) }}</span>
+          <div class="text-right font-medium">{{ formatCurrency(row.original.total) }}</div>
         </template>
         <template #status-cell="{ row }">
           <SaleStatusBadge :status="row.original.status" />

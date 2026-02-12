@@ -16,17 +16,22 @@ export function useFormatters() {
     })
   }
 
-  function formatCurrency(value: number | undefined | null): string {
+  function formatCurrency(value: number | string | undefined | null): string {
     if (value === undefined || value === null) return '—'
-    return new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(value)
+    const num = typeof value === 'string' ? parseFloat(value) : value
+    if (isNaN(num)) return '—'
+    return new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR', useGrouping: true }).format(num)
   }
 
-  function formatNumber(value: number | undefined | null, decimals = 2): string {
+  function formatNumber(value: number | string | undefined | null, decimals = 2): string {
     if (value === undefined || value === null) return '—'
+    const num = typeof value === 'string' ? parseFloat(value) : value
+    if (isNaN(num)) return '—'
     return new Intl.NumberFormat('it-IT', {
       minimumFractionDigits: decimals,
       maximumFractionDigits: decimals,
-    }).format(value)
+      useGrouping: true,
+    }).format(num)
   }
 
   function formatPercent(value: number | undefined | null): string {
