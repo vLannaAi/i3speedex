@@ -2,7 +2,7 @@
 import type { Producer } from '~/types'
 import { useDebounceFn } from '@vueuse/core'
 
-const { fetchProducers } = useProducers()
+const { fetchProducers } = useCachedProducers()
 const { canWrite } = useAuth()
 
 const producers = ref<Producer[]>([])

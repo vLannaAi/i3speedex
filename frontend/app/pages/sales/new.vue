@@ -4,7 +4,7 @@ import { PAYMENT_METHODS, PAYMENT_TERMS } from '~/utils/constants'
 
 definePageMeta({ middleware: ['role'] })
 
-const { createSale } = useSales()
+const { createSale } = useCachedSales()
 const toast = useAppToast()
 const router = useRouter()
 

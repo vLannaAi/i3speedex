@@ -354,6 +354,34 @@ export class SaleModuleLambdaStack extends cdk.Stack {
     });
 
     // ========================================
+    // Sync Lambda Functions (3)
+    // ========================================
+
+    const syncSalesFunction = new nodejs.NodejsFunction(this, 'SyncSalesFunction', {
+      ...commonLambdaProps,
+      functionName: `SaleModuleSyncSales-${environment}`,
+      entry: path.join(__dirname, '../../functions/sale-module-api/src/handlers/sync/sync-sales.ts'),
+      handler: 'handler',
+      description: 'Sync sales (initial + delta)',
+    });
+
+    const syncBuyersFunction = new nodejs.NodejsFunction(this, 'SyncBuyersFunction', {
+      ...commonLambdaProps,
+      functionName: `SaleModuleSyncBuyers-${environment}`,
+      entry: path.join(__dirname, '../../functions/sale-module-api/src/handlers/sync/sync-buyers.ts'),
+      handler: 'handler',
+      description: 'Sync buyers (initial + delta)',
+    });
+
+    const syncProducersFunction = new nodejs.NodejsFunction(this, 'SyncProducersFunction', {
+      ...commonLambdaProps,
+      functionName: `SaleModuleSyncProducers-${environment}`,
+      entry: path.join(__dirname, '../../functions/sale-module-api/src/handlers/sync/sync-producers.ts'),
+      handler: 'handler',
+      description: 'Sync producers (initial + delta)',
+    });
+
+    // ========================================
     // Dashboard Lambda Functions (4)
     // ========================================
 
@@ -426,6 +454,9 @@ export class SaleModuleLambdaStack extends cdk.Stack {
       getSalesByDateRange: getSalesByDateRangeFunction,
       getTopBuyers: getTopBuyersFunction,
       getRecentActivity: getRecentActivityFunction,
+      syncSales: syncSalesFunction,
+      syncBuyers: syncBuyersFunction,
+      syncProducers: syncProducersFunction,
     };
 
     // ========================================
@@ -584,6 +615,11 @@ export class SaleModuleLambdaStack extends cdk.Stack {
     addRoute(apigatewayv2.HttpMethod.GET, '/api/search/sales', searchSalesFunction);
     addRoute(apigatewayv2.HttpMethod.GET, '/api/search/buyers', searchBuyersFunction);
     addRoute(apigatewayv2.HttpMethod.GET, '/api/search/producers', searchProducersFunction);
+
+    // Sync Routes
+    addRoute(apigatewayv2.HttpMethod.GET, '/api/sync/sales', syncSalesFunction);
+    addRoute(apigatewayv2.HttpMethod.GET, '/api/sync/buyers', syncBuyersFunction);
+    addRoute(apigatewayv2.HttpMethod.GET, '/api/sync/producers', syncProducersFunction);
 
     // Dashboard Routes
     addRoute(apigatewayv2.HttpMethod.GET, '/api/dashboard/stats', getDashboardStatsFunction);

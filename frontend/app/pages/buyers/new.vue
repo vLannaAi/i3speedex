@@ -4,7 +4,7 @@ import { getCountryDisplay } from '~/utils/display-helpers'
 
 definePageMeta({ middleware: ['role'] })
 
-const { createBuyer } = useBuyers()
+const { createBuyer } = useCachedBuyers()
 const toast = useAppToast()
 const router = useRouter()
 

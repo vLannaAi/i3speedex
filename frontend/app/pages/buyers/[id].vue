@@ -7,7 +7,7 @@ const route = useRoute()
 const router = useRouter()
 const buyerId = route.params.id as string
 
-const { fetchBuyer, updateBuyer, deleteBuyer } = useBuyers()
+const { fetchBuyer, updateBuyer, deleteBuyer } = useCachedBuyers()
 const { fetchSales } = useSales()
 const { formatDate, formatCurrency, formatDateTime } = useFormatters()
 const { canWrite } = useAuth()

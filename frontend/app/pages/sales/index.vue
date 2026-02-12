@@ -2,9 +2,9 @@
 import type { Sale, Buyer, Producer } from '~/types'
 import { useDebounceFn } from '@vueuse/core'
 
-const { fetchSales } = useSales()
-const { fetchBuyers } = useBuyers()
-const { fetchProducers } = useProducers()
+const { fetchSales } = useCachedSales()
+const { fetchBuyers } = useCachedBuyers()
+const { fetchProducers } = useCachedProducers()
 const { formatDate, formatCurrency } = useFormatters()
 const { canWrite } = useAuth()
 

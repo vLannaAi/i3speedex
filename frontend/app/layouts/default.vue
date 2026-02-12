@@ -158,6 +158,7 @@ const navigationItems = [
       <template #header>
         <UDashboardNavbar>
           <template #right>
+            <SyncStatusIndicator />
             <UButton
               icon="i-lucide-search"
               variant="ghost"

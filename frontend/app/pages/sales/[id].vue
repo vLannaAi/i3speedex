@@ -6,7 +6,7 @@ const route = useRoute()
 const router = useRouter()
 const saleId = route.params.id as string
 
-const { fetchSale, updateSale, confirmSale, deleteSale, fetchSaleLines } = useSales()
+const { fetchSale, updateSale, confirmSale, deleteSale, fetchSaleLines } = useCachedSales()
 const { fetchAttachments } = useAttachments()
 const { formatDate, formatCurrency, formatDateTime } = useFormatters()
 const { canWrite } = useAuth()

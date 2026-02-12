@@ -6,6 +6,7 @@ import {
   type CognitoUserAttribute,
 } from 'amazon-cognito-identity-js'
 import type { UserContext } from '~/types'
+import { cryptoStore } from '~/utils/crypto-store'
 
 interface AuthState {
   user: UserContext | null
@@ -24,6 +25,7 @@ const state = reactive<AuthState>({
 let userPool: CognitoUserPool | null = null
 let cognitoUser: CognitoUser | null = null
 let refreshTimer: ReturnType<typeof setTimeout> | null = null
+let userSub: string | null = null
 
 function getUserPool(): CognitoUserPool {
   if (!userPool) {
@@ -52,6 +54,8 @@ function parseIdToken(idToken: string): UserContext {
   } else {
     groups = []
   }
+
+  userSub = payload.sub || null
 
   return {
     username: payload['cognito:username'] || payload.username || payload.sub,
@@ -128,6 +132,10 @@ export function useAuth() {
           state.isAuthenticated = true
           state.isLoading = false
           scheduleRefresh(session)
+          if (import.meta.client && userSub) {
+            const { initCache, syncAll } = useCache()
+            initCache(userSub).then((ok) => { if (ok) syncAll() })
+          }
           resolve({ success: true })
         },
         onFailure(err: Error) {
@@ -195,6 +203,10 @@ export function useAuth() {
 
   function logout() {
     if (refreshTimer) clearTimeout(refreshTimer)
+    if (import.meta.client) {
+      const { destroyCache } = useCache()
+      destroyCache()
+    }
     const pool = getUserPool()
     const currentUser = pool.getCurrentUser()
     if (currentUser) {
@@ -203,6 +215,7 @@ export function useAuth() {
     state.session = null
     state.user = null
     state.isAuthenticated = false
+    userSub = null
     navigateTo('/login')
   }
 
@@ -227,6 +240,10 @@ export function useAuth() {
         state.isAuthenticated = true
         state.isLoading = false
         scheduleRefresh(session)
+        if (import.meta.client && userSub) {
+          const { initCache, syncAll } = useCache()
+          initCache(userSub).then((ok) => { if (ok) syncAll() })
+        }
         resolve(true)
       })
     })

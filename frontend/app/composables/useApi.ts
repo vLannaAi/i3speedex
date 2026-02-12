@@ -88,5 +88,11 @@ export function useApi() {
     return request<ApiResponse<T>>(path, { method: 'DELETE' })
   }
 
-  return { request, get, getList, post, put, del }
+  function getSync<T>(path: string, since?: string) {
+    const query: Record<string, string | number | undefined> = {}
+    if (since) query.since = since
+    return request<ApiResponse<{ items: T[]; serverTimestamp: string }>>(path, { query })
+  }
+
+  return { request, get, getList, post, put, del, getSync }
 }

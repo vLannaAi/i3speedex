@@ -2,7 +2,7 @@
 import type { Buyer } from '~/types'
 import { useDebounceFn } from '@vueuse/core'
 
-const { fetchBuyers } = useBuyers()
+const { fetchBuyers } = useCachedBuyers()
 const { canWrite } = useAuth()
 
 const buyers = ref<Buyer[]>([])
