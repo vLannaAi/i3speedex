@@ -275,12 +275,6 @@ onMounted(async () => {
 
 <template>
   <div>
-    <BreadcrumbNav :items="[
-      { label: 'Dashboard', to: '/' },
-      { label: 'Buyers', to: '/buyers' },
-      { label: buyer?.companyName || '...' },
-    ]" />
-
     <!-- Header -->
     <div v-if="loading" class="mb-6">
       <LoadingSkeleton :lines="2" height="28px" />

@@ -1,7 +1,6 @@
 export const SALE_STATUSES = [
-  { value: 'draft', label: 'Draft' },
-  { value: 'confirmed', label: 'Confirmed' },
-  { value: 'invoiced', label: 'Invoiced' },
+  { value: 'proforma', label: 'Proforma' },
+  { value: 'sent', label: 'Sent' },
   { value: 'paid', label: 'Paid' },
   { value: 'cancelled', label: 'Cancelled' },
 ]
@@ -155,6 +154,27 @@ export const ITALIAN_PROVINCES = [
   { value: 'VT', label: 'Viterbo (VT)' },
   { value: 'VV', label: 'Vibo Valentia (VV)' },
 ]
+
+const ALPHA3_TO_2: Record<string, string> = {
+  ALB: 'AL', AND: 'AD', AUT: 'AT', BEL: 'BE', BGR: 'BG',
+  BIH: 'BA', BYR: 'BY', CAN: 'CA', CHE: 'CL', CHN: 'CN',
+  CYP: 'CY', CZE: 'CZ', DEU: 'DE', DNK: 'DK', DZA: 'DZ',
+  ESP: 'ES', EST: 'EE', FIN: 'FI', FRA: 'FR', GBR: 'GB',
+  GRC: 'GR', KOR: 'KR', HRV: 'HR', HUN: 'HU', IRN: 'IR',
+  IND: 'IN', IRL: 'IE', ISK: 'IS', ITA: 'IT', LIE: 'LI',
+  LTU: 'LT', LUX: 'LU', LVL: 'LV', MEX: 'MX', MDL: 'MD',
+  MKD: 'MK', MLT: 'MT', MNE: 'ME', NLD: 'NL', NOR: 'NO',
+  POL: 'PL', PRT: 'PT', ROU: 'RO', SRB: 'RS', SVK: 'SK',
+  SVN: 'SI', SWE: 'SE', SWZ: 'CH', TUR: 'TR', UKR: 'UA',
+  RUS: 'RU', USA: 'US',
+}
+
+export function toAlpha2(code: string): string {
+  if (!code) return ''
+  const upper = code.toUpperCase()
+  if (upper.length === 2) return upper
+  return ALPHA3_TO_2[upper] || upper.slice(0, 2)
+}
 
 export const COUNTRIES = [
   { value: 'IT', label: 'Italy', flag: 'circle-flags:it', eu: true },

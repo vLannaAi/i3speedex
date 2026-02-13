@@ -126,6 +126,15 @@ export function useCache() {
     ])
   }
 
+  async function forceFullSync(): Promise<void> {
+    if (!initialized) return
+    for (const entity of ['sales', 'buyers', 'producers'] as SyncEntity[]) {
+      syncState[entity].lastSync = null
+      await cryptoStore.setMeta(`lastSync_${entity}`, '')
+    }
+    await syncAll()
+  }
+
   async function getAllCached<T>(entity: SyncEntity): Promise<T[]> {
     if (!initialized) return []
     return cryptoStore.getAllItems<T>(entity)
@@ -148,6 +157,7 @@ export function useCache() {
     destroyCache,
     syncEntity,
     syncAll,
+    forceFullSync,
     getAllCached,
     invalidateAndSync,
   }

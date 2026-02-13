@@ -74,11 +74,6 @@ function onBuyerSelect(buyer: Buyer) {
 
 <template>
   <div>
-    <BreadcrumbNav :items="[
-      { label: 'Dashboard', to: '/' },
-      { label: 'Sales', to: '/sales' },
-      { label: 'New Sale' },
-    ]" />
     <div class="mb-6">
       <h1 class="text-2xl font-bold">New Sale</h1>
       <p class="text-sm text-muted mt-1">Fill in the details to create a new sale</p>

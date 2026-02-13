@@ -3,17 +3,22 @@ export function useFormatters() {
     if (!iso) return '—'
     const d = new Date(iso)
     if (isNaN(d.getTime())) return '—'
-    return d.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' })
+    const y = d.getFullYear()
+    const m = String(d.getMonth() + 1).padStart(2, '0')
+    const day = String(d.getDate()).padStart(2, '0')
+    return `${y}/${m}/${day}`
   }
 
   function formatDateTime(iso: string | undefined | null): string {
     if (!iso) return '—'
     const d = new Date(iso)
     if (isNaN(d.getTime())) return '—'
-    return d.toLocaleDateString('it-IT', {
-      day: '2-digit', month: '2-digit', year: 'numeric',
-      hour: '2-digit', minute: '2-digit',
-    })
+    const y = d.getFullYear()
+    const m = String(d.getMonth() + 1).padStart(2, '0')
+    const day = String(d.getDate()).padStart(2, '0')
+    const h = String(d.getHours()).padStart(2, '0')
+    const min = String(d.getMinutes()).padStart(2, '0')
+    return `${y}/${m}/${day} ${h}:${min}`
   }
 
   function formatCurrency(value: number | string | undefined | null): string {

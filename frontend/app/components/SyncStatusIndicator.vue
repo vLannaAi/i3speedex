@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useTimeAgo } from '@vueuse/core'
 
-const { syncState, isReady, syncAll } = useCache()
+const { syncState, isReady, forceFullSync } = useCache()
 
 const syncing = computed(() =>
   syncState.sales.syncing || syncState.buyers.syncing || syncState.producers.syncing,
@@ -32,7 +32,7 @@ const tooltipText = computed(() => {
       size="xs"
       :icon="syncing ? 'i-lucide-refresh-cw' : 'i-lucide-check-circle'"
       :class="{ 'animate-spin': syncing }"
-      @click="syncAll()"
+      @click="forceFullSync()"
     />
   </UTooltip>
 </template>

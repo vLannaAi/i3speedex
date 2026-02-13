@@ -1,32 +1,155 @@
 <script setup lang="ts">
-import type { Sale, Buyer, Producer } from '~/types'
+import type { Sale, Buyer } from '~/types'
 import { useDebounceFn } from '@vueuse/core'
+import { toAlpha2 } from '~/utils/constants'
 
 const { fetchSales } = useCachedSales()
 const { fetchBuyers } = useCachedBuyers()
-const { fetchProducers } = useCachedProducers()
-const { formatDate, formatCurrency } = useFormatters()
+const { getAllCached } = useCache()
+const { formatNumber } = useFormatters()
 const { canWrite } = useAuth()
+const route = useRoute()
+const router = useRouter()
 
 const sales = ref<Sale[]>([])
 const buyers = ref<Buyer[]>([])
-const producers = ref<Producer[]>([])
 const loading = ref(true)
 const page = ref(1)
 const pageSize = ref(20)
 const total = ref(0)
 const totalPages = ref(0)
-const search = ref('')
-const filters = ref<Record<string, string | undefined>>({})
+
+// Unified search: single source of truth
+const search = ref((route.query.q as string) || '')
+const inputFocused = ref(false)
+const rawBeforeFocus = ref('')
+
+const { activeFilters, displayString, toggleToken, isActive, hasActiveFilters, applyDisplayFormat } = useSearchQuery(search, buyers)
+
+function clearSearch() {
+  search.value = ''
+  sortKey.value = null
+  sortDir.value = null
+  page.value = 1
+  load()
+  router.replace({ query: {} })
+}
+
+function onInputFocus() {
+  inputFocused.value = true
+  rawBeforeFocus.value = search.value
+}
+
+function onInputBlur() {
+  inputFocused.value = false
+  applyDisplayFormat()
+}
+
+// Sort state (column header clicks still work alongside sort: tokens)
+const sortKey = ref<string | null>(null)
+const sortDir = ref<'asc' | 'desc' | null>(null)
+
+function toggleSort(key: string) {
+  if (sortKey.value !== key) {
+    sortKey.value = key
+    sortDir.value = 'asc'
+  } else if (sortDir.value === 'asc') {
+    sortDir.value = 'desc'
+  } else {
+    sortKey.value = null
+    sortDir.value = null
+  }
+  page.value = 1
+  load()
+}
+
+// Badge toggle: delegates to useSearchQuery then reloads
+function onToggleToken(domain: Parameters<typeof toggleToken>[0], value: string) {
+  toggleToken(domain, value)
+  page.value = 1
+  load()
+}
+
+// Year dropdown: toggle year in search
+function onYearSelect(year: string) {
+  if (!year) {
+    // "All" selected — remove all year tokens
+    const tokens = search.value.split(/\s+/).filter(Boolean)
+    const cleaned = tokens.filter((t) => {
+      const lower = t.toLowerCase()
+      // Remove tokens that are 4-digit years or year ranges
+      if (/^\d{4}$/.test(t)) return false
+      if (/^\d{4}[–-]\d{4}$/.test(t)) return false
+      if (['today', 'week', 'month'].includes(lower)) return false
+      if (/^[qh][1-4]/i.test(t)) return false
+      return true
+    })
+    search.value = cleaned.join(' ')
+  } else {
+    toggleToken('year', year)
+  }
+  page.value = 1
+  load()
+}
+
+// Buyer dropdown: toggle buyer in search
+function onBuyerSelect(buyerId: string) {
+  if (!buyerId) {
+    // "All" selected — remove all buyer tokens
+    const tokens = search.value.split(/\s+/).filter(Boolean)
+    const buyerCodes = new Set(buyers.value.filter(b => b.code).map(b => b.code!.toUpperCase()))
+    const cleaned = tokens.filter(t => !buyerCodes.has(t.toUpperCase()))
+    search.value = cleaned.join(' ')
+  } else {
+    toggleToken('buyer', buyerId)
+  }
+  page.value = 1
+  load()
+}
+
+// Global stats from all sales (recomputed when filters change)
+const globalStats = ref({
+  total: 0,
+  totalAmount: 0,
+  totalLines: 0,
+  uniqueBuyers: 0,
+  docTypes: {} as Record<string, number>,
+  statuses: {} as Record<string, number>,
+  years: [] as string[],
+})
+
+const buyerCodeMap = computed(() => {
+  const map: Record<string, string> = {}
+  for (const b of buyers.value) {
+    if (b.code) map[b.buyerId] = b.code
+  }
+  return map
+})
+
+const buyerCountryMap = computed(() => {
+  const map: Record<string, string> = {}
+  for (const b of buyers.value) {
+    if (b.country) map[b.buyerId] = toAlpha2(b.country)
+  }
+  return map
+})
+
+const docTypeColor: Record<string, 'neutral' | 'primary'> = {
+  proforma: 'neutral',
+  invoice: 'primary',
+}
+const docTypeLabel: Record<string, string> = {
+  proforma: 'PRO',
+  invoice: 'INV',
+}
 
 const columns = [
-  { accessorKey: 'saleId', header: '#', size: 60 },
-  { accessorKey: 'saleDate', header: 'Date', size: 90 },
-  { accessorKey: 'buyerName', header: 'Buyer', size: 200 },
-  { accessorKey: 'producerName', header: 'Producer', size: 200 },
-  { accessorKey: 'total', header: 'Total', size: 100 },
+  { accessorKey: 'saleId', header: 'ID', size: 80 },
+  { accessorKey: 'docType', header: 'Doc', size: 70 },
   { accessorKey: 'status', header: 'Status', size: 90 },
-  { accessorKey: 'linesCount', header: 'Lines', size: 40 },
+  { accessorKey: 'regDate', header: 'Reg / Date', size: 150 },
+  { accessorKey: 'buyerId', header: 'Buyer', size: 180 },
+  { accessorKey: 'total', header: 'Total €', size: 100 },
 ]
 
 const pageSizeOptions = [
@@ -43,14 +166,89 @@ const showing = computed(() => {
   return `Showing ${from}-${to} of ${total.value} records`
 })
 
+// Year dropdown items — check marks driven by isActive
+const yearMenuItems = computed(() => [
+  [{
+    label: `All (${globalStats.value.years.length} years)`,
+    icon: !activeFilters.value.years.length && !activeFilters.value.yearRange ? 'i-lucide-check' : undefined,
+    onSelect: () => onYearSelect(''),
+  }],
+  globalStats.value.years.map(y => ({
+    label: y,
+    icon: isActive('year', y) ? 'i-lucide-check' : undefined,
+    onSelect: () => onYearSelect(y),
+  })),
+])
+
+const yearLabel = computed(() => {
+  const f = activeFilters.value
+  if (f.years.length === 1) return f.years[0]
+  if (f.years.length > 1) return f.years.join(',')
+  if (f.yearRange) return `${f.yearRange.from}–${f.yearRange.to}`
+  return `${globalStats.value.years.length} years`
+})
+
+// Buyer dropdown items — check marks driven by isActive
+const buyerMenuItems = computed(() => {
+  const sorted = [...buyers.value].filter(b => b.code).sort((a, b) => (a.code || '').localeCompare(b.code || ''))
+  return [
+    [{
+      label: `All (${buyers.value.length} buyers)`,
+      icon: activeFilters.value.buyerIds.length === 0 ? 'i-lucide-check' : undefined,
+      onSelect: () => onBuyerSelect(''),
+    }],
+    sorted.map(b => ({
+      label: b.code || b.companyName,
+      icon: isActive('buyer', b.buyerId) ? 'i-lucide-check' : undefined,
+      onSelect: () => onBuyerSelect(b.buyerId),
+    })),
+  ]
+})
+
+const buyerLabel = computed(() => {
+  const ids = activeFilters.value.buyerIds
+  if (ids.length === 0) return `${buyers.value.length} buyers`
+  const names = ids.map((id) => {
+    const b = buyers.value.find(b => b.buyerId === id)
+    return b?.code || b?.companyName || id
+  })
+  return names.join(',')
+})
+
+const tableData = computed(() => {
+  if (!sales.value.length) return sales.value
+  const g = globalStats.value
+  const summary = {
+    saleId: `${total.value}`,
+    docType: '',
+    status: '',
+    regDate: '',
+    buyerId: '',
+    total: 0,
+    linesCount: 0,
+    _summary: true,
+    _proformaCount: g.statuses['proforma'] || 0,
+    _sentCount: g.statuses['sent'] || 0,
+    _paidCount: g.statuses['paid'] || 0,
+    _cancelledCount: g.statuses['cancelled'] || 0,
+    _proformaDocCount: g.docTypes['proforma'] || 0,
+    _invoiceDocCount: g.docTypes['invoice'] || 0,
+    _uniqueBuyers: g.uniqueBuyers,
+    _total: g.totalAmount,
+    _linesCount: g.totalLines,
+  } as any
+  return [summary, ...sales.value]
+})
+
 async function load() {
   loading.value = true
   try {
     const res = await fetchSales({
       page: page.value,
       pageSize: pageSize.value,
-      search: search.value || undefined,
-      ...filters.value,
+      filters: activeFilters.value,
+      sortKey: sortKey.value || undefined,
+      sortDir: sortDir.value || undefined,
     })
     if (res) {
       sales.value = res.data
@@ -62,20 +260,36 @@ async function load() {
   }
 }
 
-// Load buyers/producers for filter dropdowns
-async function loadFilters() {
-  const [buyersRes, producersRes] = await Promise.all([
-    fetchBuyers({ pageSize: 100 }),
-    fetchProducers({ pageSize: 100 }),
-  ])
-  if (buyersRes) buyers.value = buyersRes.data
-  if (producersRes) producers.value = producersRes.data
+async function loadGlobalStats() {
+  const allSales = await getAllCached<Sale>('sales')
+  const docTypes: Record<string, number> = {}
+  const statuses: Record<string, number> = {}
+  let totalAmount = 0
+  let totalLines = 0
+  const buyerSet = new Set<string>()
+  const yearSet = new Set<string>()
+  for (const s of allSales) {
+    if (s.docType) docTypes[s.docType] = (docTypes[s.docType] || 0) + 1
+    statuses[s.status] = (statuses[s.status] || 0) + 1
+    totalAmount += s.total || 0
+    totalLines += s.linesCount || 0
+    buyerSet.add(s.buyerId)
+    if (s.saleDate) yearSet.add(s.saleDate.slice(0, 4))
+  }
+  globalStats.value = {
+    total: allSales.length,
+    totalAmount,
+    totalLines,
+    uniqueBuyers: buyerSet.size,
+    docTypes,
+    statuses,
+    years: [...yearSet].sort().reverse(),
+  }
 }
 
-function onFilter(f: Record<string, string | undefined>) {
-  filters.value = f
-  page.value = 1
-  load()
+async function loadBuyers() {
+  const res = await fetchBuyers({ pageSize: 100 })
+  if (res) buyers.value = res.data
 }
 
 function onPageChange(p: number) {
@@ -92,86 +306,185 @@ function onPageSizeChange(s: number) {
 const debouncedSearch = useDebounceFn(() => {
   page.value = 1
   load()
+  // Sync search to URL
+  const q = search.value.trim()
+  router.replace({ query: q ? { q } : {} })
 }, 300)
 
 watch(search, () => debouncedSearch())
 
 onMounted(() => {
   load()
-  loadFilters()
+  loadBuyers()
+  loadGlobalStats()
 })
 
-const router = useRouter()
 function onSelectSale(_e: Event, row: any) {
+  if (row.original._summary) return
   router.push(`/sales/${row.original.saleId}`)
 }
 </script>
 
 <template>
   <div>
-    <BreadcrumbNav :items="[{ label: 'Dashboard', to: '/' }, { label: 'Sales' }]" />
-    <div class="flex items-center justify-between mb-6">
-      <div>
-        <h1 class="text-2xl font-bold">Sales</h1>
-        <p class="text-sm text-(--ui-text-muted) mt-1">{{ showing }}</p>
-      </div>
-      <UButton v-if="canWrite" to="/sales/new" icon="i-lucide-plus">
-        New Sale
-      </UButton>
-    </div>
-
-    <!-- Search + Filters -->
-    <UCard class="mb-4">
-      <div class="p-4">
+    <div class="px-4 sm:px-0 flex items-center gap-3 mb-4">
+      <h1 class="text-2xl font-bold shrink-0">Sales</h1>
+      <div class="ml-auto flex items-center gap-2">
         <UInput
           v-model="search"
           icon="i-lucide-search"
-          placeholder="Search sales..."
-        />
+          class="w-64"
+          size="md"
+          :placeholder="hasActiveFilters ? '' : 'PRO 2025 ROSSI sent...'"
+          :ui="{ trailing: 'pointer-events-auto' }"
+          @focus="onInputFocus"
+          @blur="onInputBlur"
+        >
+          <template v-if="search" #trailing>
+            <UIcon name="i-lucide-x" class="size-4 cursor-pointer text-(--ui-text-muted) hover:text-(--ui-text)" @click="clearSearch" />
+          </template>
+        </UInput>
+        <UButton v-if="canWrite" to="/sales/new" icon="i-lucide-plus">
+          New Sale
+        </UButton>
       </div>
-      <div class="px-4 pb-4">
-        <SaleFilters :buyers="buyers" :producers="producers" @filter="onFilter" />
-      </div>
-    </UCard>
+    </div>
 
     <!-- Table -->
-    <UCard class="overflow-hidden">
+    <div class="sm:rounded-lg sm:ring ring-(--ui-border) bg-(--ui-bg)">
       <UTable
         :columns="columns"
-        :data="sales"
+        :data="tableData"
         :loading="loading"
+        sticky
         :ui="{
-          base: 'table-fixed w-full',
+          root: '!overflow-visible w-full',
+          base: 'w-full',
+          thead: '!top-(--ui-header-height) z-10 !bg-(--ui-bg)',
           tr: 'even:bg-(--ui-bg-elevated)/50 hover:bg-(--ui-bg-accented) transition-colors cursor-pointer',
         }"
         @select="onSelectSale"
       >
         <template #saleId-header>
-          <div class="text-right w-full">#</div>
+          <button class="inline-flex items-center gap-1" @click="toggleSort('saleId')">
+            ID
+            <UIcon v-if="sortKey === 'saleId'" :name="sortDir === 'asc' ? 'i-lucide-arrow-up' : 'i-lucide-arrow-down'" class="size-3" />
+          </button>
         </template>
-        <template #saleId-cell="{ row }">
-          <div class="text-right">{{ row.original.saleId.replace('SALE', '') }}</div>
+        <template #docType-header>
+          <button class="inline-flex items-center gap-1" @click="toggleSort('docType')">
+            Doc
+            <UIcon v-if="sortKey === 'docType'" :name="sortDir === 'asc' ? 'i-lucide-arrow-up' : 'i-lucide-arrow-down'" class="size-3" />
+          </button>
         </template>
-        <template #saleDate-cell="{ row }">
-          {{ formatDate(row.original.saleDate) }}
+        <template #status-header>
+          <button class="inline-flex items-center gap-1" @click="toggleSort('status')">
+            Status
+            <UIcon v-if="sortKey === 'status'" :name="sortDir === 'asc' ? 'i-lucide-arrow-up' : 'i-lucide-arrow-down'" class="size-3" />
+          </button>
         </template>
-        <template #buyerName-cell="{ row }">
-          <span class="truncate block">{{ row.original.buyerName }}</span>
+        <template #regDate-header>
+          <button class="inline-flex items-center gap-1" @click="toggleSort('regDate')">
+            Reg / Date
+            <UIcon v-if="sortKey === 'regDate'" :name="sortDir === 'asc' ? 'i-lucide-arrow-up' : 'i-lucide-arrow-down'" class="size-3" />
+          </button>
         </template>
-        <template #producerName-cell="{ row }">
-          <span class="truncate block">{{ row.original.producerName }}</span>
+        <template #buyerId-header>
+          <button class="inline-flex items-center gap-1" @click="toggleSort('buyerId')">
+            Buyer
+            <UIcon v-if="sortKey === 'buyerId'" :name="sortDir === 'asc' ? 'i-lucide-arrow-up' : 'i-lucide-arrow-down'" class="size-3" />
+          </button>
         </template>
         <template #total-header>
-          <div class="text-right w-full">Total</div>
+          <button class="inline-flex items-center gap-1 ml-auto" @click="toggleSort('total')">
+            Total €
+            <UIcon v-if="sortKey === 'total'" :name="sortDir === 'asc' ? 'i-lucide-arrow-up' : 'i-lucide-arrow-down'" class="size-3" />
+          </button>
+        </template>
+        <template #saleId-cell="{ row }">
+          <span v-if="row.original._summary" class="text-sm font-semibold">{{ row.original.saleId }} sales</span>
+          <span v-else class="text-sm tabular-nums">{{ row.original.saleId.replace('SALE', '') }}</span>
+        </template>
+        <template #docType-cell="{ row }">
+          <div v-if="row.original._summary" class="flex flex-wrap gap-1">
+            <UBadge
+              :label="`${row.original._proformaDocCount}`"
+              color="neutral"
+              :variant="isActive('docType', 'proforma') ? 'solid' : 'subtle'"
+              size="xs"
+              class="cursor-pointer"
+              @click.stop="onToggleToken('docType', 'proforma')"
+            />
+            <UBadge
+              :label="`${row.original._invoiceDocCount}`"
+              color="primary"
+              :variant="isActive('docType', 'invoice') ? 'solid' : 'subtle'"
+              size="xs"
+              class="cursor-pointer"
+              @click.stop="onToggleToken('docType', 'invoice')"
+            />
+          </div>
+          <UBadge
+            v-else-if="row.original.docType"
+            :label="docTypeLabel[row.original.docType] || row.original.docType"
+            :color="docTypeColor[row.original.docType] || 'neutral'"
+            variant="subtle"
+            size="sm"
+          />
+          <span v-else class="text-xs text-(--ui-text-muted)">—</span>
+        </template>
+        <template #regDate-cell="{ row }">
+          <div v-if="row.original._summary" @click.stop>
+            <UDropdownMenu :items="yearMenuItems">
+              <UButton size="xs" variant="ghost" :label="yearLabel" trailing-icon="i-lucide-chevron-down" />
+            </UDropdownMenu>
+          </div>
+          <span v-else class="text-sm tabular-nums">
+            {{ row.original.regNumber ? row.original.regNumber.split('/').reverse().join('/') : '—' }}
+            <span class="opacity-60">{{ row.original.saleDate ? row.original.saleDate.slice(5).replace('-', '/') : '' }}</span>
+          </span>
+        </template>
+        <template #buyerId-cell="{ row }">
+          <div v-if="row.original._summary" @click.stop>
+            <UDropdownMenu :items="buyerMenuItems" :ui="{ content: 'max-h-60 overflow-y-auto' }">
+              <UButton size="xs" variant="ghost" :label="buyerLabel" trailing-icon="i-lucide-chevron-down" />
+            </UDropdownMenu>
+          </div>
+          <span v-else class="inline-flex items-center gap-1.5 font-semibold truncate">
+            <UIcon
+              v-if="buyerCountryMap[row.original.buyerId]"
+              :name="`circle-flags:${buyerCountryMap[row.original.buyerId]?.toLowerCase()}`"
+              class="size-4 shrink-0"
+              mode="svg"
+            />
+            {{ buyerCodeMap[row.original.buyerId] || row.original.buyerName }}
+          </span>
         </template>
         <template #total-cell="{ row }">
-          <div class="text-right font-medium">{{ formatCurrency(row.original.total) }}</div>
+          <div v-if="row.original._summary" class="text-right text-sm font-semibold tabular-nums">{{ formatNumber(row.original._total, 0) }}</div>
+          <div v-else class="text-right text-sm font-medium tabular-nums">{{ formatNumber(row.original.total, 0) }}</div>
         </template>
         <template #status-cell="{ row }">
-          <SaleStatusBadge :status="row.original.status" />
-        </template>
-        <template #linesCount-cell="{ row }">
-          <div class="text-center">{{ row.original.linesCount }}</div>
+          <div v-if="row.original._summary" class="flex flex-wrap gap-1">
+            <UBadge
+              :label="`${row.original._sentCount}`"
+              color="warning"
+              :variant="isActive('status', 'sent') ? 'solid' : 'subtle'"
+              size="xs"
+              class="cursor-pointer"
+              @click.stop="onToggleToken('status', 'sent')"
+            />
+            <UBadge
+              :label="`${row.original._paidCount}`"
+              color="success"
+              :variant="isActive('status', 'paid') ? 'solid' : 'subtle'"
+              size="xs"
+              class="cursor-pointer"
+              @click.stop="onToggleToken('status', 'paid')"
+            />
+          </div>
+          <SaleStatusBadge v-else-if="row.original.status !== 'proforma'" :status="row.original.status" />
+          <span v-else />
         </template>
         <template #empty>
           <EmptyState
@@ -205,6 +518,26 @@ function onSelectSale(_e: Event, row: any) {
           />
         </div>
       </div>
-    </UCard>
+    </div>
   </div>
 </template>
+
+<style scoped>
+@media (min-width: 640px) {
+  :deep(thead tr:first-child th:first-child) { border-top-left-radius: var(--radius-lg); }
+  :deep(thead tr:first-child th:last-child) { border-top-right-radius: var(--radius-lg); }
+  :deep(tbody tr:last-child td:first-child) { border-bottom-left-radius: var(--radius-lg); }
+  :deep(tbody tr:last-child td:last-child) { border-bottom-right-radius: var(--radius-lg); }
+}
+
+:deep(tbody tr:first-child td) {
+  position: sticky;
+  top: calc(var(--ui-header-height) + 45px);
+  z-index: 9;
+  background: color-mix(in srgb, var(--color-success-500) 15%, var(--ui-bg));
+}
+:deep(tbody tr:first-child) { cursor: default; }
+:deep(tbody tr:first-child:hover td) {
+  background: color-mix(in srgb, var(--color-success-500) 15%, var(--ui-bg));
+}
+</style>

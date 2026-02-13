@@ -12,7 +12,7 @@ const emit = defineEmits<{
 const { canWrite } = useAuth()
 
 const canConfirm = computed(() =>
-  canWrite.value && props.sale.status === 'draft'
+  canWrite.value && props.sale.status === 'proforma'
 )
 
 </script>

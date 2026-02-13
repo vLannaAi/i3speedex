@@ -59,6 +59,7 @@ function parseIdToken(idToken: string): UserContext {
 
   return {
     username: payload['cognito:username'] || payload.username || payload.sub,
+    givenName: payload.given_name || payload.name,
     email: payload.email,
     groups,
     operatorId: payload['custom:operatorId'],

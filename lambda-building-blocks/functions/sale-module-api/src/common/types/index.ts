@@ -26,6 +26,8 @@ export interface Sale extends TimestampFields, UserFields {
   SK: string; // METADATA
   saleId: string; // Unique identifier
   saleNumber: number; // Sequential number
+  regNumber?: string; // Registration number (e.g., "5/2026")
+  docType?: string; // Document type: "proforma" | "invoice"
   saleDate: string; // ISO 8601 date
 
   // Buyer information
@@ -67,7 +69,7 @@ export interface Sale extends TimestampFields, UserFields {
   referenceNumber?: string;
 
   // Status
-  status: 'draft' | 'confirmed' | 'invoiced' | 'paid' | 'cancelled';
+  status: 'proforma' | 'sent' | 'paid' | 'cancelled';
 
   // Invoice generation
   invoiceGenerated: boolean;
@@ -117,6 +119,7 @@ export interface Buyer extends TimestampFields, UserFields {
   PK: string; // BUYER#{buyerId}
   SK: string; // METADATA
   buyerId: string;
+  code?: string;
 
   // Company information
   companyName: string;
@@ -160,6 +163,7 @@ export interface Producer extends TimestampFields, UserFields {
   PK: string; // PRODUCER#{producerId}
   SK: string; // METADATA
   producerId: string;
+  code?: string;
 
   // Company information
   companyName: string;
@@ -300,6 +304,7 @@ export interface UpdateSaleLineRequest {
 }
 
 export interface CreateBuyerRequest {
+  code?: string;
   companyName: string;
   vatNumber?: string;
   fiscalCode?: string;
@@ -318,6 +323,7 @@ export interface CreateBuyerRequest {
 }
 
 export interface UpdateBuyerRequest {
+  code?: string;
   companyName?: string;
   vatNumber?: string;
   fiscalCode?: string;
@@ -337,6 +343,7 @@ export interface UpdateBuyerRequest {
 }
 
 export interface CreateProducerRequest {
+  code?: string;
   companyName: string;
   vatNumber?: string;
   fiscalCode?: string;
@@ -352,6 +359,7 @@ export interface CreateProducerRequest {
 }
 
 export interface UpdateProducerRequest {
+  code?: string;
   companyName?: string;
   vatNumber?: string;
   fiscalCode?: string;

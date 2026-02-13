@@ -3,6 +3,17 @@
 
 @theme {
   --font-sans: 'Google Sans Flex', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --color-primary-50: #fef1f3;
+  --color-primary-100: #fde6ea;
+  --color-primary-200: #facdd6;
+  --color-primary-300: #f6a3b4;
+  --color-primary-400: #ef6d8a;
+  --color-primary-500: #e43d65;
+  --color-primary-600: #d01d4e;
+  --color-primary-700: #BB0231;
+  --color-primary-800: #9c0530;
+  --color-primary-900: #83082e;
+  --color-primary-950: #4c0015;
 }
 
 /* Page transitions */

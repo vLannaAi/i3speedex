@@ -14,7 +14,7 @@ const generating = ref(false)
 const downloading = ref(false)
 
 const canGenerate = computed(() =>
-  ['confirmed', 'invoiced', 'paid'].includes(props.sale.status)
+  ['sent', 'paid'].includes(props.sale.status)
 )
 
 async function handleGeneratePdf() {

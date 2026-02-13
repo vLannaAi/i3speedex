@@ -71,11 +71,6 @@ async function handleSubmit() {
 
 <template>
   <div>
-    <BreadcrumbNav :items="[
-      { label: 'Dashboard', to: '/' },
-      { label: 'Producers', to: '/producers' },
-      { label: 'New Producer' },
-    ]" />
     <div class="mb-6">
       <h1 class="text-2xl font-bold">New Producer</h1>
       <p class="text-sm text-muted mt-1">Enter the new producer details</p>

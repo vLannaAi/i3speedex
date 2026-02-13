@@ -11,6 +11,7 @@ const colorMap: Record<string, 'neutral' | 'primary' | 'warning' | 'success' | '
   paid: 'success',
   cancelled: 'error',
   active: 'success',
+  past: 'warning',
   inactive: 'neutral',
 }
 
@@ -21,6 +22,7 @@ const labelMap: Record<string, string> = {
   paid: 'Paid',
   cancelled: 'Cancelled',
   active: 'Active',
+  past: 'Past',
   inactive: 'Inactive',
 }
 </script>

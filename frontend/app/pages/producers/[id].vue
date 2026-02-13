@@ -224,11 +224,6 @@ onMounted(async () => {
 
 <template>
   <div>
-    <BreadcrumbNav :items="[
-      { label: 'Dashboard', to: '/' },
-      { label: 'Producers', to: '/producers' },
-      { label: producer?.companyName || '...' },
-    ]" />
     <div v-if="loading" class="mb-6"><LoadingSkeleton :lines="2" height="28px" /></div>
     <div v-else-if="producer" class="flex items-start justify-between mb-6">
       <div class="flex items-center gap-3">

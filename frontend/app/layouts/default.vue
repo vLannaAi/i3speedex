@@ -6,10 +6,6 @@ const { searchAll } = useSearch()
 const { formatCurrency, formatDate } = useFormatters()
 const router = useRouter()
 
-// Sidebar
-const sidebarCollapsed = ref(false)
-const sidebarOpen = ref(false)
-
 // Offline detection
 const isOffline = ref(false)
 if (import.meta.client) {
@@ -17,12 +13,6 @@ if (import.meta.client) {
   window.addEventListener('online', () => { isOffline.value = false })
   window.addEventListener('offline', () => { isOffline.value = true })
 }
-
-// Close sidebar on mobile after navigation
-const route = useRoute()
-watch(() => route.fullPath, () => {
-  sidebarOpen.value = false
-})
 
 // Search
 const searchOpen = ref(false)
@@ -93,10 +83,27 @@ const roleLabel = computed(() => {
   return 'Viewer'
 })
 
+const colorMode = useColorMode()
+const isDark = computed(() => colorMode.value === 'dark')
+
+const displayName = computed(() =>
+  user.value?.givenName || user.value?.email || user.value?.username || '?',
+)
+
 const userMenuItems = computed(() => [
   [{
     label: user.value?.email || user.value?.username || '',
     type: 'label' as const,
+  }],
+  [{
+    label: roleLabel.value,
+    icon: 'i-lucide-shield',
+    disabled: true,
+  }],
+  [{
+    label: isDark.value ? 'Light Mode' : 'Dark Mode',
+    icon: isDark.value ? 'i-lucide-sun' : 'i-lucide-moon',
+    onSelect: () => { colorMode.preference = isDark.value ? 'light' : 'dark' },
   }],
   [{
     label: 'Sign Out',
@@ -108,83 +115,54 @@ const userMenuItems = computed(() => [
 
 // Navigation
 const navigationItems = [
-  [
-    { label: 'Dashboard', icon: 'i-lucide-layout-dashboard', to: '/' },
-  ],
-  [
-    { label: 'Sales', icon: 'i-lucide-receipt', to: '/sales' },
-    { label: 'Buyers', icon: 'i-lucide-users', to: '/buyers' },
-    { label: 'Producers', icon: 'i-lucide-factory', to: '/producers' },
-  ],
+  { label: 'Dashboard', icon: 'i-lucide-layout-dashboard', to: '/' },
+  { label: 'Sales', icon: 'i-lucide-receipt', to: '/sales' },
+  { label: 'Buyers', icon: 'i-lucide-users', to: '/buyers' },
+  { label: 'Producers', icon: 'i-lucide-factory', to: '/producers' },
 ]
 </script>
 
 <template>
-  <UDashboardGroup>
-    <UDashboardSidebar
-      v-model:open="sidebarOpen"
-      v-model:collapsed="sidebarCollapsed"
-      collapsible
-    >
-      <template #header>
-        <NuxtLink to="/" class="flex items-center gap-2 px-4 py-4 hover:opacity-80 transition-opacity">
-          <span v-if="sidebarCollapsed" class="text-lg font-bold text-primary-600">i3</span>
-          <template v-else>
-            <span class="text-xl font-bold text-primary-600">i3speedex</span>
-          </template>
-        </NuxtLink>
-      </template>
-
-      <UNavigationMenu
-        :items="navigationItems"
-        orientation="vertical"
-        :collapsed="sidebarCollapsed"
-      />
-
-      <template #footer>
-        <div class="p-2">
-          <UDropdownMenu :items="userMenuItems">
-            <UButton variant="ghost" block :square="sidebarCollapsed" class="justify-start">
-              <UAvatar :text="user?.username?.charAt(0)?.toUpperCase() || '?'" size="2xs" />
-              <span v-if="!sidebarCollapsed" class="truncate text-sm">{{ user?.username }}</span>
-              <UBadge v-if="!sidebarCollapsed" :label="roleLabel" size="xs" variant="subtle" />
-            </UButton>
-          </UDropdownMenu>
-        </div>
-      </template>
-    </UDashboardSidebar>
-
-    <UDashboardPanel>
-      <template #header>
-        <UDashboardNavbar>
-          <template #right>
-            <SyncStatusIndicator />
-            <UButton
-              icon="i-lucide-search"
-              variant="ghost"
-              color="neutral"
-              square
-              @click="searchOpen = true"
-            />
-          </template>
-        </UDashboardNavbar>
-
-        <UAlert
-          v-if="isOffline"
-          title="No connection — Changes will not be saved"
-          icon="i-lucide-wifi-off"
-          color="warning"
-          variant="soft"
+  <div class="min-h-screen">
+    <UDashboardNavbar :toggle="false">
+      <template #left>
+        <UNavigationMenu
+          :items="navigationItems"
+          orientation="horizontal"
+          :ui="{ linkLabel: 'hidden sm:inline' }"
         />
       </template>
 
-      <template #body>
-        <div class="p-4 sm:p-6 max-w-7xl mx-auto">
-          <slot />
-        </div>
+
+<template #right>
+        <SyncStatusIndicator />
+        <UButton
+          icon="i-lucide-search"
+          variant="ghost"
+          color="neutral"
+          square
+          @click="searchOpen = true"
+        />
+        <UDropdownMenu :items="userMenuItems">
+          <UButton variant="ghost">
+            <span class="truncate text-sm">{{ displayName }}</span>
+          </UButton>
+        </UDropdownMenu>
       </template>
-    </UDashboardPanel>
-  </UDashboardGroup>
+    </UDashboardNavbar>
+
+    <UAlert
+      v-if="isOffline"
+      title="No connection — Changes will not be saved"
+      icon="i-lucide-wifi-off"
+      color="warning"
+      variant="soft"
+    />
+
+    <div class="px-0 py-4 sm:px-6 sm:py-6 max-w-7xl mx-auto">
+      <slot />
+    </div>
+  </div>
 
   <!-- Search Modal -->
   <UModal v-model:open="searchOpen" :close="false">
@@ -236,7 +214,7 @@ const navigationItems = [
                 </div>
                 <UBadge
                   :label="sale.status"
-                  :color="sale.status === 'paid' ? 'success' : sale.status === 'cancelled' ? 'error' : sale.status === 'invoiced' ? 'warning' : sale.status === 'confirmed' ? 'info' : 'neutral'"
+                  :color="sale.status === 'paid' ? 'success' : sale.status === 'cancelled' ? 'error' : sale.status === 'sent' ? 'warning' : 'neutral'"
                   variant="subtle"
                   size="xs"
                 />

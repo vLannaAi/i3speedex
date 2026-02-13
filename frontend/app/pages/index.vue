@@ -8,9 +8,8 @@ onMounted(() => fetchAll())
 const statusBreakdown = computed(() => {
   if (!stats.value) return null
   const breakdown: Record<string, number> = {}
-  if (stats.value.draftSales) breakdown['draft'] = stats.value.draftSales
-  if (stats.value.confirmedSales) breakdown['confirmed'] = stats.value.confirmedSales
-  if (stats.value.invoicedSales) breakdown['invoiced'] = stats.value.invoicedSales
+  if (stats.value.proformaSales) breakdown['proforma'] = stats.value.proformaSales
+  if (stats.value.sentSales) breakdown['sent'] = stats.value.sentSales
   if (stats.value.paidSales) breakdown['paid'] = stats.value.paidSales
   if (stats.value.cancelledSales) breakdown['cancelled'] = stats.value.cancelledSales
   return Object.keys(breakdown).length > 0 ? breakdown : null

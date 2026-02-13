@@ -46,13 +46,16 @@ TABLE_BUYERS = "i2speedex-buyers-dev"
 TABLE_PRODUCERS = "i2speedex-producers-dev"
 
 STATUS_MAP = {
-    "new": "draft",
-    "to verify": "draft",
-    "proforma": "draft",
-    "ready": "confirmed",
-    "sent": "invoiced",
+    "proforma": "proforma",
+    "sent": "sent",
     "paid": "paid",
     "deleted": "cancelled",
+}
+
+DOC_TYPE_MAP = {
+    "proforma": "proforma",
+    "sent": "invoice",
+    "paid": "invoice",
 }
 
 NOW_ISO = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.000Z")
@@ -166,6 +169,7 @@ def transform_buyers(buyers_rows):
             "PK": f"BUYER#{bid}",
             "SK": "METADATA",
             "buyerId": bid,
+            "code": safe_str(b.get("code")),
             "companyName": company_name,
             "vatNumber": safe_str(b.get("vat")),
             "fiscalCode": safe_str(b.get("taxid")),
@@ -225,6 +229,7 @@ def transform_producers(producers_rows):
             "PK": f"PRODUCER#{pid}",
             "SK": "METADATA",
             "producerId": pid,
+            "code": safe_str(p.get("code")),
             "companyName": company_name,
             "vatNumber": safe_str(p.get("vat")),
             "fiscalCode": safe_str(p.get("taxid")),
@@ -277,8 +282,12 @@ def transform_sales(sales_rows, sale_lines_rows, buyers_dict, producers_dict):
         sale_id = f"SALE{sale_id_num}"
         pk = f"SALE#{sale_id}"
 
-        raw_status = safe_str(s.get("status"), "new")
+        raw_status = safe_str(s.get("status"), "proforma")
         status = map_sale_status(raw_status)
+        doc_type = DOC_TYPE_MAP.get(raw_status.lower().strip(), "proforma")
+        sale_number = s.get("number", 0) or 0
+        sale_year = s.get("year", 0) or 0
+        reg_number = f"{sale_number}/{sale_year}" if sale_year else str(sale_number)
         sale_date = convert_reg_date(s.get("reg_date"))
 
         buyer_id_num = s.get("buyer_id")
@@ -297,7 +306,9 @@ def transform_sales(sales_rows, sale_lines_rows, buyers_dict, producers_dict):
             "PK": pk,
             "SK": "METADATA",
             "saleId": sale_id,
-            "saleNumber": s.get("number", 0) or 0,
+            "saleNumber": sale_number,
+            "regNumber": reg_number,
+            "docType": doc_type,
             "saleDate": sale_date,
             # Buyer denormalized
             "buyerId": buyer_id,
@@ -322,7 +333,7 @@ def transform_sales(sales_rows, sale_lines_rows, buyers_dict, producers_dict):
             # Totals
             "subtotal": safe_float(s.get("amount")),
             "taxAmount": safe_float(s.get("vat")),
-            "total": safe_float(s.get("total")),
+            "total": safe_float(s.get("amount")) + safe_float(s.get("vat")),
             # Payment
             "paymentMethod": safe_str(s.get("payment")),
             "currency": safe_str(s.get("currency"), "EUR"),

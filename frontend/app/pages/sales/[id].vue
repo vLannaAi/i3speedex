@@ -126,19 +126,13 @@ async function refreshAttachments() {
   if (res.success && res.data) attachments.value = Array.isArray(res.data) ? res.data : []
 }
 
-const isEditable = computed(() => canWrite.value && sale.value?.status === 'draft')
+const isEditable = computed(() => canWrite.value && sale.value?.status === 'proforma')
 
 onMounted(() => load())
 </script>
 
 <template>
   <div>
-    <BreadcrumbNav :items="[
-      { label: 'Dashboard', to: '/' },
-      { label: 'Sales', to: '/sales' },
-      { label: sale ? `#${sale.saleNumber}` : '...' },
-    ]" />
-
     <!-- Header -->
     <div v-if="loading" class="mb-6">
       <LoadingSkeleton :lines="2" height="28px" />

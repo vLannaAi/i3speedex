@@ -4,17 +4,15 @@ import type { SaleStatus } from '~/types'
 defineProps<{ status: SaleStatus }>()
 
 const colorMap: Record<SaleStatus, 'neutral' | 'primary' | 'warning' | 'success' | 'error'> = {
-  draft: 'neutral',
-  confirmed: 'primary',
-  invoiced: 'warning',
+  proforma: 'neutral',
+  sent: 'warning',
   paid: 'success',
   cancelled: 'error',
 }
 
 const labelMap: Record<SaleStatus, string> = {
-  draft: 'Draft',
-  confirmed: 'Confirmed',
-  invoiced: 'Invoiced',
+  proforma: 'Proforma',
+  sent: 'Sent',
   paid: 'Paid',
   cancelled: 'Cancelled',
 }

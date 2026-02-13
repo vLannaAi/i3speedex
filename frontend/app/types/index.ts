@@ -3,6 +3,8 @@
 export interface Sale {
   saleId: string
   saleNumber: number
+  regNumber?: string
+  docType?: string
   saleDate: string
 
   buyerId: string
@@ -53,7 +55,7 @@ export interface Sale {
   updatedBy: string
 }
 
-export type SaleStatus = 'draft' | 'confirmed' | 'invoiced' | 'paid' | 'cancelled'
+export type SaleStatus = 'proforma' | 'sent' | 'paid' | 'cancelled'
 
 export interface SaleLine {
   saleId: string
@@ -84,6 +86,7 @@ export interface SaleLine {
 
 export interface Buyer {
   buyerId: string
+  code?: string
   companyName: string
   vatNumber?: string
   fiscalCode?: string
@@ -116,6 +119,7 @@ export interface Buyer {
 
 export interface Producer {
   producerId: string
+  code?: string
   companyName: string
   vatNumber?: string
   fiscalCode?: string
@@ -157,6 +161,7 @@ export interface Attachment {
 
 export interface UserContext {
   username: string
+  givenName?: string
   email?: string
   groups: string[]
   operatorId?: string
@@ -215,6 +220,7 @@ export interface UpdateSaleLineRequest {
 }
 
 export interface CreateBuyerRequest {
+  code?: string
   companyName: string
   vatNumber?: string
   fiscalCode?: string
@@ -233,6 +239,7 @@ export interface CreateBuyerRequest {
 }
 
 export interface UpdateBuyerRequest {
+  code?: string
   companyName?: string
   vatNumber?: string
   fiscalCode?: string
@@ -252,6 +259,7 @@ export interface UpdateBuyerRequest {
 }
 
 export interface CreateProducerRequest {
+  code?: string
   companyName: string
   vatNumber?: string
   fiscalCode?: string
@@ -267,6 +275,7 @@ export interface CreateProducerRequest {
 }
 
 export interface UpdateProducerRequest {
+  code?: string
   companyName?: string
   vatNumber?: string
   fiscalCode?: string
