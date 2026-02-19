@@ -126,6 +126,49 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
       internalNotes: body.internalNotes,
       referenceNumber: body.referenceNumber,
 
+      // Purchase order
+      poNumber: body.poNumber,
+      poDate: body.poDate,
+
+      // Printed note & packaging
+      printedNote: body.printedNote,
+      package: body.package,
+
+      // Delivery notes
+      deliveryNote: body.deliveryNote,
+      dnNumber: body.dnNumber,
+      dnDate: body.dnDate,
+      dnNumber2: body.dnNumber2,
+      dnDate2: body.dnDate2,
+      dnNumber3: body.dnNumber3,
+      dnDate3: body.dnDate3,
+
+      // Public Administration
+      paCupNumber: body.paCupNumber,
+      paCigNumber: body.paCigNumber,
+
+      // Payment details
+      paymentDate: body.paymentDate,
+      paymentNote: body.paymentNote,
+      bank: body.bank,
+
+      // Cash Order (C/O)
+      coBankDescription: body.coBankDescription,
+      coBankIban: body.coBankIban,
+
+      // VAT & invoice options
+      ivaPercentage: body.ivaPercentage,
+      vatOff: body.vatOff,
+      attachInvoice: body.attachInvoice ?? true,
+
+      // PDF generation
+      pdfFontBase: body.pdfFontBase ?? 8,
+
+      // Numbering
+      numberT: body.numberT,
+      year: body.year ?? currentYear,
+      registrationDate: body.registrationDate,
+
       // Status
       status: 'draft',
 

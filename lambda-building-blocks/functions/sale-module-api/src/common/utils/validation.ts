@@ -268,6 +268,104 @@ export function validateSaleData(data: any): void {
   if (data.internalNotes) {
     validateStringLength(data.internalNotes, 'internalNotes', 0, 1000);
   }
+
+  // Optional date fields
+  if (data.poDate && !isValidISODate(data.poDate)) {
+    throw new ValidationError('poDate must be a valid ISO 8601 date');
+  }
+  if (data.registrationDate && !isValidISODate(data.registrationDate)) {
+    throw new ValidationError('registrationDate must be a valid ISO 8601 date');
+  }
+  if (data.dnDate && !isValidISODate(data.dnDate)) {
+    throw new ValidationError('dnDate must be a valid ISO 8601 date');
+  }
+  if (data.dnDate2 && !isValidISODate(data.dnDate2)) {
+    throw new ValidationError('dnDate2 must be a valid ISO 8601 date');
+  }
+  if (data.dnDate3 && !isValidISODate(data.dnDate3)) {
+    throw new ValidationError('dnDate3 must be a valid ISO 8601 date');
+  }
+  if (data.paymentDate && !isValidISODate(data.paymentDate)) {
+    throw new ValidationError('paymentDate must be a valid ISO 8601 date');
+  }
+
+  // Optional IVA percentage
+  if (data.ivaPercentage !== undefined) {
+    if (!isNonNegativeNumber(data.ivaPercentage)) {
+      throw new ValidationError('ivaPercentage must be a non-negative number');
+    }
+    if (data.ivaPercentage > 100) {
+      throw new ValidationError('ivaPercentage cannot exceed 100');
+    }
+  }
+
+  // Optional PDF font base
+  if (data.pdfFontBase !== undefined) {
+    if (!isPositiveNumber(data.pdfFontBase)) {
+      throw new ValidationError('pdfFontBase must be a positive number');
+    }
+    if (data.pdfFontBase > 20) {
+      throw new ValidationError('pdfFontBase cannot exceed 20');
+    }
+  }
+
+  // Optional number T
+  if (data.numberT !== undefined) {
+    if (!isPositiveNumber(data.numberT)) {
+      throw new ValidationError('numberT must be a positive number');
+    }
+  }
+
+  // Optional year
+  if (data.year !== undefined) {
+    if (!isPositiveNumber(data.year)) {
+      throw new ValidationError('year must be a positive number');
+    }
+  }
+
+  // Optional string length validations for new fields
+  if (data.poNumber) {
+    validateStringLength(data.poNumber, 'poNumber', 1, 100);
+  }
+  if (data.printedNote) {
+    validateStringLength(data.printedNote, 'printedNote', 0, 2000);
+  }
+  if (data.package) {
+    validateStringLength(data.package, 'package', 0, 1000);
+  }
+  if (data.deliveryNote) {
+    validateStringLength(data.deliveryNote, 'deliveryNote', 0, 1000);
+  }
+  if (data.dnNumber) {
+    validateStringLength(data.dnNumber, 'dnNumber', 1, 100);
+  }
+  if (data.dnNumber2) {
+    validateStringLength(data.dnNumber2, 'dnNumber2', 1, 100);
+  }
+  if (data.dnNumber3) {
+    validateStringLength(data.dnNumber3, 'dnNumber3', 1, 100);
+  }
+  if (data.paCupNumber) {
+    validateStringLength(data.paCupNumber, 'paCupNumber', 1, 50);
+  }
+  if (data.paCigNumber) {
+    validateStringLength(data.paCigNumber, 'paCigNumber', 1, 50);
+  }
+  if (data.paymentNote) {
+    validateStringLength(data.paymentNote, 'paymentNote', 0, 1000);
+  }
+  if (data.bank) {
+    validateStringLength(data.bank, 'bank', 1, 500);
+  }
+  if (data.coBankDescription) {
+    validateStringLength(data.coBankDescription, 'coBankDescription', 1, 500);
+  }
+  if (data.coBankIban) {
+    validateStringLength(data.coBankIban, 'coBankIban', 1, 100);
+  }
+  if (data.referenceNumber) {
+    validateStringLength(data.referenceNumber, 'referenceNumber', 1, 500);
+  }
 }
 
 /**

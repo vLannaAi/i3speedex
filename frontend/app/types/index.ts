@@ -40,6 +40,40 @@ export interface Sale {
   internalNotes?: string
   referenceNumber?: string
 
+  poNumber?: string
+  poDate?: string
+
+  printedNote?: string
+  package?: string
+
+  deliveryNote?: string
+  dnNumber?: string
+  dnDate?: string
+  dnNumber2?: string
+  dnDate2?: string
+  dnNumber3?: string
+  dnDate3?: string
+
+  paCupNumber?: string
+  paCigNumber?: string
+
+  paymentDate?: string
+  paymentNote?: string
+  bank?: string
+
+  coBankDescription?: string
+  coBankIban?: string
+
+  ivaPercentage?: number
+  vatOff?: string
+  attachInvoice?: boolean
+
+  pdfFontBase?: number
+
+  numberT?: number
+  year?: number
+  registrationDate?: string
+
   status: SaleStatus
   invoiceGenerated: boolean
   invoiceGeneratedAt?: string
@@ -217,6 +251,31 @@ export interface CreateSaleRequest {
   internalNotes?: string
   referenceNumber?: string
   currency?: string
+  poNumber?: string
+  poDate?: string
+  printedNote?: string
+  package?: string
+  deliveryNote?: string
+  dnNumber?: string
+  dnDate?: string
+  dnNumber2?: string
+  dnDate2?: string
+  dnNumber3?: string
+  dnDate3?: string
+  paCupNumber?: string
+  paCigNumber?: string
+  paymentDate?: string
+  paymentNote?: string
+  bank?: string
+  coBankDescription?: string
+  coBankIban?: string
+  ivaPercentage?: number
+  vatOff?: string
+  attachInvoice?: boolean
+  pdfFontBase?: number
+  numberT?: number
+  year?: number
+  registrationDate?: string
 }
 
 export interface UpdateSaleRequest {
@@ -231,6 +290,31 @@ export interface UpdateSaleRequest {
   internalNotes?: string
   referenceNumber?: string
   status?: SaleStatus
+  poNumber?: string
+  poDate?: string
+  printedNote?: string
+  package?: string
+  deliveryNote?: string
+  dnNumber?: string
+  dnDate?: string
+  dnNumber2?: string
+  dnDate2?: string
+  dnNumber3?: string
+  dnDate3?: string
+  paCupNumber?: string
+  paCigNumber?: string
+  paymentDate?: string
+  paymentNote?: string
+  bank?: string
+  coBankDescription?: string
+  coBankIban?: string
+  ivaPercentage?: number
+  vatOff?: string
+  attachInvoice?: boolean
+  pdfFontBase?: number
+  numberT?: number
+  year?: number
+  registrationDate?: string
 }
 
 export interface CreateSaleLineRequest {

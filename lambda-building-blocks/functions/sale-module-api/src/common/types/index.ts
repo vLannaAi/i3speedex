@@ -68,6 +68,49 @@ export interface Sale extends TimestampFields, UserFields {
   internalNotes?: string;
   referenceNumber?: string;
 
+  // Purchase order
+  poNumber?: string; // Purchase Order number
+  poDate?: string; // Purchase Order date (ISO 8601)
+
+  // Printed note & packaging
+  printedNote?: string; // Note printed on invoice
+  package?: string; // Packaging information
+
+  // Delivery notes
+  deliveryNote?: string; // Delivery terms/instructions (free text)
+  dnNumber?: string; // Delivery Note number
+  dnDate?: string; // Delivery Note date (ISO 8601)
+  dnNumber2?: string; // Second DN number
+  dnDate2?: string; // Second DN date (ISO 8601)
+  dnNumber3?: string; // Third DN number
+  dnDate3?: string; // Third DN date (ISO 8601)
+
+  // Public Administration
+  paCupNumber?: string; // PA CUP code
+  paCigNumber?: string; // PA CIG code
+
+  // Payment details
+  paymentDate?: string; // Payment date (ISO 8601)
+  paymentNote?: string; // Payment notes
+  bank?: string; // Bank reference for bank transfer
+
+  // Cash Order (C/O) properties
+  coBankDescription?: string; // C/O bank description
+  coBankIban?: string; // C/O bank IBAN
+
+  // VAT & invoice options
+  ivaPercentage?: number; // Default VAT percentage
+  vatOff?: string; // VAT exemption option
+  attachInvoice?: boolean; // Attach invoice to SDI XML
+
+  // PDF generation
+  pdfFontBase?: number; // PDF font base size
+
+  // Numbering
+  numberT?: number; // Sequential number within period (e.g., T5)
+  year?: number; // Sale year
+  registrationDate?: string; // Document registration date (ISO 8601)
+
   // Status
   status: 'proforma' | 'sent' | 'paid' | 'cancelled';
 
@@ -300,6 +343,31 @@ export interface CreateSaleRequest {
   internalNotes?: string;
   referenceNumber?: string;
   currency?: string;
+  poNumber?: string;
+  poDate?: string;
+  printedNote?: string;
+  package?: string;
+  deliveryNote?: string;
+  dnNumber?: string;
+  dnDate?: string;
+  dnNumber2?: string;
+  dnDate2?: string;
+  dnNumber3?: string;
+  dnDate3?: string;
+  paCupNumber?: string;
+  paCigNumber?: string;
+  paymentDate?: string;
+  paymentNote?: string;
+  bank?: string;
+  coBankDescription?: string;
+  coBankIban?: string;
+  ivaPercentage?: number;
+  vatOff?: string;
+  attachInvoice?: boolean;
+  pdfFontBase?: number;
+  numberT?: number;
+  year?: number;
+  registrationDate?: string;
 }
 
 export interface UpdateSaleRequest {
@@ -314,6 +382,31 @@ export interface UpdateSaleRequest {
   internalNotes?: string;
   referenceNumber?: string;
   status?: 'draft' | 'confirmed' | 'invoiced' | 'paid' | 'cancelled';
+  poNumber?: string;
+  poDate?: string;
+  printedNote?: string;
+  package?: string;
+  deliveryNote?: string;
+  dnNumber?: string;
+  dnDate?: string;
+  dnNumber2?: string;
+  dnDate2?: string;
+  dnNumber3?: string;
+  dnDate3?: string;
+  paCupNumber?: string;
+  paCigNumber?: string;
+  paymentDate?: string;
+  paymentNote?: string;
+  bank?: string;
+  coBankDescription?: string;
+  coBankIban?: string;
+  ivaPercentage?: number;
+  vatOff?: string;
+  attachInvoice?: boolean;
+  pdfFontBase?: number;
+  numberT?: number;
+  year?: number;
+  registrationDate?: string;
 }
 
 export interface CreateSaleLineRequest {
