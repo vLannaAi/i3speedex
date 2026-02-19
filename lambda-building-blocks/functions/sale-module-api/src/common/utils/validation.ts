@@ -362,6 +362,56 @@ export function validateBuyerData(data: any): void {
     throw new ValidationError('postalCode is not valid for the specified country');
   }
 
+  // Optional sector
+  if (data.sector) {
+    validateEnum(data.sector, 'sector', [
+      'construction', 'mining', 'oil_gas', 'energy', 'manufacturing',
+      'food_beverage', 'agriculture', 'chemicals', 'pharmaceuticals',
+      'technology', 'transport', 'other',
+    ]);
+  }
+
+  // Optional VAT exemption
+  if (data.vatExempt) {
+    validateEnum(data.vatExempt, 'vatExempt', ['standard', 'split_payment', 'exempt']);
+  }
+
+  // Optional currency
+  if (data.currency && !isValidCurrencyCode(data.currency)) {
+    throw new ValidationError('currency must be a valid ISO 4217 currency code');
+  }
+
+  // Optional preferred language
+  if (data.preferredLanguage) {
+    validateEnum(data.preferredLanguage, 'preferredLanguage', ['it', 'en', 'de', 'fr']);
+  }
+
+  // Optional string length validations for new fields
+  if (data.industrialGroup) {
+    validateStringLength(data.industrialGroup, 'industrialGroup', 1, 200);
+  }
+  if (data.subName) {
+    validateStringLength(data.subName, 'subName', 1, 200);
+  }
+  if (data.poBox) {
+    validateStringLength(data.poBox, 'poBox', 1, 50);
+  }
+  if (data.mainContact) {
+    validateStringLength(data.mainContact, 'mainContact', 1, 200);
+  }
+  if (data.website) {
+    validateStringLength(data.website, 'website', 1, 500);
+  }
+  if (data.fax) {
+    validateStringLength(data.fax, 'fax', 1, 50);
+  }
+  if (data.defaultOperator) {
+    validateStringLength(data.defaultOperator, 'defaultOperator', 1, 200);
+  }
+  if (data.bankDetails) {
+    validateStringLength(data.bankDetails, 'bankDetails', 1, 500);
+  }
+
   // Optional status
   if (data.status) {
     validateEnum(data.status, 'status', ['active', 'inactive']);
@@ -403,6 +453,80 @@ export function validateProducerData(data: any): void {
   // Postal code validation
   if (!isValidPostalCode(data.postalCode, data.country)) {
     throw new ValidationError('postalCode is not valid for the specified country');
+  }
+
+  // Optional SDI code
+  if (data.sdi && !isValidSdiCode(data.sdi)) {
+    throw new ValidationError('sdi must be a valid 7-character SDI code');
+  }
+
+  // Optional PEC email
+  if (data.pec && !isValidEmail(data.pec)) {
+    throw new ValidationError('pec must be a valid email address');
+  }
+
+  // Optional preferred language
+  if (data.preferredLanguage) {
+    validateEnum(data.preferredLanguage, 'preferredLanguage', ['it', 'en', 'de', 'fr']);
+  }
+
+  // Optional quantity
+  if (data.quantity) {
+    validateEnum(data.quantity, 'quantity', ['any', 'small', 'medium', 'large']);
+  }
+
+  // Optional revenue percentage
+  if (data.revenuePercentage !== undefined) {
+    if (!isNonNegativeNumber(data.revenuePercentage)) {
+      throw new ValidationError('revenuePercentage must be a non-negative number');
+    }
+    if (data.revenuePercentage > 100) {
+      throw new ValidationError('revenuePercentage cannot exceed 100');
+    }
+  }
+
+  // Optional string length validations for new fields
+  if (data.subName) {
+    validateStringLength(data.subName, 'subName', 1, 200);
+  }
+  if (data.poBox) {
+    validateStringLength(data.poBox, 'poBox', 1, 50);
+  }
+  if (data.mainContact) {
+    validateStringLength(data.mainContact, 'mainContact', 1, 200);
+  }
+  if (data.fax) {
+    validateStringLength(data.fax, 'fax', 1, 50);
+  }
+  if (data.defaultOperator) {
+    validateStringLength(data.defaultOperator, 'defaultOperator', 1, 200);
+  }
+  if (data.bankDetails) {
+    validateStringLength(data.bankDetails, 'bankDetails', 1, 500);
+  }
+  if (data.qualityAssurance) {
+    validateStringLength(data.qualityAssurance, 'qualityAssurance', 1, 2000);
+  }
+  if (data.productionArea) {
+    validateStringLength(data.productionArea, 'productionArea', 1, 2000);
+  }
+  if (data.markets) {
+    validateStringLength(data.markets, 'markets', 1, 2000);
+  }
+  if (data.materials) {
+    validateStringLength(data.materials, 'materials', 1, 2000);
+  }
+  if (data.products) {
+    validateStringLength(data.products, 'products', 1, 5000);
+  }
+  if (data.standardProducts) {
+    validateStringLength(data.standardProducts, 'standardProducts', 1, 5000);
+  }
+  if (data.diameterRange) {
+    validateStringLength(data.diameterRange, 'diameterRange', 1, 500);
+  }
+  if (data.maxLength) {
+    validateStringLength(data.maxLength, 'maxLength', 1, 500);
   }
 
   // Optional status

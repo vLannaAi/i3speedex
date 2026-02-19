@@ -176,6 +176,56 @@ export function toAlpha2(code: string): string {
   return ALPHA3_TO_2[upper] || upper.slice(0, 2)
 }
 
+export const SECTORS = [
+  { value: 'construction', label: 'Construction' },
+  { value: 'mining', label: 'Mining' },
+  { value: 'oil_gas', label: 'Oil & Gas' },
+  { value: 'energy', label: 'Energy' },
+  { value: 'manufacturing', label: 'Manufacturing' },
+  { value: 'food_beverage', label: 'Food & Beverage' },
+  { value: 'agriculture', label: 'Agriculture' },
+  { value: 'chemicals', label: 'Chemicals' },
+  { value: 'pharmaceuticals', label: 'Pharmaceuticals' },
+  { value: 'technology', label: 'Technology' },
+  { value: 'transport', label: 'Transport' },
+  { value: 'other', label: 'Other' },
+]
+
+export const QUANTITY_OPTIONS = [
+  { value: 'any', label: 'Any' },
+  { value: 'small', label: 'Small batches' },
+  { value: 'medium', label: 'Medium batches' },
+  { value: 'large', label: 'Large batches' },
+]
+
+export const VAT_EXEMPT_OPTIONS = [
+  { value: 'standard', label: 'Standard VAT' },
+  { value: 'split_payment', label: 'Split Payment' },
+  { value: 'exempt', label: 'VAT Exempt' },
+]
+
+export const CURRENCIES = [
+  { value: 'EUR', label: 'EUR - Euro' },
+  { value: 'USD', label: 'USD - US Dollar' },
+  { value: 'GBP', label: 'GBP - British Pound' },
+  { value: 'CHF', label: 'CHF - Swiss Franc' },
+  { value: 'DZD', label: 'DZD - Algerian Dinar' },
+  { value: 'EGP', label: 'EGP - Egyptian Pound' },
+  { value: 'MAD', label: 'MAD - Moroccan Dirham' },
+  { value: 'TND', label: 'TND - Tunisian Dinar' },
+  { value: 'LYD', label: 'LYD - Libyan Dinar' },
+  { value: 'SAR', label: 'SAR - Saudi Riyal' },
+  { value: 'AED', label: 'AED - UAE Dirham' },
+  { value: 'QAR', label: 'QAR - Qatari Riyal' },
+  { value: 'KWD', label: 'KWD - Kuwaiti Dinar' },
+  { value: 'TRY', label: 'TRY - Turkish Lira' },
+  { value: 'CNY', label: 'CNY - Chinese Yuan' },
+  { value: 'INR', label: 'INR - Indian Rupee' },
+  { value: 'RUB', label: 'RUB - Russian Ruble' },
+  { value: 'BRL', label: 'BRL - Brazilian Real' },
+  { value: 'MXN', label: 'MXN - Mexican Peso' },
+]
+
 export const COUNTRIES = [
   { value: 'IT', label: 'Italy', flag: 'circle-flags:it', eu: true },
   { value: 'DE', label: 'Germany', flag: 'circle-flags:de', eu: true },
@@ -187,6 +237,35 @@ export const COUNTRIES = [
   { value: 'ES', label: 'Spain', flag: 'circle-flags:es', eu: true },
   { value: 'NL', label: 'Netherlands', flag: 'circle-flags:nl', eu: true },
   { value: 'BE', label: 'Belgium', flag: 'circle-flags:be', eu: true },
+  { value: 'PL', label: 'Poland', flag: 'circle-flags:pl', eu: true },
+  { value: 'CZ', label: 'Czech Republic', flag: 'circle-flags:cz', eu: true },
+  { value: 'HR', label: 'Croatia', flag: 'circle-flags:hr', eu: true },
+  { value: 'RO', label: 'Romania', flag: 'circle-flags:ro', eu: true },
+  { value: 'PT', label: 'Portugal', flag: 'circle-flags:pt', eu: true },
+  { value: 'SE', label: 'Sweden', flag: 'circle-flags:se', eu: true },
+  { value: 'DK', label: 'Denmark', flag: 'circle-flags:dk', eu: true },
+  { value: 'GR', label: 'Greece', flag: 'circle-flags:gr', eu: true },
+  { value: 'HU', label: 'Hungary', flag: 'circle-flags:hu', eu: true },
+  { value: 'IE', label: 'Ireland', flag: 'circle-flags:ie', eu: true },
+  { value: 'SK', label: 'Slovakia', flag: 'circle-flags:sk', eu: true },
+  { value: 'BG', label: 'Bulgaria', flag: 'circle-flags:bg', eu: true },
+  { value: 'US', label: 'United States', flag: 'circle-flags:us', eu: false },
+  { value: 'CA', label: 'Canada', flag: 'circle-flags:ca', eu: false },
+  { value: 'TR', label: 'Turkey', flag: 'circle-flags:tr', eu: false },
+  { value: 'DZ', label: 'Algeria', flag: 'circle-flags:dz', eu: false },
+  { value: 'EG', label: 'Egypt', flag: 'circle-flags:eg', eu: false },
+  { value: 'MA', label: 'Morocco', flag: 'circle-flags:ma', eu: false },
+  { value: 'TN', label: 'Tunisia', flag: 'circle-flags:tn', eu: false },
+  { value: 'LY', label: 'Libya', flag: 'circle-flags:ly', eu: false },
+  { value: 'SA', label: 'Saudi Arabia', flag: 'circle-flags:sa', eu: false },
+  { value: 'AE', label: 'United Arab Emirates', flag: 'circle-flags:ae', eu: false },
+  { value: 'QA', label: 'Qatar', flag: 'circle-flags:qa', eu: false },
+  { value: 'KW', label: 'Kuwait', flag: 'circle-flags:kw', eu: false },
+  { value: 'CN', label: 'China', flag: 'circle-flags:cn', eu: false },
+  { value: 'IN', label: 'India', flag: 'circle-flags:in', eu: false },
+  { value: 'RU', label: 'Russia', flag: 'circle-flags:ru', eu: false },
+  { value: 'BR', label: 'Brazil', flag: 'circle-flags:br', eu: false },
+  { value: 'MX', label: 'Mexico', flag: 'circle-flags:mx', eu: false },
 ]
 
 export const INVOICE_LANGUAGES = [

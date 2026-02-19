@@ -87,23 +87,36 @@ export interface SaleLine {
 export interface Buyer {
   buyerId: string
   code?: string
+
   companyName: string
+  industrialGroup?: string
+  sector?: string
   vatNumber?: string
   fiscalCode?: string
+  vatExempt?: string
+  currency?: string
+  preferredLanguage?: string
 
+  subName?: string
   address: string
+  poBox?: string
   city: string
   province?: string
   postalCode: string
   country: string
 
+  mainContact?: string
   email?: string
   phone?: string
+  fax?: string
+  website?: string
   pec?: string
   sdi?: string
 
   defaultPaymentMethod?: string
   defaultPaymentTerms?: string
+  defaultOperator?: string
+  bankDetails?: string
   notes?: string
 
   status: 'active' | 'inactive'
@@ -120,19 +133,42 @@ export interface Buyer {
 export interface Producer {
   producerId: string
   code?: string
+
   companyName: string
   vatNumber?: string
   fiscalCode?: string
+  sdi?: string
+  pec?: string
+  preferredLanguage?: string
 
+  subName?: string
   address: string
+  poBox?: string
   city: string
   province?: string
   postalCode: string
   country: string
 
+  mainContact?: string
   email?: string
   phone?: string
+  fax?: string
   website?: string
+  defaultOperator?: string
+
+  revenuePercentage?: number
+  bankDetails?: string
+
+  qualityAssurance?: string
+  productionArea?: string
+  markets?: string
+  materials?: string
+  products?: string
+  standardProducts?: string
+  diameterRange?: string
+  maxLength?: string
+  quantity?: string
+
   notes?: string
 
   status: 'active' | 'inactive'
@@ -222,38 +258,62 @@ export interface UpdateSaleLineRequest {
 export interface CreateBuyerRequest {
   code?: string
   companyName: string
+  industrialGroup?: string
+  sector?: string
   vatNumber?: string
   fiscalCode?: string
+  vatExempt?: string
+  currency?: string
+  preferredLanguage?: string
+  subName?: string
   address: string
+  poBox?: string
   city: string
   province?: string
   postalCode: string
   country: string
+  mainContact?: string
   email?: string
   phone?: string
+  fax?: string
+  website?: string
   pec?: string
   sdi?: string
   defaultPaymentMethod?: string
   defaultPaymentTerms?: string
+  defaultOperator?: string
+  bankDetails?: string
   notes?: string
 }
 
 export interface UpdateBuyerRequest {
   code?: string
   companyName?: string
+  industrialGroup?: string
+  sector?: string
   vatNumber?: string
   fiscalCode?: string
+  vatExempt?: string
+  currency?: string
+  preferredLanguage?: string
+  subName?: string
   address?: string
+  poBox?: string
   city?: string
   province?: string
   postalCode?: string
   country?: string
+  mainContact?: string
   email?: string
   phone?: string
+  fax?: string
+  website?: string
   pec?: string
   sdi?: string
   defaultPaymentMethod?: string
   defaultPaymentTerms?: string
+  defaultOperator?: string
+  bankDetails?: string
   notes?: string
   status?: 'active' | 'inactive'
 }
@@ -263,14 +323,33 @@ export interface CreateProducerRequest {
   companyName: string
   vatNumber?: string
   fiscalCode?: string
+  sdi?: string
+  pec?: string
+  preferredLanguage?: string
+  subName?: string
   address: string
+  poBox?: string
   city: string
   province?: string
   postalCode: string
   country: string
+  mainContact?: string
   email?: string
   phone?: string
+  fax?: string
   website?: string
+  defaultOperator?: string
+  revenuePercentage?: number
+  bankDetails?: string
+  qualityAssurance?: string
+  productionArea?: string
+  markets?: string
+  materials?: string
+  products?: string
+  standardProducts?: string
+  diameterRange?: string
+  maxLength?: string
+  quantity?: string
   notes?: string
 }
 
@@ -279,14 +358,33 @@ export interface UpdateProducerRequest {
   companyName?: string
   vatNumber?: string
   fiscalCode?: string
+  sdi?: string
+  pec?: string
+  preferredLanguage?: string
+  subName?: string
   address?: string
+  poBox?: string
   city?: string
   province?: string
   postalCode?: string
   country?: string
+  mainContact?: string
   email?: string
   phone?: string
+  fax?: string
   website?: string
+  defaultOperator?: string
+  revenuePercentage?: number
+  bankDetails?: string
+  qualityAssurance?: string
+  productionArea?: string
+  markets?: string
+  materials?: string
+  products?: string
+  standardProducts?: string
+  diameterRange?: string
+  maxLength?: string
+  quantity?: string
   notes?: string
   status?: 'active' | 'inactive'
 }

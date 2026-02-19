@@ -38,23 +38,47 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
       PK: `PRODUCER#${producerId}`,
       SK: 'METADATA',
       producerId,
+      code: body.code,
 
       // Company information
       companyName: body.companyName,
       vatNumber: body.vatNumber,
       fiscalCode: body.fiscalCode,
+      sdi: body.sdi,
+      pec: body.pec,
+      preferredLanguage: body.preferredLanguage,
 
       // Address
+      subName: body.subName,
       address: body.address,
+      poBox: body.poBox,
       city: body.city,
       province: body.province,
       postalCode: body.postalCode,
       country: body.country,
 
       // Contact information
+      mainContact: body.mainContact,
       email: body.email,
       phone: body.phone,
+      fax: body.fax,
       website: body.website,
+      defaultOperator: body.defaultOperator,
+
+      // Business terms
+      revenuePercentage: body.revenuePercentage,
+      bankDetails: body.bankDetails,
+
+      // Production information
+      qualityAssurance: body.qualityAssurance,
+      productionArea: body.productionArea,
+      markets: body.markets,
+      materials: body.materials,
+      products: body.products,
+      standardProducts: body.standardProducts,
+      diameterRange: body.diameterRange,
+      maxLength: body.maxLength,
+      quantity: body.quantity,
 
       // Notes
       notes: body.notes,

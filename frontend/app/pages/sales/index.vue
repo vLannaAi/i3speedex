@@ -555,11 +555,11 @@ function onSelectSale(_e: Event, row: any) {
   position: sticky;
   top: calc(var(--ui-header-height) + 45px);
   z-index: 9;
-  background: rgb(var(--color-primary-500) / 0.1) !important;
+  background: color-mix(in srgb, var(--color-primary-500) 10%, var(--ui-bg)) !important;
   font-weight: 400;
 }
 :deep(tbody tr:first-child) { cursor: default; }
 :deep(tbody tr:first-child:hover td) {
-  background: rgb(var(--color-primary-500) / 0.1) !important;
+  background: color-mix(in srgb, var(--color-primary-500) 10%, var(--ui-bg)) !important;
 }
 </style>

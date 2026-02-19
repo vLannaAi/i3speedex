@@ -123,25 +123,37 @@ export interface Buyer extends TimestampFields, UserFields {
 
   // Company information
   companyName: string;
+  industrialGroup?: string;
+  sector?: string;
   vatNumber?: string;
   fiscalCode?: string;
+  vatExempt?: string; // 'standard' | 'split_payment' | 'exempt'
+  currency?: string; // ISO 4217 currency code
+  preferredLanguage?: string; // 'it' | 'en' | 'de' | 'fr'
 
   // Address
+  subName?: string; // Address sub-name / c/o
   address: string;
+  poBox?: string;
   city: string;
   province?: string;
   postalCode: string;
   country: string;
 
   // Contact information
+  mainContact?: string;
   email?: string;
   phone?: string;
+  fax?: string;
+  website?: string;
   pec?: string; // Italian certified email
   sdi?: string; // Italian SDI code (7-digit)
 
   // Payment preferences
   defaultPaymentMethod?: string;
   defaultPaymentTerms?: string;
+  defaultOperator?: string;
+  bankDetails?: string;
 
   // Notes
   notes?: string;
@@ -169,18 +181,41 @@ export interface Producer extends TimestampFields, UserFields {
   companyName: string;
   vatNumber?: string;
   fiscalCode?: string;
+  sdi?: string; // Italian SDI code (7-digit)
+  pec?: string; // Italian certified email
+  preferredLanguage?: string; // 'it' | 'en' | 'de' | 'fr'
 
   // Address
+  subName?: string; // Address sub-name / c/o
   address: string;
+  poBox?: string;
   city: string;
   province?: string;
   postalCode: string;
   country: string;
 
   // Contact information
+  mainContact?: string;
   email?: string;
   phone?: string;
+  fax?: string;
   website?: string;
+  defaultOperator?: string;
+
+  // Business terms
+  revenuePercentage?: number; // Commission/revenue percentage
+  bankDetails?: string;
+
+  // Production information
+  qualityAssurance?: string; // Multi-line: ISO certs, etc.
+  productionArea?: string; // Multi-line: capabilities
+  markets?: string; // Multi-line: target markets
+  materials?: string; // Multi-line: materials worked
+  products?: string; // Product descriptions
+  standardProducts?: string;
+  diameterRange?: string;
+  maxLength?: string;
+  quantity?: string; // 'any' | 'small' | 'medium' | 'large'
 
   // Notes
   notes?: string;
@@ -306,38 +341,62 @@ export interface UpdateSaleLineRequest {
 export interface CreateBuyerRequest {
   code?: string;
   companyName: string;
+  industrialGroup?: string;
+  sector?: string;
   vatNumber?: string;
   fiscalCode?: string;
+  vatExempt?: string;
+  currency?: string;
+  preferredLanguage?: string;
+  subName?: string;
   address: string;
+  poBox?: string;
   city: string;
   province?: string;
   postalCode: string;
   country: string;
+  mainContact?: string;
   email?: string;
   phone?: string;
+  fax?: string;
+  website?: string;
   pec?: string;
   sdi?: string;
   defaultPaymentMethod?: string;
   defaultPaymentTerms?: string;
+  defaultOperator?: string;
+  bankDetails?: string;
   notes?: string;
 }
 
 export interface UpdateBuyerRequest {
   code?: string;
   companyName?: string;
+  industrialGroup?: string;
+  sector?: string;
   vatNumber?: string;
   fiscalCode?: string;
+  vatExempt?: string;
+  currency?: string;
+  preferredLanguage?: string;
+  subName?: string;
   address?: string;
+  poBox?: string;
   city?: string;
   province?: string;
   postalCode?: string;
   country?: string;
+  mainContact?: string;
   email?: string;
   phone?: string;
+  fax?: string;
+  website?: string;
   pec?: string;
   sdi?: string;
   defaultPaymentMethod?: string;
   defaultPaymentTerms?: string;
+  defaultOperator?: string;
+  bankDetails?: string;
   notes?: string;
   status?: 'active' | 'inactive';
 }
@@ -347,14 +406,33 @@ export interface CreateProducerRequest {
   companyName: string;
   vatNumber?: string;
   fiscalCode?: string;
+  sdi?: string;
+  pec?: string;
+  preferredLanguage?: string;
+  subName?: string;
   address: string;
+  poBox?: string;
   city: string;
   province?: string;
   postalCode: string;
   country: string;
+  mainContact?: string;
   email?: string;
   phone?: string;
+  fax?: string;
   website?: string;
+  defaultOperator?: string;
+  revenuePercentage?: number;
+  bankDetails?: string;
+  qualityAssurance?: string;
+  productionArea?: string;
+  markets?: string;
+  materials?: string;
+  products?: string;
+  standardProducts?: string;
+  diameterRange?: string;
+  maxLength?: string;
+  quantity?: string;
   notes?: string;
 }
 
@@ -363,14 +441,33 @@ export interface UpdateProducerRequest {
   companyName?: string;
   vatNumber?: string;
   fiscalCode?: string;
+  sdi?: string;
+  pec?: string;
+  preferredLanguage?: string;
+  subName?: string;
   address?: string;
+  poBox?: string;
   city?: string;
   province?: string;
   postalCode?: string;
   country?: string;
+  mainContact?: string;
   email?: string;
   phone?: string;
+  fax?: string;
   website?: string;
+  defaultOperator?: string;
+  revenuePercentage?: number;
+  bankDetails?: string;
+  qualityAssurance?: string;
+  productionArea?: string;
+  markets?: string;
+  materials?: string;
+  products?: string;
+  standardProducts?: string;
+  diameterRange?: string;
+  maxLength?: string;
+  quantity?: string;
   notes?: string;
   status?: 'active' | 'inactive';
 }

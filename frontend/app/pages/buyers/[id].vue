@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Buyer, Sale } from '~/types'
-import { PAYMENT_METHODS, PAYMENT_TERMS, COUNTRIES, ITALIAN_PROVINCES } from '~/utils/constants'
-import { getCountryDisplay, getProvinceDisplay, getPaymentMethodLabel, getPaymentTermsLabel } from '~/utils/display-helpers'
+import { PAYMENT_METHODS, PAYMENT_TERMS, COUNTRIES, ITALIAN_PROVINCES, SECTORS, VAT_EXEMPT_OPTIONS, CURRENCIES, INVOICE_LANGUAGES } from '~/utils/constants'
+import { getCountryDisplay, getProvinceDisplay, getPaymentMethodLabel, getPaymentTermsLabel, getSectorLabel, getVatExemptLabel, getCurrencyLabel, getLanguageLabel } from '~/utils/display-helpers'
 
 const route = useRoute()
 const router = useRouter()
@@ -35,20 +35,33 @@ const chartsLoading = ref(false)
 const sorting = ref([{ id: 'saleDate', desc: true }])
 
 const form = reactive({
+  code: '',
   companyName: '',
+  industrialGroup: '',
+  sector: '',
   vatNumber: '',
   fiscalCode: '',
+  vatExempt: '',
+  currency: 'EUR',
+  preferredLanguage: 'it',
+  subName: '',
   address: '',
+  poBox: '',
   city: '',
   province: '',
   postalCode: '',
   country: 'IT',
+  mainContact: '',
   email: '',
   phone: '',
+  fax: '',
+  website: '',
   pec: '',
   sdi: '',
   defaultPaymentMethod: '',
   defaultPaymentTerms: '',
+  defaultOperator: '',
+  bankDetails: '',
   notes: '',
   status: 'active' as 'active' | 'inactive',
 })
@@ -122,20 +135,33 @@ async function load() {
 }
 
 function populateForm(b: Buyer) {
+  form.code = b.code || ''
   form.companyName = b.companyName
+  form.industrialGroup = b.industrialGroup || ''
+  form.sector = b.sector || ''
   form.vatNumber = b.vatNumber || ''
   form.fiscalCode = b.fiscalCode || ''
+  form.vatExempt = b.vatExempt || ''
+  form.currency = b.currency || 'EUR'
+  form.preferredLanguage = b.preferredLanguage || 'it'
+  form.subName = b.subName || ''
   form.address = b.address
+  form.poBox = b.poBox || ''
   form.city = b.city
   form.province = b.province || ''
   form.postalCode = b.postalCode
   form.country = b.country
+  form.mainContact = b.mainContact || ''
   form.email = b.email || ''
   form.phone = b.phone || ''
+  form.fax = b.fax || ''
+  form.website = b.website || ''
   form.pec = b.pec || ''
   form.sdi = b.sdi || ''
   form.defaultPaymentMethod = b.defaultPaymentMethod || ''
   form.defaultPaymentTerms = b.defaultPaymentTerms || ''
+  form.defaultOperator = b.defaultOperator || ''
+  form.bankDetails = b.bankDetails || ''
   form.notes = b.notes || ''
   form.status = b.status
 }
@@ -155,20 +181,33 @@ async function save() {
   saving.value = true
   try {
     await updateBuyer(buyerId, {
+      code: form.code || undefined,
       companyName: form.companyName,
+      industrialGroup: form.industrialGroup || undefined,
+      sector: form.sector || undefined,
       vatNumber: form.vatNumber || undefined,
       fiscalCode: form.fiscalCode || undefined,
+      vatExempt: form.vatExempt || undefined,
+      currency: form.currency || undefined,
+      preferredLanguage: form.preferredLanguage || undefined,
+      subName: form.subName || undefined,
       address: form.address,
+      poBox: form.poBox || undefined,
       city: form.city,
       province: form.province || undefined,
       postalCode: form.postalCode,
       country: form.country,
+      mainContact: form.mainContact || undefined,
       email: form.email || undefined,
       phone: form.phone || undefined,
+      fax: form.fax || undefined,
+      website: form.website || undefined,
       pec: form.pec || undefined,
       sdi: form.sdi || undefined,
       defaultPaymentMethod: form.defaultPaymentMethod || undefined,
       defaultPaymentTerms: form.defaultPaymentTerms || undefined,
+      defaultOperator: form.defaultOperator || undefined,
+      bankDetails: form.bankDetails || undefined,
       notes: form.notes || undefined,
       status: form.status,
     })
@@ -286,6 +325,7 @@ onMounted(async () => {
         </div>
         <div>
           <h1 class="text-2xl font-bold">{{ buyer.companyName }}</h1>
+          <p v-if="buyer.code" class="text-sm text-gray-500 font-mono">{{ buyer.code }}</p>
           <div class="flex items-center gap-2 mt-1">
             <StatusBadge :status="buyer.status" />
             <span v-if="buyer.vatNumber" class="text-sm text-gray-500">VAT {{ buyer.vatNumber }}</span>
@@ -307,14 +347,32 @@ onMounted(async () => {
       <UCard>
         <h3 class="text-lg font-semibold mb-4">Company Details</h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <UFormField label="Code" hint="Short reference handle">
+            <UInput v-model="form.code" placeholder="e.g. Condotte Algeria" />
+          </UFormField>
           <UFormField label="Company Name" required>
             <UInput v-model="form.companyName" />
+          </UFormField>
+          <UFormField label="Industrial Group">
+            <UInput v-model="form.industrialGroup" />
+          </UFormField>
+          <UFormField label="Sector">
+            <USelect v-model="form.sector" :items="SECTORS" placeholder="Select..." />
           </UFormField>
           <UFormField label="VAT No.">
             <UInput v-model="form.vatNumber" placeholder="IT12345678901" />
           </UFormField>
           <UFormField label="Fiscal Code">
             <UInput v-model="form.fiscalCode" />
+          </UFormField>
+          <UFormField label="VAT Regime">
+            <USelect v-model="form.vatExempt" :items="VAT_EXEMPT_OPTIONS" placeholder="Select..." />
+          </UFormField>
+          <UFormField label="Currency">
+            <USelect v-model="form.currency" :items="CURRENCIES" />
+          </UFormField>
+          <UFormField label="Preferred Language">
+            <USelect v-model="form.preferredLanguage" :items="INVOICE_LANGUAGES" />
           </UFormField>
           <UFormField label="Status">
             <USelect v-model="form.status" :items="[{ value: 'active', label: 'Active' }, { value: 'inactive', label: 'Inactive' }]" />
@@ -326,10 +384,18 @@ onMounted(async () => {
         <h3 class="text-lg font-semibold mb-4">Address</h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <div class="sm:col-span-2 lg:col-span-3">
+            <UFormField label="Sub-name / c/o">
+              <UInput v-model="form.subName" placeholder="c/o or sub-name" />
+            </UFormField>
+          </div>
+          <div class="sm:col-span-2 lg:col-span-3">
             <UFormField label="Address" required>
               <UInput v-model="form.address" />
             </UFormField>
           </div>
+          <UFormField label="P.O. Box">
+            <UInput v-model="form.poBox" />
+          </UFormField>
           <UFormField label="City" required>
             <UInput v-model="form.city" />
           </UFormField>
@@ -351,11 +417,20 @@ onMounted(async () => {
       <UCard>
         <h3 class="text-lg font-semibold mb-4">Contacts</h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <UFormField label="Main Contact">
+            <UInput v-model="form.mainContact" placeholder="Contact person name" />
+          </UFormField>
           <UFormField label="Email">
             <UInput v-model="form.email" type="email" />
           </UFormField>
           <UFormField label="Phone">
             <UInput v-model="form.phone" />
+          </UFormField>
+          <UFormField label="Fax">
+            <UInput v-model="form.fax" />
+          </UFormField>
+          <UFormField label="Website">
+            <UInput v-model="form.website" placeholder="https://..." />
           </UFormField>
           <UFormField label="PEC">
             <UInput v-model="form.pec" type="email" />
@@ -367,14 +442,22 @@ onMounted(async () => {
       </UCard>
 
       <UCard>
-        <h3 class="text-lg font-semibold mb-4">Default Payment</h3>
+        <h3 class="text-lg font-semibold mb-4">Payment & Operations</h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <UFormField label="Payment method">
+          <UFormField label="Payment Method">
             <USelect v-model="form.defaultPaymentMethod" :items="PAYMENT_METHODS" placeholder="Select..." />
           </UFormField>
-          <UFormField label="Payment terms">
+          <UFormField label="Payment Terms">
             <USelect v-model="form.defaultPaymentTerms" :items="PAYMENT_TERMS" placeholder="Select..." />
           </UFormField>
+          <UFormField label="Default Operator">
+            <UInput v-model="form.defaultOperator" />
+          </UFormField>
+          <div class="sm:col-span-2">
+            <UFormField label="Bank Details">
+              <UTextarea v-model="form.bankDetails" :rows="2" placeholder="IBAN, bank name, SWIFT/BIC..." />
+            </UFormField>
+          </div>
         </div>
       </UCard>
 
@@ -400,6 +483,14 @@ onMounted(async () => {
         <UCard>
           <h3 class="text-lg font-semibold mb-3">Company Details</h3>
           <dl class="space-y-3 text-sm">
+            <div v-if="buyer.industrialGroup" class="flex justify-between">
+              <dt class="text-gray-500">Industrial Group</dt>
+              <dd class="font-medium">{{ buyer.industrialGroup }}</dd>
+            </div>
+            <div v-if="buyer.sector" class="flex justify-between">
+              <dt class="text-gray-500">Sector</dt>
+              <dd class="font-medium">{{ getSectorLabel(buyer.sector) }}</dd>
+            </div>
             <div class="flex justify-between">
               <dt class="text-gray-500">VAT No.</dt>
               <dd class="font-medium flex items-center gap-1">
@@ -414,13 +505,17 @@ onMounted(async () => {
                 <UButton v-if="buyer.fiscalCode" variant="ghost" size="xs" icon="i-lucide-copy" @click="copyToClipboard(buyer!.fiscalCode!, 'Fiscal code')" />
               </dd>
             </div>
-            <div class="flex justify-between">
-              <dt class="text-gray-500">Payment Method</dt>
-              <dd class="font-medium">{{ getPaymentMethodLabel(buyer.defaultPaymentMethod || '') }}</dd>
+            <div v-if="buyer.vatExempt" class="flex justify-between">
+              <dt class="text-gray-500">VAT Regime</dt>
+              <dd class="font-medium">{{ getVatExemptLabel(buyer.vatExempt) }}</dd>
             </div>
-            <div class="flex justify-between">
-              <dt class="text-gray-500">Payment Terms</dt>
-              <dd class="font-medium">{{ getPaymentTermsLabel(buyer.defaultPaymentTerms || '') }}</dd>
+            <div v-if="buyer.currency" class="flex justify-between">
+              <dt class="text-gray-500">Currency</dt>
+              <dd class="font-medium">{{ getCurrencyLabel(buyer.currency) }}</dd>
+            </div>
+            <div v-if="buyer.preferredLanguage" class="flex justify-between">
+              <dt class="text-gray-500">Preferred Language</dt>
+              <dd class="font-medium">{{ getLanguageLabel(buyer.preferredLanguage) }}</dd>
             </div>
           </dl>
         </UCard>
@@ -428,7 +523,9 @@ onMounted(async () => {
         <UCard>
           <h3 class="text-lg font-semibold mb-3">Address</h3>
           <div class="text-sm space-y-1">
+            <p v-if="buyer.subName" class="text-gray-500">{{ buyer.subName }}</p>
             <p class="font-medium">{{ buyer.address }}</p>
+            <p v-if="buyer.poBox" class="text-gray-500">P.O. Box {{ buyer.poBox }}</p>
             <p>
               {{ buyer.postalCode }} {{ buyer.city }}
               <span v-if="provinceInfo"> ({{ provinceInfo.label }})</span>
@@ -445,6 +542,15 @@ onMounted(async () => {
       <!-- Row 2: Contacts -->
       <UCard>
         <h3 class="text-lg font-semibold mb-4">Contact Information</h3>
+        <div v-if="buyer.mainContact" class="flex items-center gap-3 mb-4 pb-4 border-b border-gray-100 dark:border-gray-800">
+          <div class="size-10 rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-900 dark:text-indigo-400 flex items-center justify-center">
+            <UIcon name="i-lucide-user" class="size-5" />
+          </div>
+          <div>
+            <p class="text-xs text-gray-500">Main Contact</p>
+            <p class="text-sm font-medium">{{ buyer.mainContact }}</p>
+          </div>
+        </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-0 divide-y sm:divide-y-0 sm:divide-x divide-gray-100 dark:divide-gray-800">
           <!-- Left column -->
           <div class="sm:pr-6 space-y-0 divide-y divide-gray-100 dark:divide-gray-800">
@@ -476,6 +582,17 @@ onMounted(async () => {
                 <UButton variant="ghost" size="sm" icon="i-lucide-phone-call">Call</UButton>
               </a>
             </div>
+            <div v-if="buyer.fax" class="flex items-center justify-between py-3">
+              <div class="flex items-center gap-3">
+                <div class="size-10 rounded-lg bg-gray-50 text-gray-600 dark:bg-gray-800 dark:text-gray-400 flex items-center justify-center">
+                  <UIcon name="i-lucide-printer" class="size-5" />
+                </div>
+                <div>
+                  <p class="text-xs text-gray-500">Fax</p>
+                  <p class="text-sm font-medium">{{ buyer.fax }}</p>
+                </div>
+              </div>
+            </div>
           </div>
           <!-- Right column -->
           <div class="sm:pl-6 space-y-0 divide-y divide-gray-100 dark:divide-gray-800">
@@ -505,8 +622,45 @@ onMounted(async () => {
               </div>
               <UButton v-if="buyer.sdi" variant="ghost" size="sm" icon="i-lucide-copy" @click="copyToClipboard(buyer!.sdi!, 'SDI code')">Copy</UButton>
             </div>
+            <div v-if="buyer.website" class="flex items-center justify-between py-3">
+              <div class="flex items-center gap-3">
+                <div class="size-10 rounded-lg bg-cyan-50 text-cyan-600 dark:bg-cyan-900 dark:text-cyan-400 flex items-center justify-center">
+                  <UIcon name="i-lucide-globe" class="size-5" />
+                </div>
+                <div>
+                  <p class="text-xs text-gray-500">Website</p>
+                  <p class="text-sm font-medium">{{ buyer.website }}</p>
+                </div>
+              </div>
+              <a :href="buyer.website.startsWith('http') ? buyer.website : `https://${buyer.website}`" target="_blank" rel="noopener">
+                <UButton variant="ghost" size="sm" icon="i-lucide-external-link">Open</UButton>
+              </a>
+            </div>
           </div>
         </div>
+      </UCard>
+
+      <!-- Row 2b: Payment & Operations -->
+      <UCard v-if="buyer.defaultPaymentMethod || buyer.defaultPaymentTerms || buyer.defaultOperator || buyer.bankDetails">
+        <h3 class="text-lg font-semibold mb-3">Payment & Operations</h3>
+        <dl class="space-y-3 text-sm">
+          <div class="flex justify-between">
+            <dt class="text-gray-500">Payment Method</dt>
+            <dd class="font-medium">{{ getPaymentMethodLabel(buyer.defaultPaymentMethod || '') }}</dd>
+          </div>
+          <div class="flex justify-between">
+            <dt class="text-gray-500">Payment Terms</dt>
+            <dd class="font-medium">{{ getPaymentTermsLabel(buyer.defaultPaymentTerms || '') }}</dd>
+          </div>
+          <div v-if="buyer.defaultOperator" class="flex justify-between">
+            <dt class="text-gray-500">Default Operator</dt>
+            <dd class="font-medium">{{ buyer.defaultOperator }}</dd>
+          </div>
+          <div v-if="buyer.bankDetails">
+            <dt class="text-gray-500 mb-1">Bank Details</dt>
+            <dd class="font-medium whitespace-pre-wrap">{{ buyer.bankDetails }}</dd>
+          </div>
+        </dl>
       </UCard>
 
       <!-- Row 3: Quick Stats -->

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Producer, Sale } from '~/types'
-import { COUNTRIES, ITALIAN_PROVINCES } from '~/utils/constants'
-import { getCountryDisplay } from '~/utils/display-helpers'
+import { COUNTRIES, ITALIAN_PROVINCES, INVOICE_LANGUAGES, QUANTITY_OPTIONS } from '~/utils/constants'
+import { getCountryDisplay, getLanguageLabel, getQuantityLabel } from '~/utils/display-helpers'
 
 const route = useRoute()
 const router = useRouter()
@@ -68,17 +68,37 @@ const salesColumns = [
 ]
 
 const form = reactive({
+  code: '',
   companyName: '',
   vatNumber: '',
   fiscalCode: '',
+  sdi: '',
+  pec: '',
+  preferredLanguage: 'en',
+  subName: '',
   address: '',
+  poBox: '',
   city: '',
   province: '',
   postalCode: '',
   country: 'IT',
+  mainContact: '',
   email: '',
   phone: '',
+  fax: '',
   website: '',
+  defaultOperator: '',
+  revenuePercentage: null as number | null,
+  bankDetails: '',
+  qualityAssurance: '',
+  productionArea: '',
+  markets: '',
+  materials: '',
+  products: '',
+  standardProducts: '',
+  diameterRange: '',
+  maxLength: '',
+  quantity: '',
   notes: '',
   status: 'active' as 'active' | 'inactive',
 })
@@ -97,17 +117,37 @@ async function load() {
 }
 
 function populateForm(p: Producer) {
+  form.code = p.code || ''
   form.companyName = p.companyName
   form.vatNumber = p.vatNumber || ''
   form.fiscalCode = p.fiscalCode || ''
+  form.sdi = p.sdi || ''
+  form.pec = p.pec || ''
+  form.preferredLanguage = p.preferredLanguage || 'en'
+  form.subName = p.subName || ''
   form.address = p.address
+  form.poBox = p.poBox || ''
   form.city = p.city
   form.province = p.province || ''
   form.postalCode = p.postalCode
   form.country = p.country
+  form.mainContact = p.mainContact || ''
   form.email = p.email || ''
   form.phone = p.phone || ''
+  form.fax = p.fax || ''
   form.website = p.website || ''
+  form.defaultOperator = p.defaultOperator || ''
+  form.revenuePercentage = p.revenuePercentage ?? null
+  form.bankDetails = p.bankDetails || ''
+  form.qualityAssurance = p.qualityAssurance || ''
+  form.productionArea = p.productionArea || ''
+  form.markets = p.markets || ''
+  form.materials = p.materials || ''
+  form.products = p.products || ''
+  form.standardProducts = p.standardProducts || ''
+  form.diameterRange = p.diameterRange || ''
+  form.maxLength = p.maxLength || ''
+  form.quantity = p.quantity || ''
   form.notes = p.notes || ''
   form.status = p.status
 }
@@ -116,17 +156,37 @@ async function save() {
   saving.value = true
   try {
     await updateProducer(producerId, {
+      code: form.code || undefined,
       companyName: form.companyName,
       vatNumber: form.vatNumber || undefined,
       fiscalCode: form.fiscalCode || undefined,
+      sdi: form.sdi || undefined,
+      pec: form.pec || undefined,
+      preferredLanguage: form.preferredLanguage || undefined,
+      subName: form.subName || undefined,
       address: form.address,
+      poBox: form.poBox || undefined,
       city: form.city,
       province: form.province || undefined,
       postalCode: form.postalCode,
       country: form.country,
+      mainContact: form.mainContact || undefined,
       email: form.email || undefined,
       phone: form.phone || undefined,
+      fax: form.fax || undefined,
       website: form.website || undefined,
+      defaultOperator: form.defaultOperator || undefined,
+      revenuePercentage: form.revenuePercentage ?? undefined,
+      bankDetails: form.bankDetails || undefined,
+      qualityAssurance: form.qualityAssurance || undefined,
+      productionArea: form.productionArea || undefined,
+      markets: form.markets || undefined,
+      materials: form.materials || undefined,
+      products: form.products || undefined,
+      standardProducts: form.standardProducts || undefined,
+      diameterRange: form.diameterRange || undefined,
+      maxLength: form.maxLength || undefined,
+      quantity: form.quantity || undefined,
       notes: form.notes || undefined,
       status: form.status,
     })
@@ -229,6 +289,7 @@ onMounted(async () => {
       <div class="flex items-center gap-3">
         <div>
           <h1 class="text-2xl font-bold">{{ producer.companyName }}</h1>
+          <p v-if="producer.code" class="text-sm text-gray-500 font-mono">{{ producer.code }}</p>
           <div class="flex items-center gap-2 mt-1">
             <StatusBadge :status="producer.status" />
             <span v-if="producer.vatNumber" class="text-sm text-gray-500">VAT {{ producer.vatNumber }}</span>
@@ -246,9 +307,16 @@ onMounted(async () => {
           <UCard>
             <h3 class="text-lg font-semibold mb-4">Company Details</h3>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <UFormField label="Code" hint="Short reference handle">
+                <UInput v-model="form.code" placeholder="e.g. quali" />
+              </UFormField>
               <UFormField label="Company Name" required><UInput v-model="form.companyName" /></UFormField>
               <UFormField label="VAT No."><UInput v-model="form.vatNumber" placeholder="IT12345678901" /></UFormField>
               <UFormField label="Fiscal Code"><UInput v-model="form.fiscalCode" /></UFormField>
+              <UFormField label="SDI Code" hint="7 alphanumeric characters"><UInput v-model="form.sdi" /></UFormField>
+              <UFormField label="Preferred Language">
+                <USelect v-model="form.preferredLanguage" :items="INVOICE_LANGUAGES" />
+              </UFormField>
               <UFormField label="Status">
                 <USelect v-model="form.status" :items="[{ value: 'active', label: 'Active' }, { value: 'inactive', label: 'Inactive' }]" />
               </UFormField>
@@ -258,7 +326,13 @@ onMounted(async () => {
           <UCard>
             <h3 class="text-lg font-semibold mb-4">Address</h3>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div class="sm:col-span-2 lg:col-span-3"><UFormField label="Address" required><UInput v-model="form.address" /></UFormField></div>
+              <div class="sm:col-span-2 lg:col-span-3">
+                <UFormField label="Sub-name / c/o"><UInput v-model="form.subName" placeholder="c/o or sub-name" /></UFormField>
+              </div>
+              <div class="sm:col-span-2 lg:col-span-3">
+                <UFormField label="Address" required><UInput v-model="form.address" /></UFormField>
+              </div>
+              <UFormField label="P.O. Box"><UInput v-model="form.poBox" /></UFormField>
               <UFormField label="City" required><UInput v-model="form.city" /></UFormField>
               <UFormField label="Province"><USelect v-model="form.province" :items="ITALIAN_PROVINCES" placeholder="Select..." /></UFormField>
               <UFormField label="Postal Code" required><UInput v-model="form.postalCode" /></UFormField>
@@ -274,9 +348,56 @@ onMounted(async () => {
           <UCard>
             <h3 class="text-lg font-semibold mb-4">Contacts</h3>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <UFormField label="Main Contact"><UInput v-model="form.mainContact" placeholder="Contact person name" /></UFormField>
               <UFormField label="Email"><UInput v-model="form.email" type="email" /></UFormField>
               <UFormField label="Phone"><UInput v-model="form.phone" /></UFormField>
+              <UFormField label="Fax"><UInput v-model="form.fax" /></UFormField>
               <UFormField label="Website"><UInput v-model="form.website" placeholder="https://..." /></UFormField>
+              <UFormField label="PEC"><UInput v-model="form.pec" type="email" /></UFormField>
+              <UFormField label="Default Operator"><UInput v-model="form.defaultOperator" /></UFormField>
+            </div>
+          </UCard>
+
+          <UCard>
+            <h3 class="text-lg font-semibold mb-4">Business Terms</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <UFormField label="Revenue %" hint="Commission percentage">
+                <UInput v-model.number="form.revenuePercentage" type="number" min="0" max="100" step="0.01" placeholder="e.g. 10" />
+              </UFormField>
+              <div class="sm:col-span-2">
+                <UFormField label="Bank Details">
+                  <UTextarea v-model="form.bankDetails" :rows="2" placeholder="IBAN, bank name, SWIFT/BIC..." />
+                </UFormField>
+              </div>
+            </div>
+          </UCard>
+
+          <UCard>
+            <h3 class="text-lg font-semibold mb-4">Production Info</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <UFormField label="Quality Assurance" hint="ISO certifications, etc.">
+                <UTextarea v-model="form.qualityAssurance" :rows="3" />
+              </UFormField>
+              <UFormField label="Production Area" hint="Manufacturing capabilities">
+                <UTextarea v-model="form.productionArea" :rows="3" />
+              </UFormField>
+              <UFormField label="Markets">
+                <UTextarea v-model="form.markets" :rows="3" />
+              </UFormField>
+              <UFormField label="Materials">
+                <UTextarea v-model="form.materials" :rows="3" />
+              </UFormField>
+              <div class="sm:col-span-2">
+                <UFormField label="Products"><UTextarea v-model="form.products" :rows="3" /></UFormField>
+              </div>
+              <div class="sm:col-span-2">
+                <UFormField label="Standard Products"><UTextarea v-model="form.standardProducts" :rows="3" /></UFormField>
+              </div>
+              <UFormField label="Diameter Range"><UInput v-model="form.diameterRange" /></UFormField>
+              <UFormField label="Max Length"><UInput v-model="form.maxLength" /></UFormField>
+              <UFormField label="Quantity">
+                <USelect v-model="form.quantity" :items="QUANTITY_OPTIONS" placeholder="Select..." />
+              </UFormField>
             </div>
           </UCard>
 
@@ -298,32 +419,199 @@ onMounted(async () => {
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <UCard>
             <h3 class="text-lg font-semibold mb-3">Company Details</h3>
-            <dl class="space-y-2 text-sm">
-              <div><dt class="text-gray-500 inline">VAT No.:</dt> <dd class="inline font-medium">{{ producer.vatNumber || '—' }}</dd></div>
-              <div><dt class="text-gray-500 inline">Fiscal Code:</dt> <dd class="inline font-medium">{{ producer.fiscalCode || '—' }}</dd></div>
+            <dl class="space-y-3 text-sm">
+              <div class="flex justify-between">
+                <dt class="text-gray-500">VAT No.</dt>
+                <dd class="font-medium">{{ producer.vatNumber || '\u2014' }}</dd>
+              </div>
+              <div class="flex justify-between">
+                <dt class="text-gray-500">Fiscal Code</dt>
+                <dd class="font-medium">{{ producer.fiscalCode || '\u2014' }}</dd>
+              </div>
+              <div v-if="producer.sdi" class="flex justify-between">
+                <dt class="text-gray-500">SDI Code</dt>
+                <dd class="font-medium font-mono">{{ producer.sdi }}</dd>
+              </div>
+              <div v-if="producer.preferredLanguage" class="flex justify-between">
+                <dt class="text-gray-500">Preferred Language</dt>
+                <dd class="font-medium">{{ getLanguageLabel(producer.preferredLanguage) }}</dd>
+              </div>
             </dl>
           </UCard>
           <UCard>
             <h3 class="text-lg font-semibold mb-3">Address</h3>
-            <p class="text-sm">{{ producer.address }}</p>
-            <p class="text-sm">
-              {{ producer.postalCode }} {{ producer.city }}
-              <span v-if="producer.province"> ({{ getCountryDisplay(producer.country).code === 'IT' ? (ITALIAN_PROVINCES.find(p => p.value === producer!.province)?.label || producer.province) : producer.province }})</span>
-            </p>
-            <p class="text-sm flex items-center gap-1.5">
-              <UIcon v-if="getCountryDisplay(producer.country).flag" :name="getCountryDisplay(producer.country).flag" class="size-5 shrink-0" mode="svg" />
-              <span>{{ getCountryDisplay(producer.country).label }}</span>
-            </p>
-          </UCard>
-          <UCard>
-            <h3 class="text-lg font-semibold mb-3">Contacts</h3>
-            <dl class="space-y-2 text-sm">
-              <div><dt class="text-gray-500 inline">Email:</dt> <dd class="inline font-medium">{{ producer.email || '—' }}</dd></div>
-              <div><dt class="text-gray-500 inline">Phone:</dt> <dd class="inline font-medium">{{ producer.phone || '—' }}</dd></div>
-              <div><dt class="text-gray-500 inline">Website:</dt> <dd class="inline font-medium">{{ producer.website || '—' }}</dd></div>
-            </dl>
+            <div class="text-sm space-y-1">
+              <p v-if="producer.subName" class="text-gray-500">{{ producer.subName }}</p>
+              <p class="font-medium">{{ producer.address }}</p>
+              <p v-if="producer.poBox" class="text-gray-500">P.O. Box {{ producer.poBox }}</p>
+              <p>
+                {{ producer.postalCode }} {{ producer.city }}
+                <span v-if="producer.province"> ({{ getCountryDisplay(producer.country).code === 'IT' ? (ITALIAN_PROVINCES.find(p => p.value === producer!.province)?.label || producer.province) : producer.province }})</span>
+              </p>
+              <p class="flex items-center gap-1.5 mt-2">
+                <UIcon v-if="getCountryDisplay(producer.country).flag" :name="getCountryDisplay(producer.country).flag" class="size-5 shrink-0" mode="svg" />
+                <span class="font-medium">{{ getCountryDisplay(producer.country).label }}</span>
+                <UBadge v-if="getCountryDisplay(producer.country).eu" label="EU" color="primary" variant="subtle" size="xs" />
+              </p>
+            </div>
           </UCard>
         </div>
+
+        <!-- Contacts -->
+        <UCard class="mt-6">
+          <h3 class="text-lg font-semibold mb-4">Contact Information</h3>
+          <div v-if="producer.mainContact" class="flex items-center gap-3 mb-4 pb-4 border-b border-gray-100 dark:border-gray-800">
+            <div class="size-10 rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-900 dark:text-indigo-400 flex items-center justify-center">
+              <UIcon name="i-lucide-user" class="size-5" />
+            </div>
+            <div>
+              <p class="text-xs text-gray-500">Main Contact</p>
+              <p class="text-sm font-medium">{{ producer.mainContact }}</p>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-0 divide-y sm:divide-y-0 sm:divide-x divide-gray-100 dark:divide-gray-800">
+            <div class="sm:pr-6 space-y-0 divide-y divide-gray-100 dark:divide-gray-800">
+              <div class="flex items-center justify-between py-3">
+                <div class="flex items-center gap-3">
+                  <div class="size-10 rounded-lg bg-blue-50 text-blue-600 dark:bg-blue-900 dark:text-blue-400 flex items-center justify-center">
+                    <UIcon name="i-lucide-mail" class="size-5" />
+                  </div>
+                  <div>
+                    <p class="text-xs text-gray-500">Email</p>
+                    <p class="text-sm font-medium">{{ producer.email || '\u2014' }}</p>
+                  </div>
+                </div>
+                <a v-if="producer.email" :href="`mailto:${producer.email}`">
+                  <UButton variant="ghost" size="sm" icon="i-lucide-send">Send</UButton>
+                </a>
+              </div>
+              <div class="flex items-center justify-between py-3">
+                <div class="flex items-center gap-3">
+                  <div class="size-10 rounded-lg bg-green-50 text-green-600 dark:bg-green-900 dark:text-green-400 flex items-center justify-center">
+                    <UIcon name="i-lucide-phone" class="size-5" />
+                  </div>
+                  <div>
+                    <p class="text-xs text-gray-500">Phone</p>
+                    <p class="text-sm font-medium">{{ producer.phone || '\u2014' }}</p>
+                  </div>
+                </div>
+                <a v-if="producer.phone" :href="`tel:${producer.phone}`">
+                  <UButton variant="ghost" size="sm" icon="i-lucide-phone-call">Call</UButton>
+                </a>
+              </div>
+              <div v-if="producer.fax" class="flex items-center justify-between py-3">
+                <div class="flex items-center gap-3">
+                  <div class="size-10 rounded-lg bg-gray-50 text-gray-600 dark:bg-gray-800 dark:text-gray-400 flex items-center justify-center">
+                    <UIcon name="i-lucide-printer" class="size-5" />
+                  </div>
+                  <div>
+                    <p class="text-xs text-gray-500">Fax</p>
+                    <p class="text-sm font-medium">{{ producer.fax }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="sm:pl-6 space-y-0 divide-y divide-gray-100 dark:divide-gray-800">
+              <div v-if="producer.pec" class="flex items-center justify-between py-3">
+                <div class="flex items-center gap-3">
+                  <div class="size-10 rounded-lg bg-purple-50 text-purple-600 dark:bg-purple-900 dark:text-purple-400 flex items-center justify-center">
+                    <UIcon name="i-lucide-shield-check" class="size-5" />
+                  </div>
+                  <div>
+                    <p class="text-xs text-gray-500">PEC (Certified Email)</p>
+                    <p class="text-sm font-medium">{{ producer.pec }}</p>
+                  </div>
+                </div>
+                <a :href="`mailto:${producer.pec}`">
+                  <UButton variant="ghost" size="sm" icon="i-lucide-send">Send</UButton>
+                </a>
+              </div>
+              <div v-if="producer.website" class="flex items-center justify-between py-3">
+                <div class="flex items-center gap-3">
+                  <div class="size-10 rounded-lg bg-cyan-50 text-cyan-600 dark:bg-cyan-900 dark:text-cyan-400 flex items-center justify-center">
+                    <UIcon name="i-lucide-globe" class="size-5" />
+                  </div>
+                  <div>
+                    <p class="text-xs text-gray-500">Website</p>
+                    <p class="text-sm font-medium">{{ producer.website }}</p>
+                  </div>
+                </div>
+                <a :href="producer.website.startsWith('http') ? producer.website : `https://${producer.website}`" target="_blank" rel="noopener">
+                  <UButton variant="ghost" size="sm" icon="i-lucide-external-link">Open</UButton>
+                </a>
+              </div>
+              <div v-if="producer.defaultOperator" class="flex items-center justify-between py-3">
+                <div class="flex items-center gap-3">
+                  <div class="size-10 rounded-lg bg-amber-50 text-amber-600 dark:bg-amber-900 dark:text-amber-400 flex items-center justify-center">
+                    <UIcon name="i-lucide-user-cog" class="size-5" />
+                  </div>
+                  <div>
+                    <p class="text-xs text-gray-500">Default Operator</p>
+                    <p class="text-sm font-medium">{{ producer.defaultOperator }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </UCard>
+
+        <!-- Business Terms -->
+        <UCard v-if="producer.revenuePercentage != null || producer.bankDetails" class="mt-6">
+          <h3 class="text-lg font-semibold mb-3">Business Terms</h3>
+          <dl class="space-y-3 text-sm">
+            <div v-if="producer.revenuePercentage != null" class="flex justify-between">
+              <dt class="text-gray-500">Revenue %</dt>
+              <dd class="font-medium">{{ producer.revenuePercentage }}%</dd>
+            </div>
+            <div v-if="producer.bankDetails">
+              <dt class="text-gray-500 mb-1">Bank Details</dt>
+              <dd class="font-medium whitespace-pre-wrap">{{ producer.bankDetails }}</dd>
+            </div>
+          </dl>
+        </UCard>
+
+        <!-- Production Info -->
+        <UCard v-if="producer.qualityAssurance || producer.productionArea || producer.markets || producer.materials || producer.products || producer.standardProducts || producer.diameterRange || producer.maxLength || producer.quantity" class="mt-6">
+          <h3 class="text-lg font-semibold mb-3">Production Info</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+            <div v-if="producer.qualityAssurance">
+              <dt class="text-gray-500 mb-1">Quality Assurance</dt>
+              <dd class="font-medium whitespace-pre-wrap">{{ producer.qualityAssurance }}</dd>
+            </div>
+            <div v-if="producer.productionArea">
+              <dt class="text-gray-500 mb-1">Production Area</dt>
+              <dd class="font-medium whitespace-pre-wrap">{{ producer.productionArea }}</dd>
+            </div>
+            <div v-if="producer.markets">
+              <dt class="text-gray-500 mb-1">Markets</dt>
+              <dd class="font-medium whitespace-pre-wrap">{{ producer.markets }}</dd>
+            </div>
+            <div v-if="producer.materials">
+              <dt class="text-gray-500 mb-1">Materials</dt>
+              <dd class="font-medium whitespace-pre-wrap">{{ producer.materials }}</dd>
+            </div>
+            <div v-if="producer.products" class="sm:col-span-2">
+              <dt class="text-gray-500 mb-1">Products</dt>
+              <dd class="font-medium whitespace-pre-wrap">{{ producer.products }}</dd>
+            </div>
+            <div v-if="producer.standardProducts" class="sm:col-span-2">
+              <dt class="text-gray-500 mb-1">Standard Products</dt>
+              <dd class="font-medium whitespace-pre-wrap">{{ producer.standardProducts }}</dd>
+            </div>
+            <div v-if="producer.diameterRange">
+              <dt class="text-gray-500 mb-1">Diameter Range</dt>
+              <dd class="font-medium">{{ producer.diameterRange }}</dd>
+            </div>
+            <div v-if="producer.maxLength">
+              <dt class="text-gray-500 mb-1">Max Length</dt>
+              <dd class="font-medium">{{ producer.maxLength }}</dd>
+            </div>
+            <div v-if="producer.quantity">
+              <dt class="text-gray-500 mb-1">Quantity</dt>
+              <dd class="font-medium">{{ getQuantityLabel(producer.quantity) }}</dd>
+            </div>
+          </div>
+        </UCard>
 
         <!-- Quick Stats -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">

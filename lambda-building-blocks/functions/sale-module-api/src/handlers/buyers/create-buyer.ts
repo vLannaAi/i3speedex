@@ -38,28 +38,41 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
       PK: `BUYER#${buyerId}`,
       SK: 'METADATA',
       buyerId,
+      code: body.code,
 
       // Company information
       companyName: body.companyName,
+      industrialGroup: body.industrialGroup,
+      sector: body.sector,
       vatNumber: body.vatNumber,
       fiscalCode: body.fiscalCode,
+      vatExempt: body.vatExempt,
+      currency: body.currency,
+      preferredLanguage: body.preferredLanguage,
 
       // Address
+      subName: body.subName,
       address: body.address,
+      poBox: body.poBox,
       city: body.city,
       province: body.province,
       postalCode: body.postalCode,
       country: body.country,
 
       // Contact information
+      mainContact: body.mainContact,
       email: body.email,
       phone: body.phone,
+      fax: body.fax,
+      website: body.website,
       pec: body.pec,
       sdi: body.sdi,
 
       // Payment preferences
       defaultPaymentMethod: body.defaultPaymentMethod,
       defaultPaymentTerms: body.defaultPaymentTerms,
+      defaultOperator: body.defaultOperator,
+      bankDetails: body.bankDetails,
 
       // Notes
       notes: body.notes,
