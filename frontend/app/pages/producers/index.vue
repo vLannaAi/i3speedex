@@ -46,8 +46,8 @@ const columns = [
   { accessorKey: 'country', header: 'Country', size: 80, meta: { class: { td: 'w-[80px] max-[579px]:w-[40px]' } } },
   { accessorKey: 'code', header: 'Code', size: 100, meta: { class: { td: 'w-[100px]' } } },
   { accessorKey: 'companyName', header: 'Company Name', meta: { class: { th: 'hidden min-[860px]:table-cell', td: 'hidden min-[860px]:table-cell max-w-0 overflow-hidden' } } },
-  { accessorKey: 'allTimeSales', header: 'Sales €', size: 100, meta: { class: { th: 'hidden min-[860px]:table-cell', td: 'hidden min-[860px]:table-cell w-[100px]' } } },
-  { accessorKey: 'ytdSales', header: 'YTD €', size: 100, meta: { class: { td: 'w-[100px]' } } },
+  { accessorKey: 'allTimeSales', header: 'Sales €', size: 100, meta: { class: { th: 'hidden min-[860px]:table-cell', td: 'hidden min-[860px]:table-cell w-[100px] text-left' } } },
+  { accessorKey: 'ytdSales', header: 'YTD €', size: 100, meta: { class: { td: 'w-[100px] text-left' } } },
 ]
 
 async function load() {
@@ -178,17 +178,33 @@ function onSelectProducer(_e: Event, row: any) {
 
 <template>
   <div>
-    <div class="px-4 sm:px-0 flex items-center gap-3 mb-4">
+    <div class="px-9 flex items-center gap-3 mb-4 mt-4">
       <h1 class="text-2xl font-bold shrink-0">Producers</h1>
+      <NuxtLink v-if="canWrite" to="/producers/new">
+        <UButton
+          icon="i-lucide-plus"
+          label="New"
+          variant="outline"
+          color="primary"
+          class="bg-(--ui-bg) ring-primary text-primary hover:bg-(--ui-bg-accented)"
+        />
+      </NuxtLink>
       <div class="ml-auto flex items-center gap-2">
-        <UInput v-model="search" icon="i-lucide-search" class="w-32" size="md" />
-        <NuxtLink v-if="canWrite" to="/producers/new">
-          <UButton icon="i-lucide-plus">New Producer</UButton>
-        </NuxtLink>
+        <UInput
+          v-model="search"
+          icon="i-lucide-search"
+          class="w-32"
+          size="md"
+          :ui="{ icon: { trailing: { pointerEvents: 'auto' } } }"
+        >
+          <template v-if="search" #trailing>
+            <UButton color="gray" variant="link" icon="i-lucide-x" :padded="false" @click="search = ''" />
+          </template>
+        </UInput>
       </div>
     </div>
 
-    <div class="sm:rounded-lg sm:ring ring-(--ui-border) bg-(--ui-bg)">
+    <div class="rounded-none ring-0 sm:rounded-lg sm:ring ring-(--ui-border) bg-(--ui-bg)">
       <UTable
         :columns="columns"
         :data="tableData"
@@ -197,58 +213,63 @@ function onSelectProducer(_e: Event, row: any) {
         :ui="{
           root: '!overflow-visible w-full',
           base: 'w-full',
-          thead: '!top-(--ui-header-height) z-10 !bg-(--ui-bg)',
-          tr: 'even:bg-(--ui-bg-elevated)/50 hover:bg-(--ui-bg-accented) transition-colors cursor-pointer',
+          thead: 'sticky top-16 z-10 bg-primary text-white font-normal text-sm',
+          th: { color: 'text-white', base: 'first:!pl-9' },
+          tr: 'hover:bg-(--ui-bg-accented) transition-colors cursor-pointer',
+          td: { base: 'whitespace-nowrap first:!pl-9' },
         }"
         @select="onSelectProducer"
       >
         <template #producerId-header>
-          <button class="inline-flex items-center gap-1" @click="toggleSort('producerId')">
+          <button class="inline-flex items-center gap-1 text-white" @click="toggleSort('producerId')">
             ID
             <UIcon v-if="sortKey === 'producerId'" :name="sortDir === 'asc' ? 'i-lucide-arrow-up' : 'i-lucide-arrow-down'" class="size-3" />
           </button>
         </template>
         <template #status-header>
-          <button class="inline-flex items-center gap-1" @click="toggleSort('status')">
+          <button class="inline-flex items-center gap-1 text-white" @click="toggleSort('status')">
             Status
             <UIcon v-if="sortKey === 'status'" :name="sortDir === 'asc' ? 'i-lucide-arrow-up' : 'i-lucide-arrow-down'" class="size-3" />
           </button>
         </template>
         <template #country-header>
-          <button class="inline-flex items-center gap-1" @click="toggleSort('country')">
+          <button class="inline-flex items-center gap-1 text-white" @click="toggleSort('country')">
             Country
             <UIcon v-if="sortKey === 'country'" :name="sortDir === 'asc' ? 'i-lucide-arrow-up' : 'i-lucide-arrow-down'" class="size-3" />
           </button>
         </template>
         <template #code-header>
-          <button class="inline-flex items-center gap-1" @click="toggleSort('code')">
+          <button class="inline-flex items-center gap-1 text-white" @click="toggleSort('code')">
             Code
             <UIcon v-if="sortKey === 'code'" :name="sortDir === 'asc' ? 'i-lucide-arrow-up' : 'i-lucide-arrow-down'" class="size-3" />
           </button>
         </template>
         <template #companyName-header>
-          <button class="inline-flex items-center gap-1" @click="toggleSort('companyName')">
+          <button class="inline-flex items-center gap-1 text-white" @click="toggleSort('companyName')">
             Company Name
             <UIcon v-if="sortKey === 'companyName'" :name="sortDir === 'asc' ? 'i-lucide-arrow-up' : 'i-lucide-arrow-down'" class="size-3" />
           </button>
         </template>
         <template #allTimeSales-header>
-          <button class="inline-flex items-center gap-1 ml-auto" @click="toggleSort('allTimeSales')">
-            Sales €
-            <UIcon v-if="sortKey === 'allTimeSales'" :name="sortDir === 'asc' ? 'i-lucide-arrow-up' : 'i-lucide-arrow-down'" class="size-3" />
-          </button>
+          <div class="flex justify-start w-full">
+            <button class="inline-flex items-center gap-1 text-white" @click="toggleSort('allTimeSales')">
+              Sales €
+              <UIcon v-if="sortKey === 'allTimeSales'" :name="sortDir === 'asc' ? 'i-lucide-arrow-up' : 'i-lucide-arrow-down'" class="size-3" />
+            </button>
+          </div>
         </template>
         <template #ytdSales-header>
-          <button class="inline-flex items-center gap-1 ml-auto" @click="toggleSort('ytdSales')">
-            {{ ytdLabel }}
-            <UIcon v-if="sortKey === 'ytdSales'" :name="sortDir === 'asc' ? 'i-lucide-arrow-up' : 'i-lucide-arrow-down'" class="size-3" />
-          </button>
+          <div class="flex justify-start w-full">
+            <button class="inline-flex items-center gap-1 text-white" @click="toggleSort('ytdSales')">
+              {{ ytdLabel }}
+              <UIcon v-if="sortKey === 'ytdSales'" :name="sortDir === 'asc' ? 'i-lucide-arrow-up' : 'i-lucide-arrow-down'" class="size-3" />
+            </button>
+          </div>
         </template>
         <template #producerId-cell="{ row }">
           <span v-if="row.original._summary" class="text-sm font-semibold">{{ row.original.producerId }}<span class="hidden min-[580px]:inline"> producers</span></span>
-          <span v-else class="text-sm tabular-nums">
-            <span class="hidden min-[580px]:inline">{{ row.original.producerId }}</span>
-            <span class="min-[580px]:hidden">{{ row.original.producerId.replace('PRODUCER', '') }}</span>
+          <span v-else class="text-xs !font-mono tabular-nums text-(--ui-text-muted)">
+            #<span class="text-(--ui-text) font-medium">{{ row.original.producerId.replace('PRODUCER', '') }}</span>
           </span>
         </template>
         <template #status-cell="{ row }">
@@ -304,13 +325,13 @@ function onSelectProducer(_e: Event, row: any) {
 }
 
 :deep(tbody tr:first-child td) {
-  position: sticky;
-  top: calc(var(--ui-header-height) + 45px);
+  position: static !important;
   z-index: 9;
-  background: color-mix(in srgb, var(--color-success-500) 15%, var(--ui-bg));
+  background: var(--ui-bg-elevated);
+  font-weight: 600;
 }
 :deep(tbody tr:first-child) { cursor: default; }
 :deep(tbody tr:first-child:hover td) {
-  background: color-mix(in srgb, var(--color-success-500) 15%, var(--ui-bg));
+  background: var(--ui-bg-elevated);
 }
 </style>

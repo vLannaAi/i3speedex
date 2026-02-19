@@ -40,6 +40,8 @@ export function useCache() {
     const ok = await cryptoStore.init(userSub)
     if (!ok) return false
 
+    initialized = true
+
     // Restore lastSync timestamps from meta
     for (const entity of ['sales', 'buyers', 'producers'] as SyncEntity[]) {
       const lastSync = await cryptoStore.getMeta(`lastSync_${entity}`)
@@ -50,8 +52,6 @@ export function useCache() {
         syncState[entity].count = items.length
       }
     }
-
-    initialized = true
 
     // Start background sync every 5 minutes
     if (syncInterval) clearInterval(syncInterval)

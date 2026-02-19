@@ -149,7 +149,7 @@ const columns = [
   { accessorKey: 'status', header: 'Status', size: 90 },
   { accessorKey: 'regDate', header: 'Reg / Date', size: 150 },
   { accessorKey: 'buyerId', header: 'Buyer', size: 180 },
-  { accessorKey: 'total', header: 'Total €', size: 100 },
+  { accessorKey: 'total', header: 'Total €', size: 100, meta: { class: { td: 'text-left' } } },
 ]
 
 const pageSizeOptions = [
@@ -327,31 +327,46 @@ function onSelectSale(_e: Event, row: any) {
 
 <template>
   <div>
-    <div class="px-4 sm:px-0 flex items-center gap-3 mb-4">
+    <div class="px-9 flex items-center gap-3 mb-4 mt-4">
       <h1 class="text-2xl font-bold shrink-0">Sales</h1>
-      <div class="ml-auto flex items-center gap-2">
+      <NuxtLink v-if="canWrite" to="/sales/new">
+        <UButton
+          icon="i-lucide-plus"
+          label="New"
+          variant="outline"
+          color="primary"
+          class="bg-(--ui-bg) ring-primary text-primary hover:bg-(--ui-bg-accented)"
+        />
+      </NuxtLink>
+      <div class="ml-auto">
         <UInput
           v-model="search"
-          icon="i-lucide-search"
           class="w-64"
           size="md"
-          :placeholder="hasActiveFilters ? '' : 'PRO 2025 ROSSI sent...'"
-          :ui="{ trailing: 'pointer-events-auto' }"
+          :placeholder="hasActiveFilters ? '' : 'Search...'"
+          :ui="{ icon: { trailing: { pointerEvents: 'auto' } } }"
           @focus="onInputFocus"
           @blur="onInputBlur"
         >
-          <template v-if="search" #trailing>
-            <UIcon name="i-lucide-x" class="size-4 cursor-pointer text-(--ui-text-muted) hover:text-(--ui-text)" @click="clearSearch" />
+          <template #trailing>
+             <UIcon
+               v-if="search"
+               name="i-lucide-x"
+               class="cursor-pointer text-(--ui-text-muted) hover:text-(--ui-text)"
+               @click="clearSearch"
+             />
+             <UIcon
+               v-else
+               name="i-lucide-search"
+               class="text-(--ui-text-dimmed)"
+             />
           </template>
         </UInput>
-        <UButton v-if="canWrite" to="/sales/new" icon="i-lucide-plus">
-          New Sale
-        </UButton>
       </div>
     </div>
 
     <!-- Table -->
-    <div class="sm:rounded-lg sm:ring ring-(--ui-border) bg-(--ui-bg)">
+    <div class="rounded-none ring-0 sm:rounded-lg sm:ring ring-(--ui-border) bg-(--ui-bg)">
       <UTable
         :columns="columns"
         :data="tableData"
@@ -360,50 +375,56 @@ function onSelectSale(_e: Event, row: any) {
         :ui="{
           root: '!overflow-visible w-full',
           base: 'w-full',
-          thead: '!top-(--ui-header-height) z-10 !bg-(--ui-bg)',
-          tr: 'even:bg-(--ui-bg-elevated)/50 hover:bg-(--ui-bg-accented) transition-colors cursor-pointer',
+          thead: 'sticky top-16 z-10 bg-primary text-white font-normal text-sm',
+          th: { color: 'text-white', base: 'first:!pl-9' },
+          tr: 'hover:bg-(--ui-bg-accented) transition-colors cursor-pointer',
+          td: { base: 'whitespace-nowrap first:!pl-9' },
         }"
         @select="onSelectSale"
       >
         <template #saleId-header>
-          <button class="inline-flex items-center gap-1" @click="toggleSort('saleId')">
+          <button class="inline-flex items-center gap-1 text-white" @click="toggleSort('saleId')">
             ID
             <UIcon v-if="sortKey === 'saleId'" :name="sortDir === 'asc' ? 'i-lucide-arrow-up' : 'i-lucide-arrow-down'" class="size-3" />
           </button>
         </template>
         <template #docType-header>
-          <button class="inline-flex items-center gap-1" @click="toggleSort('docType')">
+          <button class="inline-flex items-center gap-1 text-white" @click="toggleSort('docType')">
             Doc
             <UIcon v-if="sortKey === 'docType'" :name="sortDir === 'asc' ? 'i-lucide-arrow-up' : 'i-lucide-arrow-down'" class="size-3" />
           </button>
         </template>
         <template #status-header>
-          <button class="inline-flex items-center gap-1" @click="toggleSort('status')">
+          <button class="inline-flex items-center gap-1 text-white" @click="toggleSort('status')">
             Status
             <UIcon v-if="sortKey === 'status'" :name="sortDir === 'asc' ? 'i-lucide-arrow-up' : 'i-lucide-arrow-down'" class="size-3" />
           </button>
         </template>
         <template #regDate-header>
-          <button class="inline-flex items-center gap-1" @click="toggleSort('regDate')">
+          <button class="inline-flex items-center gap-1 text-white" @click="toggleSort('regDate')">
             Reg / Date
             <UIcon v-if="sortKey === 'regDate'" :name="sortDir === 'asc' ? 'i-lucide-arrow-up' : 'i-lucide-arrow-down'" class="size-3" />
           </button>
         </template>
         <template #buyerId-header>
-          <button class="inline-flex items-center gap-1" @click="toggleSort('buyerId')">
+          <button class="inline-flex items-center gap-1 text-white" @click="toggleSort('buyerId')">
             Buyer
             <UIcon v-if="sortKey === 'buyerId'" :name="sortDir === 'asc' ? 'i-lucide-arrow-up' : 'i-lucide-arrow-down'" class="size-3" />
           </button>
         </template>
         <template #total-header>
-          <button class="inline-flex items-center gap-1 ml-auto" @click="toggleSort('total')">
-            Total €
-            <UIcon v-if="sortKey === 'total'" :name="sortDir === 'asc' ? 'i-lucide-arrow-up' : 'i-lucide-arrow-down'" class="size-3" />
-          </button>
+          <div class="!text-left w-full">
+            <button class="inline-flex items-center gap-1 text-white" @click="toggleSort('total')">
+              Total €
+              <UIcon v-if="sortKey === 'total'" :name="sortDir === 'asc' ? 'i-lucide-arrow-up' : 'i-lucide-arrow-down'" class="size-3" />
+            </button>
+          </div>
         </template>
         <template #saleId-cell="{ row }">
           <span v-if="row.original._summary" class="text-sm font-semibold">{{ row.original.saleId }} sales</span>
-          <span v-else class="text-sm tabular-nums">{{ row.original.saleId.replace('SALE', '') }}</span>
+          <span v-else class="text-xs !font-mono tabular-nums text-(--ui-text-muted)">
+            #<span class="text-(--ui-text) font-medium">{{ row.original.saleId.replace('SALE', '') }}</span>
+          </span>
         </template>
         <template #docType-cell="{ row }">
           <div v-if="row.original._summary" class="flex flex-wrap gap-1">
@@ -534,10 +555,11 @@ function onSelectSale(_e: Event, row: any) {
   position: sticky;
   top: calc(var(--ui-header-height) + 45px);
   z-index: 9;
-  background: color-mix(in srgb, var(--color-success-500) 15%, var(--ui-bg));
+  background: rgb(var(--color-primary-500) / 0.1) !important;
+  font-weight: 400;
 }
 :deep(tbody tr:first-child) { cursor: default; }
 :deep(tbody tr:first-child:hover td) {
-  background: color-mix(in srgb, var(--color-success-500) 15%, var(--ui-bg));
+  background: rgb(var(--color-primary-500) / 0.1) !important;
 }
 </style>
