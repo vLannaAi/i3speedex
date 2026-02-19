@@ -5,7 +5,7 @@ export default defineAppConfig({
   appTitle: 'Sales Management',
   ui: {
     colors: {
-      primary: 'blue',
+      primary: 'primary',
       success: 'green',
       warning: 'amber',
       error: 'red',

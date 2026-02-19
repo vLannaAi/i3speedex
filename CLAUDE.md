@@ -4,113 +4,113 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-i2speedex Sale Module — an AWS serverless application for managing sales, invoices, buyers, and producers. Built with TypeScript, AWS CDK, and Lambda. Targets Italian market (FatturaPA e-invoicing, SDI codes, PEC).
+i3speedex Sale Module — an AWS serverless application for managing sales, invoices, buyers, and producers. Built with TypeScript throughout: Nuxt 4 frontend, AWS CDK infrastructure, and Lambda handlers. Targets the Italian market (FatturaPA e-invoicing, SDI codes, PEC).
 
 AWS Region: `eu-west-1`. Runtime: Node.js 20.x, ARM64.
 
-## Repository Layout
-
-```
-lambda-building-blocks/
-├── cdk/                          # AWS CDK infrastructure (9 stacks)
-│   ├── bin/app.ts                # CDK entry point, stack wiring
-│   └── lib/                      # Stack definitions
-├── functions/
-│   ├── sale-module-api/          # Main API: 40 Lambda handlers
-│   ├── html-to-pdf/              # Puppeteer+Chromium PDF generation
-│   ├── template-renderer/        # Handlebars/EJS/Mustache → HTML
-│   ├── sdi-invoice-generator/    # FatturaPA XML generation
-│   └── email-reconciler/         # LLM-powered email parsing (Claude API)
-└── layers/                       # Lambda Layers (shared code)
-```
-
 ## Build & Test Commands
 
-Each function is a separate npm workspace. Navigate to the function directory first.
+### Frontend (`frontend/`)
 
 ```bash
-# Build CDK infrastructure
-cd lambda-building-blocks/cdk && npm run build
+cd frontend && npm run dev          # Dev server (localhost:3000)
+cd frontend && npm run build        # Production build
+cd frontend && npm run generate     # Static site generation
+cd frontend && npm run lint         # ESLint
+cd frontend && npm run typecheck    # TypeScript validation
+```
 
-# Build a specific function
-cd lambda-building-blocks/functions/sale-module-api && npm run build
+### Backend — Sale Module API (`lambda-building-blocks/functions/sale-module-api/`)
 
-# Run unit tests (sale-module-api)
-cd lambda-building-blocks/functions/sale-module-api && npm test
+```bash
+cd lambda-building-blocks/functions/sale-module-api && npm run build   # TypeScript compile
+cd lambda-building-blocks/functions/sale-module-api && npm test        # Unit tests
+cd lambda-building-blocks/functions/sale-module-api && npx jest tests/unit/handlers/sales/list-sales.test.ts  # Single test
+cd lambda-building-blocks/functions/sale-module-api && npm run test:watch     # Watch mode
+cd lambda-building-blocks/functions/sale-module-api && npm run test:coverage  # Coverage (70% threshold)
+cd lambda-building-blocks/functions/sale-module-api && npm run lint           # ESLint
+```
 
-# Run a single test file
-cd lambda-building-blocks/functions/sale-module-api && npx jest tests/unit/handlers/sales/list-sales.test.ts
+### CDK Infrastructure (`lambda-building-blocks/cdk/`)
 
-# Watch mode
-cd lambda-building-blocks/functions/sale-module-api && npm run test:watch
-
-# Coverage (70% threshold on branches/functions/lines/statements)
-cd lambda-building-blocks/functions/sale-module-api && npm run test:coverage
-
-# Lint
-cd lambda-building-blocks/functions/sale-module-api && npm run lint
-
-# Deploy (dev/prod via CDK context)
-cd lambda-building-blocks/cdk && npm run deploy:dev
-cd lambda-building-blocks/cdk && npm run deploy:prod
-
-# Preview changes before deploy
-cd lambda-building-blocks/cdk && cdk diff --context environment=dev
+```bash
+cd lambda-building-blocks/cdk && npm run build         # Compile stacks
+cd lambda-building-blocks/cdk && npm run deploy:dev     # Deploy dev
+cd lambda-building-blocks/cdk && npm run deploy:prod    # Deploy prod
+cd lambda-building-blocks/cdk && cdk diff --context environment=dev  # Preview changes
 ```
 
 ## Architecture
 
-### CDK Stacks (cdk/bin/app.ts)
+### Two-Part System
 
-9 stacks with cross-stack references. Deployment order matters:
-1. **SaleModuleDynamoDBStack** — 5 DynamoDB tables (Sales, SaleLines, Buyers, Producers, Users) with GSI1-4, streams enabled
-2. **SaleModuleCognitoStack** — User Pool, JWT auth, role-based access (Admin/Operator)
-3. **SaleModuleApiGatewayStack** — HTTP API v2 with JWT authorizer (depends on Cognito)
-4. **SaleModuleS3Stack** — Documents + Attachments buckets
-5. **SaleModuleLambdaStack** — All 40 API handlers (depends on DynamoDB, Cognito, API Gateway, S3)
-6. **HtmlToPdfStack**, **TemplateRendererStack**, **SdiInvoiceGeneratorStack** — Building block functions
-7. **EmailReconcilerStack** — AI email parsing
+1. **Frontend** (`frontend/`) — Nuxt 4 SPA (SSR disabled) with Nuxt UI v4 + Tailwind CSS 4
+2. **Backend** (`lambda-building-blocks/`) — AWS CDK with 9 stacks deploying ~45 Lambda handlers
 
-### Sale Module API (functions/sale-module-api/)
+### Frontend Architecture
 
-Handler pattern — each handler is a standalone Lambda:
-```
-src/handlers/{domain}/{verb}-{noun}.ts   → e.g., sales/create-sale.ts
-src/common/clients/dynamodb.ts           → DynamoDB CRUD operations
-src/common/clients/s3.ts                 → S3 file operations
-src/common/clients/lambda.ts             → Cross-function invocation
-src/common/middleware/auth.ts            → JWT validation, role checking
-src/common/types/index.ts               → All TypeScript interfaces
-src/common/utils/response.ts            → HTTP response formatting
-src/common/utils/validation.ts          → Input validation
-```
+**Framework**: Nuxt 4.3.1, Vue 3 Composition API (`<script setup>`), SPA mode (no SSR).
+**UI**: Nuxt UI v4 + Tailwind CSS 4 + Lucide icons. Custom red primary color (#bb0231).
+**Auth**: Amazon Cognito Identity JS SDK — session restored on load via plugin, auto-token-refresh on 401.
 
-Handler domains: `sales/`, `buyers/`, `producers/`, `invoices/`, `attachments/`, `search/`, `dashboard/`
+Key patterns:
+- **Composables** (`app/composables/`) — All business logic lives here: `useAuth` (Cognito), `useApi` (HTTP client with auto-refresh), `useSales`/`useBuyers`/`useProducers` (CRUD), `useInvoices`, `useAttachments`, `useDashboard`, `useSearch`
+- **Encrypted caching** — `useCachedSales`/`useCachedBuyers`/`useCachedProducers` implement delta sync with AES-GCM encrypted localStorage via `useCache` + `utils/crypto-store.ts`
+- **API layer** — All API calls go through `useApi` composable which wraps `$fetch` with Bearer token injection
+- **File-based routing** — `app/pages/` with `[id].vue` dynamic routes for sales, buyers, producers
+- **Auth middleware** — `middleware/auth.global.ts` (global login guard) + `middleware/role.ts` (role-based access)
+- **Components** organized by domain: `sales/`, `buyers/`, `producers/`, `attachments/`, `shared/`, `layout/`
 
-### Key Patterns
+Runtime config (from `.env`): `NUXT_PUBLIC_API_BASE_URL`, `NUXT_PUBLIC_COGNITO_USER_POOL_ID`, `NUXT_PUBLIC_COGNITO_CLIENT_ID`, `NUXT_PUBLIC_COGNITO_REGION`.
 
-- **DynamoDB single-table design**: Composite keys (PK: `SALE#{id}`, SK: `METADATA` or `LINE#{lineId}`), 4 GSIs for flexible queries
-- **Soft delete**: `deletedAt` timestamp field, filter with `attribute_not_exists(deletedAt)`
+### Backend Architecture
+
+**CDK Stacks** (9 stacks, deployment order matters — defined in `cdk/bin/app.ts`):
+1. DynamoDB (5 tables) → 2. Cognito → 3. API Gateway HTTP v2 → 4. S3 → 5. Lambda (all handlers) → 6-8. Building blocks (HTML-to-PDF, Template Renderer, SDI Generator) → 9. Email Reconciler
+
+**Handler pattern** — each handler is a standalone Lambda in `functions/sale-module-api/src/handlers/{domain}/{verb}-{noun}.ts`. Domains: `sales/`, `buyers/`, `producers/`, `invoices/`, `attachments/`, `dashboard/`, `search/`, `sync/`.
+
+**Shared code** in `src/common/`:
+- `clients/dynamodb.ts` — DynamoDB CRUD operations
+- `clients/s3.ts` — S3 file operations
+- `clients/lambda.ts` — Cross-Lambda invocation
+- `middleware/auth.ts` — JWT validation via `getUserContext(event)`, role checking via `requireRole(user, ['admin'])`
+- `utils/response.ts` — `successResponse(statusCode, data)` / `errorResponse(statusCode, message)`
+- `types/index.ts` — All TypeScript interfaces
+
+### DynamoDB Design
+
+Single-table design with composite keys:
+- **Sale**: PK=`SALE#{saleId}`, SK=`METADATA`
+- **SaleLine**: PK=`SALE#{saleId}`, SK=`LINE#{lineId}`
+- **Buyer**: PK=`BUYER#{buyerId}`, SK=`METADATA`
+- **Producer**: PK=`PRODUCER#{producerId}`, SK=`METADATA`
+- **GSIs**: GSI1 (by status), GSI2 (by buyer), GSI3 (by producer), GSI4 (by creator)
+- **Soft delete**: `deletedAt` timestamp, filter with `attribute_not_exists(deletedAt)`
 - **Denormalization**: Buyer/producer names stored directly on Sale records
-- **Auth**: JWT from Cognito, extracted via `getUserContext(event)`, checked via `requireRole(user, ['admin'])`
-- **Responses**: Standardized via `successResponse(statusCode, data)` / `errorResponse(statusCode, message)`
-- **Invoice workflow**: Sale data → Template Renderer (HTML) → HTML-to-PDF (PDF) or SDI Generator (XML)
 
 ### Testing
 
-Tests in `tests/unit/handlers/` mirror the handler structure. AWS SDK is mocked:
+Tests in `tests/unit/handlers/` mirror the handler structure. AWS SDK clients are mocked:
 ```typescript
 jest.mock('../../src/common/clients/dynamodb');
 ```
+Jest config: `ts-jest`, 10s timeout, 70% coverage threshold, ignores `tests/integration/`.
 
-Jest config: `ts-jest` preset, 10s timeout, ignores `tests/integration/`.
+### Invoice Workflow
+
+Sale data → Template Renderer (Handlebars/EJS → HTML) → HTML-to-PDF (Puppeteer+Chromium → PDF) or SDI Generator (FatturaPA XML). Supports Italian, English, German, French.
 
 ## Environment Configuration
 
-Environment passed via CDK context (`--context environment=dev|staging|prod`). Key differences:
-- **dev**: 256MB memory, 5 reserved concurrency, 7-day log retention, no X-Ray
-- **prod**: 512MB memory, 10 reserved concurrency, 30-day log retention, X-Ray enabled, RETAIN removal policy
+CDK context (`--context environment=dev|staging|prod`):
+- **dev**: 256MB memory, 5 reserved concurrency, 7-day log retention
+- **prod**: 512MB memory, 10 reserved concurrency, 30-day log retention, X-Ray, RETAIN removal policy
 
-## Multi-Language Support
+## Building Block Functions
 
-Invoice generation supports: Italian (it), English (en), German (de), French (fr). Italian-specific: FatturaPA XML, VAT numbers, fiscal codes, PEC, SDI codes.
+Separate Lambda functions in `lambda-building-blocks/functions/`:
+- `html-to-pdf/` — Puppeteer + `@sparticuz/chromium` for PDF generation
+- `template-renderer/` — Handlebars/EJS/Mustache HTML rendering
+- `sdi-invoice-generator/` — FatturaPA XML for Italian e-invoicing
+- `email-reconciler/` — Claude API-powered email parsing

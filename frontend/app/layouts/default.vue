@@ -124,32 +124,33 @@ const navigationItems = [
 
 <template>
   <div class="min-h-screen">
-    <UDashboardNavbar :toggle="false">
-      <template #left>
-        <UNavigationMenu
-          :items="navigationItems"
-          orientation="horizontal"
-          :ui="{ linkLabel: 'hidden sm:inline' }"
-        />
-      </template>
+    <div class="sticky top-0 z-50 bg-(--ui-bg)">
+      <UDashboardNavbar :toggle="false">
+        <template #left>
+          <UNavigationMenu
+            :items="navigationItems"
+            orientation="horizontal"
+            :ui="{ linkLabel: 'hidden sm:inline' }"
+          />
+        </template>
 
-
-<template #right>
-        <SyncStatusIndicator />
-        <UButton
-          icon="i-lucide-search"
-          variant="ghost"
-          color="neutral"
-          square
-          @click="searchOpen = true"
-        />
-        <UDropdownMenu :items="userMenuItems">
-          <UButton variant="ghost">
-            <span class="truncate text-sm">{{ displayName }}</span>
-          </UButton>
-        </UDropdownMenu>
-      </template>
-    </UDashboardNavbar>
+        <template #right>
+          <SyncStatusIndicator />
+          <UButton
+            icon="i-lucide-search"
+            variant="ghost"
+            color="neutral"
+            square
+            @click="searchOpen = true"
+          />
+          <UDropdownMenu :items="userMenuItems">
+            <UButton variant="ghost">
+              <span class="truncate text-sm">{{ displayName }}</span>
+            </UButton>
+          </UDropdownMenu>
+        </template>
+      </UDashboardNavbar>
+    </div>
 
     <UAlert
       v-if="isOffline"
@@ -159,7 +160,7 @@ const navigationItems = [
       variant="soft"
     />
 
-    <div class="px-0 py-4 sm:px-6 sm:py-6 max-w-7xl mx-auto">
+    <div class="!px-0 !py-0 sm:px-6 sm:py-6 max-w-7xl mx-auto">
       <slot />
     </div>
   </div>
