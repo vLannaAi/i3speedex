@@ -1,2 +1,4 @@
 __pycache__/
 tmux.txt
+*.png
+.playwright-mcp/
