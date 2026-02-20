@@ -116,8 +116,8 @@ async function removeLine(lineId: string) {
 <template>
   <div>
     <!-- Lines table -->
-    <div class="overflow-x-auto">
-      <table class="w-full text-sm">
+    <div class="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+      <table class="w-full text-sm min-w-[640px]">
         <thead>
           <tr class="border-b border-(--ui-border) bg-(--ui-bg-muted) text-xs text-(--ui-text-muted) uppercase">
             <th class="px-3 py-2 text-left">#</th>

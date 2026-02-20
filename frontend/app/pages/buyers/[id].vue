@@ -318,7 +318,7 @@ onMounted(async () => {
     <div v-if="loading" class="mb-6">
       <LoadingSkeleton :lines="2" height="28px" />
     </div>
-    <div v-else-if="buyer" class="flex items-start justify-between mb-6">
+    <div v-else-if="buyer" class="flex flex-wrap items-start justify-between gap-4 mb-6">
       <div class="flex items-center gap-4">
         <div class="size-14 rounded-xl bg-primary-100 text-primary-700 dark:bg-primary-900 dark:text-primary-300 flex items-center justify-center text-lg font-bold shrink-0">
           {{ initials }}
@@ -482,39 +482,39 @@ onMounted(async () => {
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <UCard>
           <h3 class="text-lg font-semibold mb-3">Company Details</h3>
-          <dl class="space-y-3 text-sm">
-            <div v-if="buyer.industrialGroup" class="flex justify-between">
-              <dt class="text-gray-500">Industrial Group</dt>
+          <dl class="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-3 text-sm">
+            <div v-if="buyer.industrialGroup">
+              <dt class="text-gray-500 text-xs">Industrial Group</dt>
               <dd class="font-medium">{{ buyer.industrialGroup }}</dd>
             </div>
-            <div v-if="buyer.sector" class="flex justify-between">
-              <dt class="text-gray-500">Sector</dt>
+            <div v-if="buyer.sector">
+              <dt class="text-gray-500 text-xs">Sector</dt>
               <dd class="font-medium">{{ getSectorLabel(buyer.sector) }}</dd>
             </div>
-            <div class="flex justify-between">
-              <dt class="text-gray-500">VAT No.</dt>
+            <div>
+              <dt class="text-gray-500 text-xs">VAT No.</dt>
               <dd class="font-medium flex items-center gap-1">
                 {{ buyer.vatNumber || '\u2014' }}
                 <UButton v-if="buyer.vatNumber" variant="ghost" size="xs" icon="i-lucide-copy" @click="copyToClipboard(buyer!.vatNumber!, 'VAT number')" />
               </dd>
             </div>
-            <div class="flex justify-between">
-              <dt class="text-gray-500">Fiscal Code</dt>
+            <div>
+              <dt class="text-gray-500 text-xs">Fiscal Code</dt>
               <dd class="font-medium flex items-center gap-1">
                 {{ buyer.fiscalCode || '\u2014' }}
                 <UButton v-if="buyer.fiscalCode" variant="ghost" size="xs" icon="i-lucide-copy" @click="copyToClipboard(buyer!.fiscalCode!, 'Fiscal code')" />
               </dd>
             </div>
-            <div v-if="buyer.vatExempt" class="flex justify-between">
-              <dt class="text-gray-500">VAT Regime</dt>
+            <div v-if="buyer.vatExempt">
+              <dt class="text-gray-500 text-xs">VAT Regime</dt>
               <dd class="font-medium">{{ getVatExemptLabel(buyer.vatExempt) }}</dd>
             </div>
-            <div v-if="buyer.currency" class="flex justify-between">
-              <dt class="text-gray-500">Currency</dt>
+            <div v-if="buyer.currency">
+              <dt class="text-gray-500 text-xs">Currency</dt>
               <dd class="font-medium">{{ getCurrencyLabel(buyer.currency) }}</dd>
             </div>
-            <div v-if="buyer.preferredLanguage" class="flex justify-between">
-              <dt class="text-gray-500">Preferred Language</dt>
+            <div v-if="buyer.preferredLanguage">
+              <dt class="text-gray-500 text-xs">Preferred Language</dt>
               <dd class="font-medium">{{ getLanguageLabel(buyer.preferredLanguage) }}</dd>
             </div>
           </dl>
@@ -643,21 +643,21 @@ onMounted(async () => {
       <!-- Row 2b: Payment & Operations -->
       <UCard v-if="buyer.defaultPaymentMethod || buyer.defaultPaymentTerms || buyer.defaultOperator || buyer.bankDetails">
         <h3 class="text-lg font-semibold mb-3">Payment & Operations</h3>
-        <dl class="space-y-3 text-sm">
-          <div class="flex justify-between">
-            <dt class="text-gray-500">Payment Method</dt>
-            <dd class="font-medium">{{ getPaymentMethodLabel(buyer.defaultPaymentMethod || '') }}</dd>
+        <dl class="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-3 text-sm">
+          <div v-if="buyer.defaultPaymentMethod">
+            <dt class="text-gray-500 text-xs">Payment Method</dt>
+            <dd class="font-medium">{{ getPaymentMethodLabel(buyer.defaultPaymentMethod) }}</dd>
           </div>
-          <div class="flex justify-between">
-            <dt class="text-gray-500">Payment Terms</dt>
-            <dd class="font-medium">{{ getPaymentTermsLabel(buyer.defaultPaymentTerms || '') }}</dd>
+          <div v-if="buyer.defaultPaymentTerms">
+            <dt class="text-gray-500 text-xs">Payment Terms</dt>
+            <dd class="font-medium">{{ getPaymentTermsLabel(buyer.defaultPaymentTerms) }}</dd>
           </div>
-          <div v-if="buyer.defaultOperator" class="flex justify-between">
-            <dt class="text-gray-500">Default Operator</dt>
+          <div v-if="buyer.defaultOperator">
+            <dt class="text-gray-500 text-xs">Default Operator</dt>
             <dd class="font-medium">{{ buyer.defaultOperator }}</dd>
           </div>
-          <div v-if="buyer.bankDetails">
-            <dt class="text-gray-500 mb-1">Bank Details</dt>
+          <div v-if="buyer.bankDetails" class="col-span-2 sm:col-span-3">
+            <dt class="text-gray-500 text-xs">Bank Details</dt>
             <dd class="font-medium whitespace-pre-wrap">{{ buyer.bankDetails }}</dd>
           </div>
         </dl>

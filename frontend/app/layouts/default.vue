@@ -160,7 +160,7 @@ const navigationItems = [
       variant="soft"
     />
 
-    <div class="!px-0 !py-0 sm:px-6 sm:py-6 max-w-7xl mx-auto">
+    <div class="px-4 py-4 sm:px-6 sm:py-6 max-w-7xl mx-auto">
       <slot />
     </div>
   </div>

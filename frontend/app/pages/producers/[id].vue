@@ -285,7 +285,7 @@ onMounted(async () => {
 <template>
   <div>
     <div v-if="loading" class="mb-6"><LoadingSkeleton :lines="2" height="28px" /></div>
-    <div v-else-if="producer" class="flex items-start justify-between mb-6">
+    <div v-else-if="producer" class="flex flex-wrap items-start justify-between gap-4 mb-6">
       <div class="flex items-center gap-3">
         <div>
           <h1 class="text-2xl font-bold">{{ producer.companyName }}</h1>
@@ -416,24 +416,25 @@ onMounted(async () => {
       </template>
 
       <template v-else>
+        <div class="space-y-6">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <UCard>
             <h3 class="text-lg font-semibold mb-3">Company Details</h3>
-            <dl class="space-y-3 text-sm">
-              <div class="flex justify-between">
-                <dt class="text-gray-500">VAT No.</dt>
+            <dl class="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
+              <div>
+                <dt class="text-gray-500 text-xs">VAT No.</dt>
                 <dd class="font-medium">{{ producer.vatNumber || '\u2014' }}</dd>
               </div>
-              <div class="flex justify-between">
-                <dt class="text-gray-500">Fiscal Code</dt>
+              <div>
+                <dt class="text-gray-500 text-xs">Fiscal Code</dt>
                 <dd class="font-medium">{{ producer.fiscalCode || '\u2014' }}</dd>
               </div>
-              <div v-if="producer.sdi" class="flex justify-between">
-                <dt class="text-gray-500">SDI Code</dt>
+              <div v-if="producer.sdi">
+                <dt class="text-gray-500 text-xs">SDI Code</dt>
                 <dd class="font-medium font-mono">{{ producer.sdi }}</dd>
               </div>
-              <div v-if="producer.preferredLanguage" class="flex justify-between">
-                <dt class="text-gray-500">Preferred Language</dt>
+              <div v-if="producer.preferredLanguage">
+                <dt class="text-gray-500 text-xs">Preferred Language</dt>
                 <dd class="font-medium">{{ getLanguageLabel(producer.preferredLanguage) }}</dd>
               </div>
             </dl>
@@ -458,7 +459,7 @@ onMounted(async () => {
         </div>
 
         <!-- Contacts -->
-        <UCard class="mt-6">
+        <UCard>
           <h3 class="text-lg font-semibold mb-4">Contact Information</h3>
           <div v-if="producer.mainContact" class="flex items-center gap-3 mb-4 pb-4 border-b border-gray-100 dark:border-gray-800">
             <div class="size-10 rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-900 dark:text-indigo-400 flex items-center justify-center">
@@ -556,61 +557,61 @@ onMounted(async () => {
         </UCard>
 
         <!-- Business Terms -->
-        <UCard v-if="producer.revenuePercentage != null || producer.bankDetails" class="mt-6">
+        <UCard v-if="producer.revenuePercentage != null || producer.bankDetails">
           <h3 class="text-lg font-semibold mb-3">Business Terms</h3>
-          <dl class="space-y-3 text-sm">
-            <div v-if="producer.revenuePercentage != null" class="flex justify-between">
-              <dt class="text-gray-500">Revenue %</dt>
+          <dl class="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-3 text-sm">
+            <div v-if="producer.revenuePercentage != null">
+              <dt class="text-gray-500 text-xs">Revenue %</dt>
               <dd class="font-medium">{{ producer.revenuePercentage }}%</dd>
             </div>
-            <div v-if="producer.bankDetails">
-              <dt class="text-gray-500 mb-1">Bank Details</dt>
+            <div v-if="producer.bankDetails" class="col-span-2 sm:col-span-3">
+              <dt class="text-gray-500 text-xs">Bank Details</dt>
               <dd class="font-medium whitespace-pre-wrap">{{ producer.bankDetails }}</dd>
             </div>
           </dl>
         </UCard>
 
         <!-- Production Info -->
-        <UCard v-if="producer.qualityAssurance || producer.productionArea || producer.markets || producer.materials || producer.products || producer.standardProducts || producer.diameterRange || producer.maxLength || producer.quantity" class="mt-6">
+        <UCard v-if="producer.qualityAssurance || producer.productionArea || producer.markets || producer.materials || producer.products || producer.standardProducts || producer.diameterRange || producer.maxLength || producer.quantity">
           <h3 class="text-lg font-semibold mb-3">Production Info</h3>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-            <div v-if="producer.qualityAssurance">
-              <dt class="text-gray-500 mb-1">Quality Assurance</dt>
+          <dl class="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-3 text-sm">
+            <div v-if="producer.qualityAssurance" class="col-span-2 sm:col-span-3">
+              <dt class="text-gray-500 text-xs">Quality Assurance</dt>
               <dd class="font-medium whitespace-pre-wrap">{{ producer.qualityAssurance }}</dd>
             </div>
             <div v-if="producer.productionArea">
-              <dt class="text-gray-500 mb-1">Production Area</dt>
+              <dt class="text-gray-500 text-xs">Production Area</dt>
               <dd class="font-medium whitespace-pre-wrap">{{ producer.productionArea }}</dd>
             </div>
             <div v-if="producer.markets">
-              <dt class="text-gray-500 mb-1">Markets</dt>
+              <dt class="text-gray-500 text-xs">Markets</dt>
               <dd class="font-medium whitespace-pre-wrap">{{ producer.markets }}</dd>
             </div>
             <div v-if="producer.materials">
-              <dt class="text-gray-500 mb-1">Materials</dt>
+              <dt class="text-gray-500 text-xs">Materials</dt>
               <dd class="font-medium whitespace-pre-wrap">{{ producer.materials }}</dd>
             </div>
-            <div v-if="producer.products" class="sm:col-span-2">
-              <dt class="text-gray-500 mb-1">Products</dt>
+            <div v-if="producer.products" class="col-span-2 sm:col-span-3">
+              <dt class="text-gray-500 text-xs">Products</dt>
               <dd class="font-medium whitespace-pre-wrap">{{ producer.products }}</dd>
             </div>
-            <div v-if="producer.standardProducts" class="sm:col-span-2">
-              <dt class="text-gray-500 mb-1">Standard Products</dt>
+            <div v-if="producer.standardProducts" class="col-span-2 sm:col-span-3">
+              <dt class="text-gray-500 text-xs">Standard Products</dt>
               <dd class="font-medium whitespace-pre-wrap">{{ producer.standardProducts }}</dd>
             </div>
             <div v-if="producer.diameterRange">
-              <dt class="text-gray-500 mb-1">Diameter Range</dt>
+              <dt class="text-gray-500 text-xs">Diameter Range</dt>
               <dd class="font-medium">{{ producer.diameterRange }}</dd>
             </div>
             <div v-if="producer.maxLength">
-              <dt class="text-gray-500 mb-1">Max Length</dt>
+              <dt class="text-gray-500 text-xs">Max Length</dt>
               <dd class="font-medium">{{ producer.maxLength }}</dd>
             </div>
             <div v-if="producer.quantity">
-              <dt class="text-gray-500 mb-1">Quantity</dt>
+              <dt class="text-gray-500 text-xs">Quantity</dt>
               <dd class="font-medium">{{ getQuantityLabel(producer.quantity) }}</dd>
             </div>
-          </div>
+          </dl>
         </UCard>
 
         <!-- Quick Stats -->
@@ -636,7 +637,7 @@ onMounted(async () => {
         </div>
 
         <!-- Sales History -->
-        <UCard class="mt-6">
+        <UCard>
           <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
             <h3 class="text-lg font-semibold">Sales History</h3>
             <div class="flex items-center gap-2">
@@ -705,15 +706,16 @@ onMounted(async () => {
         </UCard>
 
         <!-- Notes -->
-        <UCard v-if="producer.notes" class="mt-6">
+        <UCard v-if="producer.notes">
           <h3 class="text-lg font-semibold mb-2">Notes</h3>
           <p class="text-sm text-gray-600">{{ producer.notes }}</p>
         </UCard>
 
         <!-- Metadata -->
-        <div class="text-xs text-gray-400 space-y-1 mt-6">
+        <div class="text-xs text-gray-400 space-y-1">
           <p>Created on {{ formatDateTime(producer.createdAt) }} by {{ producer.createdBy }}</p>
           <p>Updated on {{ formatDateTime(producer.updatedAt) }} by {{ producer.updatedBy }}</p>
+        </div>
         </div>
       </template>
     </template>
