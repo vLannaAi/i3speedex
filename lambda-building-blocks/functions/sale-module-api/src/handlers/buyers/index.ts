@@ -1,10 +1,6 @@
 /**
  * Buyers Handlers Index
- * Export all buyers-related Lambda handlers
+ * Export all buyers-related handlers from the consolidated buyers.ts
  */
 
-export { handler as listBuyers } from './list-buyers';
-export { handler as getBuyer } from './get-buyer';
-export { handler as createBuyer } from './create-buyer';
-export { handler as updateBuyer } from './update-buyer';
-export { handler as deleteBuyer } from './delete-buyer';
+export { listBuyers, getBuyer, createBuyer, updateBuyer, deleteBuyer, handler } from './buyers';

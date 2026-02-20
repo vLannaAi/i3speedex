@@ -25,7 +25,7 @@ cd frontend && npm run typecheck    # TypeScript validation
 ```bash
 cd lambda-building-blocks/functions/sale-module-api && npm run build   # TypeScript compile
 cd lambda-building-blocks/functions/sale-module-api && npm test        # Unit tests
-cd lambda-building-blocks/functions/sale-module-api && npx jest tests/unit/handlers/sales/list-sales.test.ts  # Single test
+cd lambda-building-blocks/functions/sale-module-api && npx jest tests/unit/handlers/list-sales.test.ts  # Single test
 cd lambda-building-blocks/functions/sale-module-api && npm run test:watch     # Watch mode
 cd lambda-building-blocks/functions/sale-module-api && npm run test:coverage  # Coverage (70% threshold)
 cd lambda-building-blocks/functions/sale-module-api && npm run lint           # ESLint
@@ -45,7 +45,7 @@ cd lambda-building-blocks/cdk && cdk diff --context environment=dev  # Preview c
 ### Two-Part System
 
 1. **Frontend** (`frontend/`) — Nuxt 4 SPA (SSR disabled) with Nuxt UI v4 + Tailwind CSS 4
-2. **Backend** (`lambda-building-blocks/`) — AWS CDK with 9 stacks deploying ~45 Lambda handlers
+2. **Backend** (`lambda-building-blocks/`) — AWS CDK with 9 stacks deploying 12 consolidated Lambda functions (38 routes total)
 
 ### Frontend Architecture
 
@@ -68,14 +68,33 @@ Runtime config (from `.env`): `NUXT_PUBLIC_API_BASE_URL`, `NUXT_PUBLIC_COGNITO_U
 **CDK Stacks** (9 stacks, deployment order matters — defined in `cdk/bin/app.ts`):
 1. DynamoDB (5 tables) → 2. Cognito → 3. API Gateway HTTP v2 → 4. S3 → 5. Lambda (all handlers) → 6-8. Building blocks (HTML-to-PDF, Template Renderer, SDI Generator) → 9. Email Reconciler
 
-**Handler pattern** — each handler is a standalone Lambda in `functions/sale-module-api/src/handlers/{domain}/{verb}-{noun}.ts`. Domains: `sales/`, `buyers/`, `producers/`, `invoices/`, `attachments/`, `dashboard/`, `search/`, `sync/`.
+**Lambda functions (12 total)** — each is a router that dispatches by HTTP method/path to internal handler functions. All entry points are in `functions/sale-module-api/src/handlers/`:
+
+| # | Lambda | Entry point | Routes |
+|---|--------|-------------|--------|
+| 1 | BuyersFunction | `buyers/buyers.ts` | GET/POST /api/buyers, GET/PUT/DELETE /api/buyers/{id} |
+| 2 | ProducersFunction | `producers/producers.ts` | GET/POST /api/producers, GET/PUT/DELETE /api/producers/{id} |
+| 3 | SalesCrudFunction | `sales/sales-crud.ts` | GET/POST /api/sales, GET/PUT/DELETE /api/sales/{id} |
+| 4 | SaleLinesFunction | `sales/sale-lines.ts` | GET/POST /api/sales/{id}/lines, PUT/DELETE /api/sales/{id}/lines/{lineId} |
+| 5 | ConfirmSaleFunction | `sales/confirm-sale.ts` | POST /api/sales/{id}/confirm |
+| 6 | InvoiceFunction | `invoices/invoices.ts` | POST /api/sales/{id}/invoice/{html\|pdf\|sdi}, GET …/download |
+| 7 | AttachmentUploadFunction | `attachments/generate-upload-url.ts` | POST /api/sales/{id}/upload-url |
+| 8 | AttachmentCrudFunction | `attachments/attachments.ts` | POST/GET /api/sales/{id}/attachments, DELETE …/{attachmentId} |
+| 9 | SearchFunction | `search/search.ts` | GET /api/search/{sales\|buyers\|producers} |
+| 10 | SyncSalesFunction | `sync/sync-sales.ts` | GET /api/sync/sales |
+| 11 | SyncEntitiesFunction | `sync/sync-entities.ts` | GET /api/sync/{buyers\|producers} |
+| 12 | DashboardFunction | `dashboard/dashboard.ts` | GET /api/dashboard/{stats\|sales-by-date\|top-buyers\|recent-activity} |
+
+**Consolidated handler pattern** — `buyers/buyers.ts` and `producers/producers.ts` contain all CRUD operations as named exports (`listBuyers`, `getBuyer`, `createBuyer`, `updateBuyer`, `deleteBuyer`) plus a `handler` router. The `sales/` domain still uses individual files (`list-sales.ts`, `get-sale.ts`, etc.) imported by the router.
 
 **Shared code** in `src/common/`:
-- `clients/dynamodb.ts` — DynamoDB CRUD operations
+- `clients/dynamodb.ts` — DynamoDB CRUD operations (`getItem`, `putItem`, `updateItem`, `scanAllItems`, `scanItems`, `queryItems`, `softDelete`, `addTimestamps`, `updateTimestamp`)
 - `clients/s3.ts` — S3 file operations
 - `clients/lambda.ts` — Cross-Lambda invocation
-- `middleware/auth.ts` — JWT validation via `getUserContext(event)`, role checking via `requireRole(user, ['admin'])`
-- `utils/response.ts` — `successResponse(statusCode, data)` / `errorResponse(statusCode, message)`
+- `middleware/auth.ts` — JWT validation via `getUserContext(event)`, `requireWritePermission(user)`, `getPathParameter`, `getQueryParameter`, `parseRequestBody`
+- `utils/response.ts` — `successResponse`, `createdResponse`, `noContentResponse`, `paginatedResponse`, `handleError`
+- `utils/validation.ts` — `validatePaginationParams`, `validateBuyerData`, `validateProducerData`, `NotFoundError`, `ForbiddenError`, `ValidationError`
+- `utils/entity-utils.ts` — Shared DynamoDB patterns: `scanEntities` (list + paginate), `getEntityOrThrow` (fetch + 404 check), `buildUpdateSet` (UPDATE expression builder), `searchEntities` (keyword search + paginate)
 - `types/index.ts` — All TypeScript interfaces
 
 ### DynamoDB Design
@@ -91,11 +110,15 @@ Single-table design with composite keys:
 
 ### Testing
 
-Tests in `tests/unit/handlers/` mirror the handler structure. AWS SDK clients are mocked:
+Tests live flat in `tests/unit/handlers/` (one file per domain or per handler). AWS SDK clients are mocked with partial mocks to preserve utility functions:
 ```typescript
-jest.mock('../../src/common/clients/dynamodb');
+jest.mock('../../../src/common/clients/dynamodb', () => ({
+  ...jest.requireActual('../../../src/common/clients/dynamodb'),
+  scanAllItems: jest.fn(),
+  getItem: jest.fn(),
+}));
 ```
-Jest config: `ts-jest`, 10s timeout, 70% coverage threshold, ignores `tests/integration/`.
+Consolidated domains (`buyers.ts`, `producers.ts`) are tested via named exports (`listBuyers`, `getBuyer`, …) imported directly — no HTTP routing needed in tests. Jest config: `ts-jest`, 10s timeout, 70% coverage threshold, ignores `tests/integration/`.
 
 ### Invoice Workflow
 

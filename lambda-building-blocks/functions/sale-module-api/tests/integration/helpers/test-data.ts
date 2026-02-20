@@ -4,10 +4,7 @@
  * Provides factory functions to generate realistic test data
  */
 
-import { CreateSaleRequest } from '../../../src/handlers/sales/create-sale';
-import { CreateBuyerRequest } from '../../../src/handlers/buyers/create-buyer';
-import { CreateProducerRequest } from '../../../src/handlers/producers/create-producer';
-import { CreateSaleLineRequest } from '../../../src/handlers/sales/create-sale-line';
+import { CreateSaleRequest, CreateBuyerRequest, CreateProducerRequest, CreateSaleLineRequest } from '../../../src/common/types';
 
 let saleCounter = 0;
 let buyerCounter = 0;
