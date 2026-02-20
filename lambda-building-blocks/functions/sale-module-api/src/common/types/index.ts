@@ -112,7 +112,7 @@ export interface Sale extends TimestampFields, UserFields {
   registrationDate?: string; // Document registration date (ISO 8601)
 
   // Status
-  status: 'proforma' | 'sent' | 'paid' | 'cancelled';
+  status: 'draft' | 'confirmed' | 'invoiced' | 'paid' | 'cancelled';
 
   // Invoice generation
   invoiceGenerated: boolean;

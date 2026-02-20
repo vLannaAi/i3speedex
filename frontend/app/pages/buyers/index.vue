@@ -110,21 +110,7 @@ function buyerStatus(buyer: Buyer): string {
   return 'past'
 }
 
-// Sort state
-const sortKey = ref<string | null>(null)
-const sortDir = ref<'asc' | 'desc' | null>(null)
-
-function toggleSort(key: string) {
-  if (sortKey.value !== key) {
-    sortKey.value = key
-    sortDir.value = 'asc'
-  } else if (sortDir.value === 'asc') {
-    sortDir.value = 'desc'
-  } else {
-    sortKey.value = null
-    sortDir.value = null
-  }
-}
+const { sortKey, sortDir, toggleSort } = useTableSort()
 
 const statusOrder: Record<string, number> = { active: 0, past: 1, inactive: 2 }
 
@@ -195,184 +181,94 @@ function onSelectBuyer(_e: Event, row: any) {
 
 <template>
   <div>
-    <div class="px-9 flex items-center gap-3 mb-4 mt-4">
-      <h1 class="text-2xl font-bold shrink-0">Buyers</h1>
-      <NuxtLink v-if="canWrite" to="/buyers/new">
-        <UButton
-          icon="i-lucide-plus"
-          label="New"
-          variant="outline"
-          color="primary"
-          class="bg-(--ui-bg) ring-primary text-primary hover:bg-(--ui-bg-accented)"
-        />
-      </NuxtLink>
-      <div class="ml-auto flex items-center gap-2">
-        <UInput
-          v-model="search"
-          icon="i-lucide-search"
-          class="w-32"
-          size="md"
-          :ui="{ icon: { trailing: { pointerEvents: 'auto' } } }"
-        >
-          <template v-if="search" #trailing>
-            <UButton color="gray" variant="link" icon="i-lucide-x" :padded="false" @click="search = ''" />
-          </template>
-        </UInput>
-      </div>
-    </div>
-
-    <div class="rounded-none ring-0 sm:rounded-lg sm:ring ring-(--ui-border) bg-(--ui-bg)">
-      <UTable
-        :columns="columns"
-        :data="tableData"
-        :loading="loading"
-        sticky
-        :ui="{
-          root: '!overflow-visible w-full',
-          base: 'w-full',
-          thead: 'sticky top-16 z-10 bg-primary text-white font-normal text-sm',
-          th: { color: 'text-white', base: 'first:!pl-9' },
-          tr: 'hover:bg-(--ui-bg-accented) transition-colors cursor-pointer',
-          td: { base: 'whitespace-nowrap first:!pl-9' },
-        }"
-        @select="onSelectBuyer"
+    <ListPageHeader title="Buyers" new-to="/buyers/new" :can-write="canWrite">
+      <UInput
+        v-model="search"
+        icon="i-lucide-search"
+        class="w-32"
+        size="md"
+        :ui="{ icon: { trailing: { pointerEvents: 'auto' } } }"
       >
-        <template #buyerId-header>
-          <button class="inline-flex items-center gap-1 text-white" @click="toggleSort('buyerId')">
-            ID
-            <UIcon v-if="sortKey === 'buyerId'" :name="sortDir === 'asc' ? 'i-lucide-arrow-up' : 'i-lucide-arrow-down'" class="size-3" />
-          </button>
+        <template v-if="search" #trailing>
+          <UButton color="gray" variant="link" icon="i-lucide-x" :padded="false" @click="search = ''" />
         </template>
-        <template #status-header>
-          <button class="inline-flex items-center gap-1 text-white" @click="toggleSort('status')">
-            Status
-            <UIcon v-if="sortKey === 'status'" :name="sortDir === 'asc' ? 'i-lucide-arrow-up' : 'i-lucide-arrow-down'" class="size-3" />
-          </button>
-        </template>
-        <template #country-header>
-          <button class="inline-flex items-center gap-1 text-white" @click="toggleSort('country')">
-            Country
-            <UIcon v-if="sortKey === 'country'" :name="sortDir === 'asc' ? 'i-lucide-arrow-up' : 'i-lucide-arrow-down'" class="size-3" />
-          </button>
-        </template>
-        <template #code-header>
-          <button class="inline-flex items-center gap-1 text-white" @click="toggleSort('code')">
-            Code
-            <UIcon v-if="sortKey === 'code'" :name="sortDir === 'asc' ? 'i-lucide-arrow-up' : 'i-lucide-arrow-down'" class="size-3" />
-          </button>
-        </template>
-        <template #companyName-header>
-          <button class="inline-flex items-center gap-1 text-white" @click="toggleSort('companyName')">
-            Company Name
-            <UIcon v-if="sortKey === 'companyName'" :name="sortDir === 'asc' ? 'i-lucide-arrow-up' : 'i-lucide-arrow-down'" class="size-3" />
-          </button>
-        </template>
-        <template #buyerId-cell="{ row }">
-          <span v-if="row.original._summary" class="text-sm font-semibold">{{ row.original.buyerId }}<span class="hidden min-[580px]:inline"> buyers</span></span>
-          <span v-else class="text-xs !font-mono tabular-nums text-(--ui-text-muted)">
-            #<span class="text-(--ui-text) font-medium">{{ row.original.buyerId.replace('BUYER', '') }}</span>
-          </span>
-        </template>
-        <template #status-cell="{ row }">
-          <div v-if="row.original._summary" class="flex flex-wrap gap-1">
-            <UBadge :label="`${row.original._activeCount}`" color="success" variant="subtle" size="xs" />
-            <UBadge :label="`${row.original._pastCount}`" color="warning" variant="subtle" size="xs" />
-            <UBadge :label="`${row.original._inactiveCount}`" color="neutral" variant="subtle" size="xs" />
-          </div>
-          <StatusBadge v-else :status="buyerStatus(row.original)" />
-        </template>
-        <template #country-cell="{ row }">
-          <span v-if="row.original._summary" class="text-sm font-semibold">{{ row.original.country }} countries</span>
-          <span v-else-if="row.original.country" class="inline-flex items-center gap-1.5">
-            <UIcon :name="`circle-flags:${toAlpha2(row.original.country).toLowerCase()}`" class="size-4" mode="svg" />
-            <span class="hidden min-[580px]:inline">{{ row.original.country }}</span>
-          </span>
-          <span v-else class="text-(--ui-text-muted)">—</span>
-        </template>
-        <template #code-cell="{ row }">
-          <span v-if="!row.original._summary" class="font-semibold text-(--ui-text-highlighted)">{{ row.original.code || '—' }}</span>
-        </template>
-        <template #companyName-cell="{ row }">
-          <div v-if="!row.original._summary" class="font-medium truncate">{{ row.original.companyName }}</div>
-        </template>
-        <template #allTimeSales-header>
-          <div class="flex justify-start w-full">
-            <button class="inline-flex items-center gap-1 text-white" @click="toggleSort('allTimeSales')">
-              Sales €
-              <UIcon v-if="sortKey === 'allTimeSales'" :name="sortDir === 'asc' ? 'i-lucide-arrow-up' : 'i-lucide-arrow-down'" class="size-3" />
-            </button>
-          </div>
-        </template>
-        <template #allTimeSales-cell="{ row }">
-          <div v-if="row.original._summary" class="text-left text-sm font-semibold tabular-nums">{{ formatNumber(row.original._allTimeSales, 0) }}</div>
-          <div v-else-if="allTimeSales[row.original.buyerId]" class="text-left text-sm font-medium tabular-nums">{{ formatNumber(allTimeSales[row.original.buyerId], 0) }}</div>
-        </template>
-        <template #ytdSales-header>
-          <div class="flex justify-start w-full">
-            <button class="inline-flex items-center gap-1 text-white" @click="toggleSort('ytdSales')">
-              {{ ytdLabel }}
-              <UIcon v-if="sortKey === 'ytdSales'" :name="sortDir === 'asc' ? 'i-lucide-arrow-up' : 'i-lucide-arrow-down'" class="size-3" />
-            </button>
-          </div>
-        </template>
-        <template #ytdSales-cell="{ row }">
-          <div v-if="row.original._summary" class="text-left text-sm font-semibold tabular-nums text-(--ui-text-highlighted)">{{ formatNumber(row.original._ytdSales, 0) }}</div>
-          <div v-else-if="activeYtdMap[row.original.buyerId]" class="text-left text-sm font-medium tabular-nums text-(--ui-text-highlighted)">{{ formatNumber(activeYtdMap[row.original.buyerId], 0) }}</div>
-        </template>
-        <template #toPay-header>
-          <div class="flex justify-start w-full">
-            <button class="inline-flex items-center gap-1 text-white" @click="toggleSort('toPay')">
-              To Pay €
-              <UIcon v-if="sortKey === 'toPay'" :name="sortDir === 'asc' ? 'i-lucide-arrow-up' : 'i-lucide-arrow-down'" class="size-3" />
-            </button>
-          </div>
-        </template>
-        <template #toPay-cell="{ row }">
-          <div v-if="row.original._summary" class="text-right text-sm font-semibold tabular-nums text-red-500">{{ formatNumber(row.original._toPay, 0) }}</div>
-          <div v-else-if="toPay[row.original.buyerId]" class="text-right text-sm font-medium tabular-nums text-red-500">{{ formatNumber(toPay[row.original.buyerId], 0) }}</div>
-        </template>
-        <template #empty>
-          <EmptyState
-            title="No buyers"
-            description="Get started by adding your first buyer"
-            icon="i-lucide-users"
-            :action-to="canWrite ? '/buyers/new' : undefined"
-            :action-label="canWrite ? 'New Buyer' : undefined"
-          />
-        </template>
-      </UTable>
-    </div>
+      </UInput>
+    </ListPageHeader>
+
+    <AppTable :columns="columns" :data="tableData" :loading="loading" summary-style="elevated" @select="onSelectBuyer">
+      <template #buyerId-header>
+        <SortableHeader label="ID" column-key="buyerId" :sort-key="sortKey" :sort-dir="sortDir" @sort="toggleSort" />
+      </template>
+      <template #status-header>
+        <SortableHeader label="Status" column-key="status" :sort-key="sortKey" :sort-dir="sortDir" @sort="toggleSort" />
+      </template>
+      <template #country-header>
+        <SortableHeader label="Country" column-key="country" :sort-key="sortKey" :sort-dir="sortDir" @sort="toggleSort" />
+      </template>
+      <template #code-header>
+        <SortableHeader label="Code" column-key="code" :sort-key="sortKey" :sort-dir="sortDir" @sort="toggleSort" />
+      </template>
+      <template #companyName-header>
+        <SortableHeader label="Company Name" column-key="companyName" :sort-key="sortKey" :sort-dir="sortDir" @sort="toggleSort" />
+      </template>
+      <template #allTimeSales-header>
+        <SortableHeader label="Sales €" column-key="allTimeSales" :sort-key="sortKey" :sort-dir="sortDir" justify="start" @sort="toggleSort" />
+      </template>
+      <template #ytdSales-header>
+        <SortableHeader :label="ytdLabel" column-key="ytdSales" :sort-key="sortKey" :sort-dir="sortDir" justify="start" @sort="toggleSort" />
+      </template>
+      <template #toPay-header>
+        <SortableHeader label="To Pay €" column-key="toPay" :sort-key="sortKey" :sort-dir="sortDir" justify="start" @sort="toggleSort" />
+      </template>
+      <template #buyerId-cell="{ row }">
+        <span v-if="row.original._summary" class="text-sm font-semibold">{{ row.original.buyerId }}<span class="hidden min-[580px]:inline"> buyers</span></span>
+        <span v-else class="text-xs !font-mono tabular-nums text-(--ui-text-muted)">
+          #<span class="text-(--ui-text) font-medium">{{ row.original.buyerId.replace('BUYER', '') }}</span>
+        </span>
+      </template>
+      <template #status-cell="{ row }">
+        <div v-if="row.original._summary" class="flex flex-wrap gap-1">
+          <UBadge :label="`${row.original._activeCount}`" color="success" variant="subtle" size="xs" />
+          <UBadge :label="`${row.original._pastCount}`" color="warning" variant="subtle" size="xs" />
+          <UBadge :label="`${row.original._inactiveCount}`" color="neutral" variant="subtle" size="xs" />
+        </div>
+        <StatusBadge v-else :status="buyerStatus(row.original)" />
+      </template>
+      <template #country-cell="{ row }">
+        <span v-if="row.original._summary" class="text-sm font-semibold">{{ row.original.country }} countries</span>
+        <span v-else-if="row.original.country" class="inline-flex items-center gap-1.5">
+          <UIcon :name="`circle-flags:${toAlpha2(row.original.country).toLowerCase()}`" class="size-4" mode="svg" />
+          <span class="hidden min-[580px]:inline">{{ row.original.country }}</span>
+        </span>
+        <span v-else class="text-(--ui-text-muted)">—</span>
+      </template>
+      <template #code-cell="{ row }">
+        <span v-if="!row.original._summary" class="font-semibold text-(--ui-text-highlighted)">{{ row.original.code || '—' }}</span>
+      </template>
+      <template #companyName-cell="{ row }">
+        <div v-if="!row.original._summary" class="font-medium truncate">{{ row.original.companyName }}</div>
+      </template>
+      <template #allTimeSales-cell="{ row }">
+        <div v-if="row.original._summary" class="text-left text-sm font-semibold tabular-nums">{{ formatNumber(row.original._allTimeSales, 0) }}</div>
+        <div v-else-if="allTimeSales[row.original.buyerId]" class="text-left text-sm font-medium tabular-nums">{{ formatNumber(allTimeSales[row.original.buyerId], 0) }}</div>
+      </template>
+      <template #ytdSales-cell="{ row }">
+        <div v-if="row.original._summary" class="text-left text-sm font-semibold tabular-nums text-(--ui-text-highlighted)">{{ formatNumber(row.original._ytdSales, 0) }}</div>
+        <div v-else-if="activeYtdMap[row.original.buyerId]" class="text-left text-sm font-medium tabular-nums text-(--ui-text-highlighted)">{{ formatNumber(activeYtdMap[row.original.buyerId], 0) }}</div>
+      </template>
+      <template #toPay-cell="{ row }">
+        <div v-if="row.original._summary" class="text-right text-sm font-semibold tabular-nums text-red-500">{{ formatNumber(row.original._toPay, 0) }}</div>
+        <div v-else-if="toPay[row.original.buyerId]" class="text-right text-sm font-medium tabular-nums text-red-500">{{ formatNumber(toPay[row.original.buyerId], 0) }}</div>
+      </template>
+      <template #empty>
+        <EmptyState
+          title="No buyers"
+          description="Get started by adding your first buyer"
+          icon="i-lucide-users"
+          :action-to="canWrite ? '/buyers/new' : undefined"
+          :action-label="canWrite ? 'New Buyer' : undefined"
+        />
+      </template>
+    </AppTable>
   </div>
 </template>
-
-<style scoped>
-/* Round table corners to match container */
-@media (min-width: 640px) {
-  :deep(thead tr:first-child th:first-child) {
-    border-top-left-radius: var(--radius-lg);
-  }
-  :deep(thead tr:first-child th:last-child) {
-    border-top-right-radius: var(--radius-lg);
-  }
-  :deep(tbody tr:last-child td:first-child) {
-    border-bottom-left-radius: var(--radius-lg);
-  }
-  :deep(tbody tr:last-child td:last-child) {
-    border-bottom-right-radius: var(--radius-lg);
-  }
-}
-
-/* Summary row: sticky + accent background matching Active badge */
-:deep(tbody tr:first-child td) {
-  position: static !important;
-  z-index: 9;
-  background: var(--ui-bg-elevated);
-  font-weight: 600;
-}
-:deep(tbody tr:first-child) {
-  cursor: default;
-}
-:deep(tbody tr:first-child:hover td) {
-  background: var(--ui-bg-elevated);
-}
-</style>

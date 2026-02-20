@@ -69,55 +69,41 @@ export class SaleModuleLambdaStack extends cdk.Stack {
     };
 
     // ========================================
-    // Sales CRUD Lambda Functions (10)
+    // 12 Consolidated Lambda Functions
     // ========================================
 
-    // 1. List Sales
-    const listSalesFunction = new nodejs.NodejsFunction(this, 'ListSalesFunction', {
+    const buyersFunction = new nodejs.NodejsFunction(this, 'BuyersFunction', {
       ...commonLambdaProps,
-      functionName: `SaleModuleListSales-${environment}`,
-      entry: path.join(__dirname, '../../functions/sale-module-api/src/handlers/sales/list-sales.ts'),
+      functionName: `SaleModuleBuyers-${environment}`,
+      entry: path.join(__dirname, '../../functions/sale-module-api/src/handlers/buyers/buyers.ts'),
       handler: 'handler',
-      description: 'List sales with pagination and filtering',
+      description: 'Buyers CRUD (list, get, create, update, delete)',
     });
 
-    // 2. Get Sale
-    const getSaleFunction = new nodejs.NodejsFunction(this, 'GetSaleFunction', {
+    const producersFunction = new nodejs.NodejsFunction(this, 'ProducersFunction', {
       ...commonLambdaProps,
-      functionName: `SaleModuleGetSale-${environment}`,
-      entry: path.join(__dirname, '../../functions/sale-module-api/src/handlers/sales/get-sale.ts'),
+      functionName: `SaleModuleProducers-${environment}`,
+      entry: path.join(__dirname, '../../functions/sale-module-api/src/handlers/producers/producers.ts'),
       handler: 'handler',
-      description: 'Get single sale by ID',
+      description: 'Producers CRUD (list, get, create, update, delete)',
     });
 
-    // 3. Create Sale
-    const createSaleFunction = new nodejs.NodejsFunction(this, 'CreateSaleFunction', {
+    const salesCrudFunction = new nodejs.NodejsFunction(this, 'SalesCrudFunction', {
       ...commonLambdaProps,
-      functionName: `SaleModuleCreateSale-${environment}`,
-      entry: path.join(__dirname, '../../functions/sale-module-api/src/handlers/sales/create-sale.ts'),
+      functionName: `SaleModuleSalesCrud-${environment}`,
+      entry: path.join(__dirname, '../../functions/sale-module-api/src/handlers/sales/sales-crud.ts'),
       handler: 'handler',
-      description: 'Create new sale',
+      description: 'Sales CRUD (list, get, create, update, delete)',
     });
 
-    // 4. Update Sale
-    const updateSaleFunction = new nodejs.NodejsFunction(this, 'UpdateSaleFunction', {
+    const saleLinesFunction = new nodejs.NodejsFunction(this, 'SaleLinesFunction', {
       ...commonLambdaProps,
-      functionName: `SaleModuleUpdateSale-${environment}`,
-      entry: path.join(__dirname, '../../functions/sale-module-api/src/handlers/sales/update-sale.ts'),
+      functionName: `SaleModuleSaleLines-${environment}`,
+      entry: path.join(__dirname, '../../functions/sale-module-api/src/handlers/sales/sale-lines.ts'),
       handler: 'handler',
-      description: 'Update sale details',
+      description: 'Sale lines CRUD (list, create, update, delete)',
     });
 
-    // 5. Delete Sale
-    const deleteSaleFunction = new nodejs.NodejsFunction(this, 'DeleteSaleFunction', {
-      ...commonLambdaProps,
-      functionName: `SaleModuleDeleteSale-${environment}`,
-      entry: path.join(__dirname, '../../functions/sale-module-api/src/handlers/sales/delete-sale.ts'),
-      handler: 'handler',
-      description: 'Soft delete sale',
-    });
-
-    // 6. Confirm Sale
     const confirmSaleFunction = new nodejs.NodejsFunction(this, 'ConfirmSaleFunction', {
       ...commonLambdaProps,
       functionName: `SaleModuleConfirmSale-${environment}`,
@@ -126,236 +112,38 @@ export class SaleModuleLambdaStack extends cdk.Stack {
       description: 'Confirm sale',
     });
 
-    // 7. List Sale Lines
-    const listSaleLinesFunction = new nodejs.NodejsFunction(this, 'ListSaleLinesFunction', {
+    const invoiceFunction = new nodejs.NodejsFunction(this, 'InvoiceFunction', {
       ...commonLambdaProps,
-      functionName: `SaleModuleListSaleLines-${environment}`,
-      entry: path.join(__dirname, '../../functions/sale-module-api/src/handlers/sales/list-sale-lines.ts'),
+      functionName: `SaleModuleInvoice-${environment}`,
+      entry: path.join(__dirname, '../../functions/sale-module-api/src/handlers/invoices/invoices.ts'),
       handler: 'handler',
-      description: 'List sale lines',
-    });
-
-    // 8. Create Sale Line
-    const createSaleLineFunction = new nodejs.NodejsFunction(this, 'CreateSaleLineFunction', {
-      ...commonLambdaProps,
-      functionName: `SaleModuleCreateSaleLine-${environment}`,
-      entry: path.join(__dirname, '../../functions/sale-module-api/src/handlers/sales/create-sale-line.ts'),
-      handler: 'handler',
-      description: 'Add line to sale',
-    });
-
-    // 9. Update Sale Line
-    const updateSaleLineFunction = new nodejs.NodejsFunction(this, 'UpdateSaleLineFunction', {
-      ...commonLambdaProps,
-      functionName: `SaleModuleUpdateSaleLine-${environment}`,
-      entry: path.join(__dirname, '../../functions/sale-module-api/src/handlers/sales/update-sale-line.ts'),
-      handler: 'handler',
-      description: 'Update sale line',
-    });
-
-    // 10. Delete Sale Line
-    const deleteSaleLineFunction = new nodejs.NodejsFunction(this, 'DeleteSaleLineFunction', {
-      ...commonLambdaProps,
-      functionName: `SaleModuleDeleteSaleLine-${environment}`,
-      entry: path.join(__dirname, '../../functions/sale-module-api/src/handlers/sales/delete-sale-line.ts'),
-      handler: 'handler',
-      description: 'Delete sale line',
-    });
-
-    // ========================================
-    // Buyers CRUD Lambda Functions (5)
-    // ========================================
-
-    const listBuyersFunction = new nodejs.NodejsFunction(this, 'ListBuyersFunction', {
-      ...commonLambdaProps,
-      functionName: `SaleModuleListBuyers-${environment}`,
-      entry: path.join(__dirname, '../../functions/sale-module-api/src/handlers/buyers/list-buyers.ts'),
-      handler: 'handler',
-      description: 'List buyers',
-    });
-
-    const getBuyerFunction = new nodejs.NodejsFunction(this, 'GetBuyerFunction', {
-      ...commonLambdaProps,
-      functionName: `SaleModuleGetBuyer-${environment}`,
-      entry: path.join(__dirname, '../../functions/sale-module-api/src/handlers/buyers/get-buyer.ts'),
-      handler: 'handler',
-      description: 'Get buyer by ID',
-    });
-
-    const createBuyerFunction = new nodejs.NodejsFunction(this, 'CreateBuyerFunction', {
-      ...commonLambdaProps,
-      functionName: `SaleModuleCreateBuyer-${environment}`,
-      entry: path.join(__dirname, '../../functions/sale-module-api/src/handlers/buyers/create-buyer.ts'),
-      handler: 'handler',
-      description: 'Create new buyer',
-    });
-
-    const updateBuyerFunction = new nodejs.NodejsFunction(this, 'UpdateBuyerFunction', {
-      ...commonLambdaProps,
-      functionName: `SaleModuleUpdateBuyer-${environment}`,
-      entry: path.join(__dirname, '../../functions/sale-module-api/src/handlers/buyers/update-buyer.ts'),
-      handler: 'handler',
-      description: 'Update buyer',
-    });
-
-    const deleteBuyerFunction = new nodejs.NodejsFunction(this, 'DeleteBuyerFunction', {
-      ...commonLambdaProps,
-      functionName: `SaleModuleDeleteBuyer-${environment}`,
-      entry: path.join(__dirname, '../../functions/sale-module-api/src/handlers/buyers/delete-buyer.ts'),
-      handler: 'handler',
-      description: 'Delete buyer',
-    });
-
-    // ========================================
-    // Producers CRUD Lambda Functions (5)
-    // ========================================
-
-    const listProducersFunction = new nodejs.NodejsFunction(this, 'ListProducersFunction', {
-      ...commonLambdaProps,
-      functionName: `SaleModuleListProducers-${environment}`,
-      entry: path.join(__dirname, '../../functions/sale-module-api/src/handlers/producers/list-producers.ts'),
-      handler: 'handler',
-      description: 'List producers',
-    });
-
-    const getProducerFunction = new nodejs.NodejsFunction(this, 'GetProducerFunction', {
-      ...commonLambdaProps,
-      functionName: `SaleModuleGetProducer-${environment}`,
-      entry: path.join(__dirname, '../../functions/sale-module-api/src/handlers/producers/get-producer.ts'),
-      handler: 'handler',
-      description: 'Get producer by ID',
-    });
-
-    const createProducerFunction = new nodejs.NodejsFunction(this, 'CreateProducerFunction', {
-      ...commonLambdaProps,
-      functionName: `SaleModuleCreateProducer-${environment}`,
-      entry: path.join(__dirname, '../../functions/sale-module-api/src/handlers/producers/create-producer.ts'),
-      handler: 'handler',
-      description: 'Create new producer',
-    });
-
-    const updateProducerFunction = new nodejs.NodejsFunction(this, 'UpdateProducerFunction', {
-      ...commonLambdaProps,
-      functionName: `SaleModuleUpdateProducer-${environment}`,
-      entry: path.join(__dirname, '../../functions/sale-module-api/src/handlers/producers/update-producer.ts'),
-      handler: 'handler',
-      description: 'Update producer',
-    });
-
-    const deleteProducerFunction = new nodejs.NodejsFunction(this, 'DeleteProducerFunction', {
-      ...commonLambdaProps,
-      functionName: `SaleModuleDeleteProducer-${environment}`,
-      entry: path.join(__dirname, '../../functions/sale-module-api/src/handlers/producers/delete-producer.ts'),
-      handler: 'handler',
-      description: 'Delete producer',
-    });
-
-    // ========================================
-    // Invoice Generation Lambda Functions (4)
-    // ========================================
-
-    const generateHtmlInvoiceFunction = new nodejs.NodejsFunction(this, 'GenerateHtmlInvoiceFunction', {
-      ...commonLambdaProps,
-      functionName: `SaleModuleGenerateHtmlInvoice-${environment}`,
-      entry: path.join(__dirname, '../../functions/sale-module-api/src/handlers/invoices/generate-html-invoice.ts'),
-      handler: 'handler',
-      description: 'Generate HTML invoice',
+      description: 'Invoice generation (html, pdf, sdi, download)',
       timeout: cdk.Duration.seconds(60),
     });
 
-    const generatePdfInvoiceFunction = new nodejs.NodejsFunction(this, 'GeneratePdfInvoiceFunction', {
+    const attachmentUploadFunction = new nodejs.NodejsFunction(this, 'AttachmentUploadFunction', {
       ...commonLambdaProps,
-      functionName: `SaleModuleGeneratePdfInvoice-${environment}`,
-      entry: path.join(__dirname, '../../functions/sale-module-api/src/handlers/invoices/generate-pdf-invoice.ts'),
-      handler: 'handler',
-      description: 'Generate PDF invoice',
-      timeout: cdk.Duration.seconds(60),
-    });
-
-    const generateSdiInvoiceFunction = new nodejs.NodejsFunction(this, 'GenerateSdiInvoiceFunction', {
-      ...commonLambdaProps,
-      functionName: `SaleModuleGenerateSdiInvoice-${environment}`,
-      entry: path.join(__dirname, '../../functions/sale-module-api/src/handlers/invoices/generate-sdi-invoice.ts'),
-      handler: 'handler',
-      description: 'Generate SDI XML invoice',
-      timeout: cdk.Duration.seconds(60),
-    });
-
-    const getInvoiceDownloadUrlFunction = new nodejs.NodejsFunction(this, 'GetInvoiceDownloadUrlFunction', {
-      ...commonLambdaProps,
-      functionName: `SaleModuleGetInvoiceDownloadUrl-${environment}`,
-      entry: path.join(__dirname, '../../functions/sale-module-api/src/handlers/invoices/get-invoice-download-url.ts'),
-      handler: 'handler',
-      description: 'Get invoice download URL',
-    });
-
-    // ========================================
-    // Attachment Lambda Functions (4)
-    // ========================================
-
-    const generateUploadUrlFunction = new nodejs.NodejsFunction(this, 'GenerateUploadUrlFunction', {
-      ...commonLambdaProps,
-      functionName: `SaleModuleGenerateUploadUrl-${environment}`,
+      functionName: `SaleModuleAttachmentUpload-${environment}`,
       entry: path.join(__dirname, '../../functions/sale-module-api/src/handlers/attachments/generate-upload-url.ts'),
       handler: 'handler',
-      description: 'Generate upload URL',
+      description: 'Generate S3 presigned upload URL',
     });
 
-    const registerAttachmentFunction = new nodejs.NodejsFunction(this, 'RegisterAttachmentFunction', {
+    const attachmentCrudFunction = new nodejs.NodejsFunction(this, 'AttachmentCrudFunction', {
       ...commonLambdaProps,
-      functionName: `SaleModuleRegisterAttachment-${environment}`,
-      entry: path.join(__dirname, '../../functions/sale-module-api/src/handlers/attachments/register-attachment.ts'),
+      functionName: `SaleModuleAttachmentCrud-${environment}`,
+      entry: path.join(__dirname, '../../functions/sale-module-api/src/handlers/attachments/attachments.ts'),
       handler: 'handler',
-      description: 'Register attachment',
+      description: 'Attachment CRUD (register, list, delete)',
     });
 
-    const listAttachmentsFunction = new nodejs.NodejsFunction(this, 'ListAttachmentsFunction', {
+    const searchFunction = new nodejs.NodejsFunction(this, 'SearchFunction', {
       ...commonLambdaProps,
-      functionName: `SaleModuleListAttachments-${environment}`,
-      entry: path.join(__dirname, '../../functions/sale-module-api/src/handlers/attachments/list-attachments.ts'),
+      functionName: `SaleModuleSearch-${environment}`,
+      entry: path.join(__dirname, '../../functions/sale-module-api/src/handlers/search/search.ts'),
       handler: 'handler',
-      description: 'List attachments',
+      description: 'Search sales, buyers, and producers',
     });
-
-    const deleteAttachmentFunction = new nodejs.NodejsFunction(this, 'DeleteAttachmentFunction', {
-      ...commonLambdaProps,
-      functionName: `SaleModuleDeleteAttachment-${environment}`,
-      entry: path.join(__dirname, '../../functions/sale-module-api/src/handlers/attachments/delete-attachment.ts'),
-      handler: 'handler',
-      description: 'Delete attachment',
-    });
-
-    // ========================================
-    // Search Lambda Functions (3)
-    // ========================================
-
-    const searchSalesFunction = new nodejs.NodejsFunction(this, 'SearchSalesFunction', {
-      ...commonLambdaProps,
-      functionName: `SaleModuleSearchSales-${environment}`,
-      entry: path.join(__dirname, '../../functions/sale-module-api/src/handlers/search/search-sales.ts'),
-      handler: 'handler',
-      description: 'Search sales',
-    });
-
-    const searchBuyersFunction = new nodejs.NodejsFunction(this, 'SearchBuyersFunction', {
-      ...commonLambdaProps,
-      functionName: `SaleModuleSearchBuyers-${environment}`,
-      entry: path.join(__dirname, '../../functions/sale-module-api/src/handlers/search/search-buyers.ts'),
-      handler: 'handler',
-      description: 'Search buyers',
-    });
-
-    const searchProducersFunction = new nodejs.NodejsFunction(this, 'SearchProducersFunction', {
-      ...commonLambdaProps,
-      functionName: `SaleModuleSearchProducers-${environment}`,
-      entry: path.join(__dirname, '../../functions/sale-module-api/src/handlers/search/search-producers.ts'),
-      handler: 'handler',
-      description: 'Search producers',
-    });
-
-    // ========================================
-    // Sync Lambda Functions (3)
-    // ========================================
 
     const syncSalesFunction = new nodejs.NodejsFunction(this, 'SyncSalesFunction', {
       ...commonLambdaProps,
@@ -365,107 +153,44 @@ export class SaleModuleLambdaStack extends cdk.Stack {
       description: 'Sync sales (initial + delta)',
     });
 
-    const syncBuyersFunction = new nodejs.NodejsFunction(this, 'SyncBuyersFunction', {
+    const syncEntitiesFunction = new nodejs.NodejsFunction(this, 'SyncEntitiesFunction', {
       ...commonLambdaProps,
-      functionName: `SaleModuleSyncBuyers-${environment}`,
-      entry: path.join(__dirname, '../../functions/sale-module-api/src/handlers/sync/sync-buyers.ts'),
+      functionName: `SaleModuleSyncEntities-${environment}`,
+      entry: path.join(__dirname, '../../functions/sale-module-api/src/handlers/sync/sync-entities.ts'),
       handler: 'handler',
-      description: 'Sync buyers (initial + delta)',
+      description: 'Sync buyers and producers (initial + delta)',
     });
 
-    const syncProducersFunction = new nodejs.NodejsFunction(this, 'SyncProducersFunction', {
+    const dashboardFunction = new nodejs.NodejsFunction(this, 'DashboardFunction', {
       ...commonLambdaProps,
-      functionName: `SaleModuleSyncProducers-${environment}`,
-      entry: path.join(__dirname, '../../functions/sale-module-api/src/handlers/sync/sync-producers.ts'),
+      functionName: `SaleModuleDashboard-${environment}`,
+      entry: path.join(__dirname, '../../functions/sale-module-api/src/handlers/dashboard/dashboard.ts'),
       handler: 'handler',
-      description: 'Sync producers (initial + delta)',
-    });
-
-    // ========================================
-    // Dashboard Lambda Functions (4)
-    // ========================================
-
-    const getDashboardStatsFunction = new nodejs.NodejsFunction(this, 'GetDashboardStatsFunction', {
-      ...commonLambdaProps,
-      functionName: `SaleModuleGetDashboardStats-${environment}`,
-      entry: path.join(__dirname, '../../functions/sale-module-api/src/handlers/dashboard/get-dashboard-stats.ts'),
-      handler: 'handler',
-      description: 'Get dashboard statistics',
-    });
-
-    const getSalesByDateRangeFunction = new nodejs.NodejsFunction(this, 'GetSalesByDateRangeFunction', {
-      ...commonLambdaProps,
-      functionName: `SaleModuleGetSalesByDateRange-${environment}`,
-      entry: path.join(__dirname, '../../functions/sale-module-api/src/handlers/dashboard/get-sales-by-date-range.ts'),
-      handler: 'handler',
-      description: 'Get sales by date range',
-    });
-
-    const getTopBuyersFunction = new nodejs.NodejsFunction(this, 'GetTopBuyersFunction', {
-      ...commonLambdaProps,
-      functionName: `SaleModuleGetTopBuyers-${environment}`,
-      entry: path.join(__dirname, '../../functions/sale-module-api/src/handlers/dashboard/get-top-buyers.ts'),
-      handler: 'handler',
-      description: 'Get top buyers',
-    });
-
-    const getRecentActivityFunction = new nodejs.NodejsFunction(this, 'GetRecentActivityFunction', {
-      ...commonLambdaProps,
-      functionName: `SaleModuleGetRecentActivity-${environment}`,
-      entry: path.join(__dirname, '../../functions/sale-module-api/src/handlers/dashboard/get-recent-activity.ts'),
-      handler: 'handler',
-      description: 'Get recent activity',
+      description: 'Dashboard stats, sales by date, top buyers, recent activity',
     });
 
     // Store functions for easy access
     this.functions = {
-      listSales: listSalesFunction,
-      getSale: getSaleFunction,
-      createSale: createSaleFunction,
-      updateSale: updateSaleFunction,
-      deleteSale: deleteSaleFunction,
+      buyers: buyersFunction,
+      producers: producersFunction,
+      salesCrud: salesCrudFunction,
+      saleLines: saleLinesFunction,
       confirmSale: confirmSaleFunction,
-      listSaleLines: listSaleLinesFunction,
-      createSaleLine: createSaleLineFunction,
-      updateSaleLine: updateSaleLineFunction,
-      deleteSaleLine: deleteSaleLineFunction,
-      listBuyers: listBuyersFunction,
-      getBuyer: getBuyerFunction,
-      createBuyer: createBuyerFunction,
-      updateBuyer: updateBuyerFunction,
-      deleteBuyer: deleteBuyerFunction,
-      listProducers: listProducersFunction,
-      getProducer: getProducerFunction,
-      createProducer: createProducerFunction,
-      updateProducer: updateProducerFunction,
-      deleteProducer: deleteProducerFunction,
-      generateHtmlInvoice: generateHtmlInvoiceFunction,
-      generatePdfInvoice: generatePdfInvoiceFunction,
-      generateSdiInvoice: generateSdiInvoiceFunction,
-      getInvoiceDownloadUrl: getInvoiceDownloadUrlFunction,
-      generateUploadUrl: generateUploadUrlFunction,
-      registerAttachment: registerAttachmentFunction,
-      listAttachments: listAttachmentsFunction,
-      deleteAttachment: deleteAttachmentFunction,
-      searchSales: searchSalesFunction,
-      searchBuyers: searchBuyersFunction,
-      searchProducers: searchProducersFunction,
-      getDashboardStats: getDashboardStatsFunction,
-      getSalesByDateRange: getSalesByDateRangeFunction,
-      getTopBuyers: getTopBuyersFunction,
-      getRecentActivity: getRecentActivityFunction,
+      invoice: invoiceFunction,
+      attachmentUpload: attachmentUploadFunction,
+      attachmentCrud: attachmentCrudFunction,
+      search: searchFunction,
       syncSales: syncSalesFunction,
-      syncBuyers: syncBuyersFunction,
-      syncProducers: syncProducersFunction,
+      syncEntities: syncEntitiesFunction,
+      dashboard: dashboardFunction,
     };
 
     // ========================================
     // Grant Permissions
     // ========================================
 
-    // DynamoDB permissions for all functions
+    // DynamoDB and S3 permissions for all functions
     Object.values(this.functions).forEach((func) => {
-      // Sales table access
       func.addToRolePolicy(new iam.PolicyStatement({
         actions: [
           'dynamodb:GetItem',
@@ -481,7 +206,6 @@ export class SaleModuleLambdaStack extends cdk.Stack {
         ],
       }));
 
-      // Buyers table access
       func.addToRolePolicy(new iam.PolicyStatement({
         actions: [
           'dynamodb:GetItem',
@@ -497,7 +221,6 @@ export class SaleModuleLambdaStack extends cdk.Stack {
         ],
       }));
 
-      // Producers table access
       func.addToRolePolicy(new iam.PolicyStatement({
         actions: [
           'dynamodb:GetItem',
@@ -513,7 +236,6 @@ export class SaleModuleLambdaStack extends cdk.Stack {
         ],
       }));
 
-      // S3 permissions
       func.addToRolePolicy(new iam.PolicyStatement({
         actions: [
           's3:GetObject',
@@ -528,104 +250,110 @@ export class SaleModuleLambdaStack extends cdk.Stack {
       }));
     });
 
-    // Lambda invoke permissions for invoice functions
-    const invoiceFunctions = [
-      generateHtmlInvoiceFunction,
-      generatePdfInvoiceFunction,
-      generateSdiInvoiceFunction,
-    ];
-
-    invoiceFunctions.forEach((func) => {
-      func.addToRolePolicy(new iam.PolicyStatement({
-        actions: ['lambda:InvokeFunction'],
-        resources: [
-          `arn:aws:lambda:${this.region}:${this.account}:function:${props.templateRendererFunctionName}`,
-          `arn:aws:lambda:${this.region}:${this.account}:function:${props.htmlToPdfFunctionName}`,
-          `arn:aws:lambda:${this.region}:${this.account}:function:${props.sdiGeneratorFunctionName}`,
-        ],
-      }));
-    });
+    // Lambda invoke permissions for the consolidated invoice function
+    invoiceFunction.addToRolePolicy(new iam.PolicyStatement({
+      actions: ['lambda:InvokeFunction'],
+      resources: [
+        `arn:aws:lambda:${this.region}:${this.account}:function:${props.templateRendererFunctionName}`,
+        `arn:aws:lambda:${this.region}:${this.account}:function:${props.htmlToPdfFunctionName}`,
+        `arn:aws:lambda:${this.region}:${this.account}:function:${props.sdiGeneratorFunctionName}`,
+      ],
+    }));
 
     // ========================================
-    // API Gateway Integrations (Part 1 of 2)
+    // API Gateway Routes
     // ========================================
 
-    // Helper function to create route with integration
+    const mkInt = (id: string, fn: lambda.Function) =>
+      new integrations.HttpLambdaIntegration(id, fn,
+        { payloadFormatVersion: apigatewayv2.PayloadFormatVersion.VERSION_1_0 });
+
+    const buyersInt         = mkInt('BuyersIntegration', buyersFunction);
+    const producersInt      = mkInt('ProducersIntegration', producersFunction);
+    const salesCrudInt      = mkInt('SalesCrudIntegration', salesCrudFunction);
+    const saleLinesInt      = mkInt('SaleLinesIntegration', saleLinesFunction);
+    const confirmSaleInt    = mkInt('ConfirmSaleIntegration', confirmSaleFunction);
+    const invoiceInt        = mkInt('InvoiceIntegration', invoiceFunction);
+    const attachUploadInt   = mkInt('AttachmentUploadIntegration', attachmentUploadFunction);
+    const attachCrudInt     = mkInt('AttachmentCrudIntegration', attachmentCrudFunction);
+    const searchInt         = mkInt('SearchIntegration', searchFunction);
+    const syncSalesInt      = mkInt('SyncSalesIntegration', syncSalesFunction);
+    const syncEntitiesInt   = mkInt('SyncEntitiesIntegration', syncEntitiesFunction);
+    const dashboardInt      = mkInt('DashboardIntegration', dashboardFunction);
+
     const addRoute = (
       method: apigatewayv2.HttpMethod,
-      path: string,
-      func: lambda.Function,
+      routePath: string,
+      integration: integrations.HttpLambdaIntegration,
       requireAuth = true
     ) => {
-      const integration = new integrations.HttpLambdaIntegration(
-        `${func.node.id}Integration`,
-        func,
-        { payloadFormatVersion: apigatewayv2.PayloadFormatVersion.VERSION_1_0 }
-      );
-
       httpApi.addRoutes({
-        path,
+        path: routePath,
         methods: [method],
         integration,
         authorizer: requireAuth ? jwtAuthorizer : undefined,
       });
     };
 
-    // Sales Routes
-    addRoute(apigatewayv2.HttpMethod.GET, '/api/sales', listSalesFunction);
-    addRoute(apigatewayv2.HttpMethod.GET, '/api/sales/{id}', getSaleFunction);
-    addRoute(apigatewayv2.HttpMethod.POST, '/api/sales', createSaleFunction);
-    addRoute(apigatewayv2.HttpMethod.PUT, '/api/sales/{id}', updateSaleFunction);
-    addRoute(apigatewayv2.HttpMethod.DELETE, '/api/sales/{id}', deleteSaleFunction);
-    addRoute(apigatewayv2.HttpMethod.POST, '/api/sales/{id}/confirm', confirmSaleFunction);
+    const { GET, POST, PUT, DELETE } = apigatewayv2.HttpMethod;
+
+    // Sales CRUD Routes
+    addRoute(GET,    '/api/sales',      salesCrudInt);
+    addRoute(GET,    '/api/sales/{id}', salesCrudInt);
+    addRoute(POST,   '/api/sales',      salesCrudInt);
+    addRoute(PUT,    '/api/sales/{id}', salesCrudInt);
+    addRoute(DELETE, '/api/sales/{id}', salesCrudInt);
+
+    // Confirm Sale Route
+    addRoute(POST, '/api/sales/{id}/confirm', confirmSaleInt);
 
     // Sale Lines Routes
-    addRoute(apigatewayv2.HttpMethod.GET, '/api/sales/{id}/lines', listSaleLinesFunction);
-    addRoute(apigatewayv2.HttpMethod.POST, '/api/sales/{id}/lines', createSaleLineFunction);
-    addRoute(apigatewayv2.HttpMethod.PUT, '/api/sales/{id}/lines/{lineId}', updateSaleLineFunction);
-    addRoute(apigatewayv2.HttpMethod.DELETE, '/api/sales/{id}/lines/{lineId}', deleteSaleLineFunction);
+    addRoute(GET,    '/api/sales/{id}/lines',              saleLinesInt);
+    addRoute(POST,   '/api/sales/{id}/lines',              saleLinesInt);
+    addRoute(PUT,    '/api/sales/{id}/lines/{lineId}',     saleLinesInt);
+    addRoute(DELETE, '/api/sales/{id}/lines/{lineId}',     saleLinesInt);
 
     // Buyers Routes
-    addRoute(apigatewayv2.HttpMethod.GET, '/api/buyers', listBuyersFunction);
-    addRoute(apigatewayv2.HttpMethod.GET, '/api/buyers/{id}', getBuyerFunction);
-    addRoute(apigatewayv2.HttpMethod.POST, '/api/buyers', createBuyerFunction);
-    addRoute(apigatewayv2.HttpMethod.PUT, '/api/buyers/{id}', updateBuyerFunction);
-    addRoute(apigatewayv2.HttpMethod.DELETE, '/api/buyers/{id}', deleteBuyerFunction);
+    addRoute(GET,    '/api/buyers',      buyersInt);
+    addRoute(GET,    '/api/buyers/{id}', buyersInt);
+    addRoute(POST,   '/api/buyers',      buyersInt);
+    addRoute(PUT,    '/api/buyers/{id}', buyersInt);
+    addRoute(DELETE, '/api/buyers/{id}', buyersInt);
 
     // Producers Routes
-    addRoute(apigatewayv2.HttpMethod.GET, '/api/producers', listProducersFunction);
-    addRoute(apigatewayv2.HttpMethod.GET, '/api/producers/{id}', getProducerFunction);
-    addRoute(apigatewayv2.HttpMethod.POST, '/api/producers', createProducerFunction);
-    addRoute(apigatewayv2.HttpMethod.PUT, '/api/producers/{id}', updateProducerFunction);
-    addRoute(apigatewayv2.HttpMethod.DELETE, '/api/producers/{id}', deleteProducerFunction);
+    addRoute(GET,    '/api/producers',      producersInt);
+    addRoute(GET,    '/api/producers/{id}', producersInt);
+    addRoute(POST,   '/api/producers',      producersInt);
+    addRoute(PUT,    '/api/producers/{id}', producersInt);
+    addRoute(DELETE, '/api/producers/{id}', producersInt);
 
     // Invoice Routes
-    addRoute(apigatewayv2.HttpMethod.POST, '/api/sales/{id}/invoice/html', generateHtmlInvoiceFunction);
-    addRoute(apigatewayv2.HttpMethod.POST, '/api/sales/{id}/invoice/pdf', generatePdfInvoiceFunction);
-    addRoute(apigatewayv2.HttpMethod.POST, '/api/sales/{id}/invoice/sdi', generateSdiInvoiceFunction);
-    addRoute(apigatewayv2.HttpMethod.GET, '/api/sales/{id}/invoice/download', getInvoiceDownloadUrlFunction);
+    addRoute(POST, '/api/sales/{id}/invoice/html',     invoiceInt);
+    addRoute(POST, '/api/sales/{id}/invoice/pdf',      invoiceInt);
+    addRoute(POST, '/api/sales/{id}/invoice/sdi',      invoiceInt);
+    addRoute(GET,  '/api/sales/{id}/invoice/download', invoiceInt);
 
     // Attachment Routes
-    addRoute(apigatewayv2.HttpMethod.POST, '/api/sales/{id}/upload-url', generateUploadUrlFunction);
-    addRoute(apigatewayv2.HttpMethod.POST, '/api/sales/{id}/attachments', registerAttachmentFunction);
-    addRoute(apigatewayv2.HttpMethod.GET, '/api/sales/{id}/attachments', listAttachmentsFunction);
-    addRoute(apigatewayv2.HttpMethod.DELETE, '/api/sales/{id}/attachments/{attachmentId}', deleteAttachmentFunction);
+    addRoute(POST,   '/api/sales/{id}/upload-url',                    attachUploadInt);
+    addRoute(POST,   '/api/sales/{id}/attachments',                   attachCrudInt);
+    addRoute(GET,    '/api/sales/{id}/attachments',                   attachCrudInt);
+    addRoute(DELETE, '/api/sales/{id}/attachments/{attachmentId}',    attachCrudInt);
 
     // Search Routes
-    addRoute(apigatewayv2.HttpMethod.GET, '/api/search/sales', searchSalesFunction);
-    addRoute(apigatewayv2.HttpMethod.GET, '/api/search/buyers', searchBuyersFunction);
-    addRoute(apigatewayv2.HttpMethod.GET, '/api/search/producers', searchProducersFunction);
+    addRoute(GET, '/api/search/sales',     searchInt);
+    addRoute(GET, '/api/search/buyers',    searchInt);
+    addRoute(GET, '/api/search/producers', searchInt);
 
     // Sync Routes
-    addRoute(apigatewayv2.HttpMethod.GET, '/api/sync/sales', syncSalesFunction);
-    addRoute(apigatewayv2.HttpMethod.GET, '/api/sync/buyers', syncBuyersFunction);
-    addRoute(apigatewayv2.HttpMethod.GET, '/api/sync/producers', syncProducersFunction);
+    addRoute(GET, '/api/sync/sales',     syncSalesInt);
+    addRoute(GET, '/api/sync/buyers',    syncEntitiesInt);
+    addRoute(GET, '/api/sync/producers', syncEntitiesInt);
 
     // Dashboard Routes
-    addRoute(apigatewayv2.HttpMethod.GET, '/api/dashboard/stats', getDashboardStatsFunction);
-    addRoute(apigatewayv2.HttpMethod.GET, '/api/dashboard/sales-by-date', getSalesByDateRangeFunction);
-    addRoute(apigatewayv2.HttpMethod.GET, '/api/dashboard/top-buyers', getTopBuyersFunction);
-    addRoute(apigatewayv2.HttpMethod.GET, '/api/dashboard/recent-activity', getRecentActivityFunction);
+    addRoute(GET, '/api/dashboard/stats',           dashboardInt);
+    addRoute(GET, '/api/dashboard/sales-by-date',   dashboardInt);
+    addRoute(GET, '/api/dashboard/top-buyers',      dashboardInt);
+    addRoute(GET, '/api/dashboard/recent-activity', dashboardInt);
 
     // ========================================
     // Tags

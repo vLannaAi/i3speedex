@@ -26,10 +26,17 @@ const rawBeforeFocus = ref('')
 
 const { activeFilters, displayString, toggleToken, isActive, hasActiveFilters, applyDisplayFormat } = useSearchQuery(search, buyers)
 
+const { sortKey, sortDir, toggleSort: toggleSortBase, resetSort } = useTableSort()
+
+function toggleSort(key: string) {
+  toggleSortBase(key)
+  page.value = 1
+  load()
+}
+
 function clearSearch() {
   search.value = ''
-  sortKey.value = null
-  sortDir.value = null
+  resetSort()
   page.value = 1
   load()
   router.replace({ query: {} })
@@ -43,24 +50,6 @@ function onInputFocus() {
 function onInputBlur() {
   inputFocused.value = false
   applyDisplayFormat()
-}
-
-// Sort state (column header clicks still work alongside sort: tokens)
-const sortKey = ref<string | null>(null)
-const sortDir = ref<'asc' | 'desc' | null>(null)
-
-function toggleSort(key: string) {
-  if (sortKey.value !== key) {
-    sortKey.value = key
-    sortDir.value = 'asc'
-  } else if (sortDir.value === 'asc') {
-    sortDir.value = 'desc'
-  } else {
-    sortKey.value = null
-    sortDir.value = null
-  }
-  page.value = 1
-  load()
 }
 
 // Badge toggle: delegates to useSearchQuery then reloads
@@ -150,13 +139,6 @@ const columns = [
   { accessorKey: 'regDate', header: 'Reg / Date', size: 150 },
   { accessorKey: 'buyerId', header: 'Buyer', size: 180 },
   { accessorKey: 'total', header: 'Total €', size: 100, meta: { class: { td: 'text-left' } } },
-]
-
-const pageSizeOptions = [
-  { label: '10', value: 10 },
-  { label: '20', value: 20 },
-  { label: '50', value: 50 },
-  { label: '100', value: 100 },
 ]
 
 const showing = computed(() => {
@@ -327,239 +309,157 @@ function onSelectSale(_e: Event, row: any) {
 
 <template>
   <div>
-    <div class="px-9 flex items-center gap-3 mb-4 mt-4">
-      <h1 class="text-2xl font-bold shrink-0">Sales</h1>
-      <NuxtLink v-if="canWrite" to="/sales/new">
-        <UButton
-          icon="i-lucide-plus"
-          label="New"
-          variant="outline"
-          color="primary"
-          class="bg-(--ui-bg) ring-primary text-primary hover:bg-(--ui-bg-accented)"
-        />
-      </NuxtLink>
-      <div class="ml-auto">
-        <UInput
-          v-model="search"
-          class="w-64"
-          size="md"
-          :placeholder="hasActiveFilters ? '' : 'Search...'"
-          :ui="{ icon: { trailing: { pointerEvents: 'auto' } } }"
-          @focus="onInputFocus"
-          @blur="onInputBlur"
-        >
-          <template #trailing>
-             <UIcon
-               v-if="search"
-               name="i-lucide-x"
-               class="cursor-pointer text-(--ui-text-muted) hover:text-(--ui-text)"
-               @click="clearSearch"
-             />
-             <UIcon
-               v-else
-               name="i-lucide-search"
-               class="text-(--ui-text-dimmed)"
-             />
-          </template>
-        </UInput>
-      </div>
-    </div>
-
-    <!-- Table -->
-    <div class="rounded-none ring-0 sm:rounded-lg sm:ring ring-(--ui-border) bg-(--ui-bg)">
-      <UTable
-        :columns="columns"
-        :data="tableData"
-        :loading="loading"
-        sticky
-        :ui="{
-          root: '!overflow-visible w-full',
-          base: 'w-full',
-          thead: 'sticky top-16 z-10 bg-primary text-white font-normal text-sm',
-          th: { color: 'text-white', base: 'first:!pl-9' },
-          tr: 'hover:bg-(--ui-bg-accented) transition-colors cursor-pointer',
-          td: { base: 'whitespace-nowrap first:!pl-9' },
-        }"
-        @select="onSelectSale"
+    <ListPageHeader title="Sales" new-to="/sales/new" :can-write="canWrite">
+      <UInput
+        v-model="search"
+        class="w-64"
+        size="md"
+        :placeholder="hasActiveFilters ? '' : 'Search...'"
+        :ui="{ icon: { trailing: { pointerEvents: 'auto' } } }"
+        @focus="onInputFocus"
+        @blur="onInputBlur"
       >
-        <template #saleId-header>
-          <button class="inline-flex items-center gap-1 text-white" @click="toggleSort('saleId')">
-            ID
-            <UIcon v-if="sortKey === 'saleId'" :name="sortDir === 'asc' ? 'i-lucide-arrow-up' : 'i-lucide-arrow-down'" class="size-3" />
-          </button>
+        <template #trailing>
+           <UIcon
+             v-if="search"
+             name="i-lucide-x"
+             class="cursor-pointer text-(--ui-text-muted) hover:text-(--ui-text)"
+             @click="clearSearch"
+           />
+           <UIcon
+             v-else
+             name="i-lucide-search"
+             class="text-(--ui-text-dimmed)"
+           />
         </template>
-        <template #docType-header>
-          <button class="inline-flex items-center gap-1 text-white" @click="toggleSort('docType')">
-            Doc
-            <UIcon v-if="sortKey === 'docType'" :name="sortDir === 'asc' ? 'i-lucide-arrow-up' : 'i-lucide-arrow-down'" class="size-3" />
-          </button>
-        </template>
-        <template #status-header>
-          <button class="inline-flex items-center gap-1 text-white" @click="toggleSort('status')">
-            Status
-            <UIcon v-if="sortKey === 'status'" :name="sortDir === 'asc' ? 'i-lucide-arrow-up' : 'i-lucide-arrow-down'" class="size-3" />
-          </button>
-        </template>
-        <template #regDate-header>
-          <button class="inline-flex items-center gap-1 text-white" @click="toggleSort('regDate')">
-            Reg / Date
-            <UIcon v-if="sortKey === 'regDate'" :name="sortDir === 'asc' ? 'i-lucide-arrow-up' : 'i-lucide-arrow-down'" class="size-3" />
-          </button>
-        </template>
-        <template #buyerId-header>
-          <button class="inline-flex items-center gap-1 text-white" @click="toggleSort('buyerId')">
-            Buyer
-            <UIcon v-if="sortKey === 'buyerId'" :name="sortDir === 'asc' ? 'i-lucide-arrow-up' : 'i-lucide-arrow-down'" class="size-3" />
-          </button>
-        </template>
-        <template #total-header>
-          <div class="!text-left w-full">
-            <button class="inline-flex items-center gap-1 text-white" @click="toggleSort('total')">
-              Total €
-              <UIcon v-if="sortKey === 'total'" :name="sortDir === 'asc' ? 'i-lucide-arrow-up' : 'i-lucide-arrow-down'" class="size-3" />
-            </button>
-          </div>
-        </template>
-        <template #saleId-cell="{ row }">
-          <span v-if="row.original._summary" class="text-sm font-semibold">{{ row.original.saleId }} sales</span>
-          <span v-else class="text-xs !font-mono tabular-nums text-(--ui-text-muted)">
-            #<span class="text-(--ui-text) font-medium">{{ row.original.saleId.replace('SALE', '') }}</span>
-          </span>
-        </template>
-        <template #docType-cell="{ row }">
-          <div v-if="row.original._summary" class="flex flex-wrap gap-1">
-            <UBadge
-              :label="`${row.original._proformaDocCount}`"
-              color="neutral"
-              :variant="isActive('docType', 'proforma') ? 'solid' : 'subtle'"
-              size="xs"
-              class="cursor-pointer"
-              @click.stop="onToggleToken('docType', 'proforma')"
-            />
-            <UBadge
-              :label="`${row.original._invoiceDocCount}`"
-              color="primary"
-              :variant="isActive('docType', 'invoice') ? 'solid' : 'subtle'"
-              size="xs"
-              class="cursor-pointer"
-              @click.stop="onToggleToken('docType', 'invoice')"
-            />
-          </div>
-          <UBadge
-            v-else-if="row.original.docType"
-            :label="docTypeLabel[row.original.docType] || row.original.docType"
-            :color="docTypeColor[row.original.docType] || 'neutral'"
-            variant="subtle"
-            size="sm"
-          />
-          <span v-else class="text-xs text-(--ui-text-muted)">—</span>
-        </template>
-        <template #regDate-cell="{ row }">
-          <div v-if="row.original._summary" @click.stop>
-            <UDropdownMenu :items="yearMenuItems">
-              <UButton size="xs" variant="ghost" :label="yearLabel" trailing-icon="i-lucide-chevron-down" />
-            </UDropdownMenu>
-          </div>
-          <span v-else class="text-sm tabular-nums">
-            {{ row.original.regNumber ? row.original.regNumber.split('/').reverse().join('/') : '—' }}
-            <span class="opacity-60">{{ row.original.saleDate ? row.original.saleDate.slice(5).replace('-', '/') : '' }}</span>
-          </span>
-        </template>
-        <template #buyerId-cell="{ row }">
-          <div v-if="row.original._summary" @click.stop>
-            <UDropdownMenu :items="buyerMenuItems" :ui="{ content: 'max-h-60 overflow-y-auto' }">
-              <UButton size="xs" variant="ghost" :label="buyerLabel" trailing-icon="i-lucide-chevron-down" />
-            </UDropdownMenu>
-          </div>
-          <span v-else class="inline-flex items-center gap-1.5 font-semibold truncate">
-            <UIcon
-              v-if="buyerCountryMap[row.original.buyerId]"
-              :name="`circle-flags:${buyerCountryMap[row.original.buyerId]?.toLowerCase()}`"
-              class="size-4 shrink-0"
-              mode="svg"
-            />
-            {{ buyerCodeMap[row.original.buyerId] || row.original.buyerName }}
-          </span>
-        </template>
-        <template #total-cell="{ row }">
-          <div v-if="row.original._summary" class="text-right text-sm font-semibold tabular-nums">{{ formatNumber(row.original._total, 0) }}</div>
-          <div v-else class="text-right text-sm font-medium tabular-nums">{{ formatNumber(row.original.total, 0) }}</div>
-        </template>
-        <template #status-cell="{ row }">
-          <div v-if="row.original._summary" class="flex flex-wrap gap-1">
-            <UBadge
-              :label="`${row.original._sentCount}`"
-              color="warning"
-              :variant="isActive('status', 'sent') ? 'solid' : 'subtle'"
-              size="xs"
-              class="cursor-pointer"
-              @click.stop="onToggleToken('status', 'sent')"
-            />
-            <UBadge
-              :label="`${row.original._paidCount}`"
-              color="success"
-              :variant="isActive('status', 'paid') ? 'solid' : 'subtle'"
-              size="xs"
-              class="cursor-pointer"
-              @click.stop="onToggleToken('status', 'paid')"
-            />
-          </div>
-          <SaleStatusBadge v-else-if="row.original.status !== 'proforma'" :status="row.original.status" />
-          <span v-else />
-        </template>
-        <template #empty>
-          <EmptyState
-            title="No sales"
-            description="Get started by creating your first sale"
-            icon="i-lucide-file-text"
-            :action-to="canWrite ? '/sales/new' : undefined"
-            :action-label="canWrite ? 'New Sale' : undefined"
-          />
-        </template>
-      </UTable>
+      </UInput>
+    </ListPageHeader>
 
-      <!-- Pagination -->
-      <div class="flex items-center justify-between px-4 py-3 border-t border-(--ui-border)">
-        <div class="flex items-center gap-2">
-          <span class="text-sm text-(--ui-text-muted)">Rows per page:</span>
-          <USelect
-            v-model="pageSize"
-            :items="pageSizeOptions"
-            class="w-20"
-            @update:model-value="onPageSizeChange"
+    <AppTable :columns="columns" :data="tableData" :loading="loading" summary-style="primary" @select="onSelectSale">
+      <template #saleId-header>
+        <SortableHeader label="ID" column-key="saleId" :sort-key="sortKey" :sort-dir="sortDir" @sort="toggleSort" />
+      </template>
+      <template #docType-header>
+        <SortableHeader label="Doc" column-key="docType" :sort-key="sortKey" :sort-dir="sortDir" @sort="toggleSort" />
+      </template>
+      <template #status-header>
+        <SortableHeader label="Status" column-key="status" :sort-key="sortKey" :sort-dir="sortDir" @sort="toggleSort" />
+      </template>
+      <template #regDate-header>
+        <SortableHeader label="Reg / Date" column-key="regDate" :sort-key="sortKey" :sort-dir="sortDir" @sort="toggleSort" />
+      </template>
+      <template #buyerId-header>
+        <SortableHeader label="Buyer" column-key="buyerId" :sort-key="sortKey" :sort-dir="sortDir" @sort="toggleSort" />
+      </template>
+      <template #total-header>
+        <SortableHeader label="Total €" column-key="total" :sort-key="sortKey" :sort-dir="sortDir" justify="start" @sort="toggleSort" />
+      </template>
+      <template #saleId-cell="{ row }">
+        <span v-if="row.original._summary" class="text-sm font-semibold">{{ row.original.saleId }} sales</span>
+        <span v-else class="text-xs !font-mono tabular-nums text-(--ui-text-muted)">
+          #<span class="text-(--ui-text) font-medium">{{ row.original.saleId.replace('SALE', '') }}</span>
+        </span>
+      </template>
+      <template #docType-cell="{ row }">
+        <div v-if="row.original._summary" class="flex flex-wrap gap-1">
+          <UBadge
+            :label="`${row.original._proformaDocCount}`"
+            color="neutral"
+            :variant="isActive('docType', 'proforma') ? 'solid' : 'subtle'"
+            size="xs"
+            class="cursor-pointer"
+            @click.stop="onToggleToken('docType', 'proforma')"
+          />
+          <UBadge
+            :label="`${row.original._invoiceDocCount}`"
+            color="primary"
+            :variant="isActive('docType', 'invoice') ? 'solid' : 'subtle'"
+            size="xs"
+            class="cursor-pointer"
+            @click.stop="onToggleToken('docType', 'invoice')"
           />
         </div>
-        <div class="flex items-center gap-4">
-          <span class="text-sm text-(--ui-text-muted)">{{ showing }}</span>
-          <UPagination
-            v-model="page"
-            :total="total"
-            :items-per-page="pageSize"
-            @update:model-value="onPageChange"
+        <UBadge
+          v-else-if="row.original.docType"
+          :label="docTypeLabel[row.original.docType] || row.original.docType"
+          :color="docTypeColor[row.original.docType] || 'neutral'"
+          variant="subtle"
+          size="sm"
+        />
+        <span v-else class="text-xs text-(--ui-text-muted)">—</span>
+      </template>
+      <template #regDate-cell="{ row }">
+        <div v-if="row.original._summary" @click.stop>
+          <UDropdownMenu :items="yearMenuItems">
+            <UButton size="xs" variant="ghost" :label="yearLabel" trailing-icon="i-lucide-chevron-down" />
+          </UDropdownMenu>
+        </div>
+        <span v-else class="text-sm tabular-nums">
+          {{ row.original.regNumber ? row.original.regNumber.split('/').reverse().join('/') : '—' }}
+          <span class="opacity-60">{{ row.original.saleDate ? row.original.saleDate.slice(5).replace('-', '/') : '' }}</span>
+        </span>
+      </template>
+      <template #buyerId-cell="{ row }">
+        <div v-if="row.original._summary" @click.stop>
+          <UDropdownMenu :items="buyerMenuItems" :ui="{ content: 'max-h-60 overflow-y-auto' }">
+            <UButton size="xs" variant="ghost" :label="buyerLabel" trailing-icon="i-lucide-chevron-down" />
+          </UDropdownMenu>
+        </div>
+        <span v-else class="inline-flex items-center gap-1.5 font-semibold truncate">
+          <UIcon
+            v-if="buyerCountryMap[row.original.buyerId]"
+            :name="`circle-flags:${buyerCountryMap[row.original.buyerId]?.toLowerCase()}`"
+            class="size-4 shrink-0"
+            mode="svg"
+          />
+          {{ buyerCodeMap[row.original.buyerId] || row.original.buyerName }}
+        </span>
+      </template>
+      <template #total-cell="{ row }">
+        <div v-if="row.original._summary" class="text-right text-sm font-semibold tabular-nums">{{ formatNumber(row.original._total, 0) }}</div>
+        <div v-else class="text-right text-sm font-medium tabular-nums">{{ formatNumber(row.original.total, 0) }}</div>
+      </template>
+      <template #status-cell="{ row }">
+        <div v-if="row.original._summary" class="flex flex-wrap gap-1">
+          <UBadge
+            :label="`${row.original._sentCount}`"
+            color="warning"
+            :variant="isActive('status', 'sent') ? 'solid' : 'subtle'"
+            size="xs"
+            class="cursor-pointer"
+            @click.stop="onToggleToken('status', 'sent')"
+          />
+          <UBadge
+            :label="`${row.original._paidCount}`"
+            color="success"
+            :variant="isActive('status', 'paid') ? 'solid' : 'subtle'"
+            size="xs"
+            class="cursor-pointer"
+            @click.stop="onToggleToken('status', 'paid')"
           />
         </div>
-      </div>
-    </div>
+        <SaleStatusBadge v-else-if="row.original.status !== 'proforma'" :status="row.original.status" />
+        <span v-else />
+      </template>
+      <template #empty>
+        <EmptyState
+          title="No sales"
+          description="Get started by creating your first sale"
+          icon="i-lucide-file-text"
+          :action-to="canWrite ? '/sales/new' : undefined"
+          :action-label="canWrite ? 'New Sale' : undefined"
+        />
+      </template>
+      <template #after>
+        <TablePagination
+          :page="page"
+          :total="total"
+          :page-size="pageSize"
+          :showing="showing"
+          @update:page="onPageChange"
+          @update:page-size="onPageSizeChange"
+        />
+      </template>
+    </AppTable>
   </div>
 </template>
-
-<style scoped>
-@media (min-width: 640px) {
-  :deep(thead tr:first-child th:first-child) { border-top-left-radius: var(--radius-lg); }
-  :deep(thead tr:first-child th:last-child) { border-top-right-radius: var(--radius-lg); }
-  :deep(tbody tr:last-child td:first-child) { border-bottom-left-radius: var(--radius-lg); }
-  :deep(tbody tr:last-child td:last-child) { border-bottom-right-radius: var(--radius-lg); }
-}
-
-:deep(tbody tr:first-child td) {
-  position: sticky;
-  top: calc(var(--ui-header-height) + 45px);
-  z-index: 9;
-  background: color-mix(in srgb, var(--color-primary-500) 10%, var(--ui-bg)) !important;
-  font-weight: 400;
-}
-:deep(tbody tr:first-child) { cursor: default; }
-:deep(tbody tr:first-child:hover td) {
-  background: color-mix(in srgb, var(--color-primary-500) 10%, var(--ui-bg)) !important;
-}
-</style>

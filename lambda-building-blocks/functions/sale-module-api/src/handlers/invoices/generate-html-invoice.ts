@@ -123,7 +123,18 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
         vat: sale.buyerVatNumber || '',
         taxid: sale.buyerFiscalCode || '',
       },
-      sale_lines: lines.map((line) => ({
+      producer: {
+        id: sale.producerId || 0,
+        name: sale.producerName || '',
+        country: sale.producerCountry || 'IT',
+        address: sale.producerAddress || '',
+        zip: sale.producerPostalCode || '',
+        city: sale.producerCity || '',
+        prov: sale.producerProvince || '',
+        vat: sale.producerVatNumber || '',
+        taxid: sale.producerFiscalCode || '',
+      },
+      lines: lines.map((line) => ({
         description: line.productDescription,
         code: line.productCode || '',
         qty: line.quantity,
@@ -131,6 +142,11 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
         discount: line.discount || 0,
         vat: line.taxRate,
       })),
+      totals: {
+        subtotal: sale.subtotal || 0,
+        taxAmount: sale.taxAmount || 0,
+        total: sale.total || 0,
+      },
       countries: [
         { code: 'IT', name: 'Italia' },
         { code: 'DE', name: 'Germania' },

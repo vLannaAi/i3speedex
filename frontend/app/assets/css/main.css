@@ -2,6 +2,9 @@
 @import "@nuxt/ui";
 
 @theme {
+  --breakpoint-sm-table: 580px;
+  --breakpoint-md-table: 860px;
+
   --color-primary-50: #fff0f3;
   --color-primary-100: #ffe3e8;
   --color-primary-200: #ffc9d4;

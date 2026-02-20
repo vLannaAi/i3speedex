@@ -1,16 +1,17 @@
 <script setup lang="ts">
 import type { Buyer } from '~/types'
 
-defineProps<{
+const props = defineProps<{
   buyer: Buyer
 }>()
 </script>
 
 <template>
-  <div class="text-sm space-y-1">
-    <p class="font-medium text-gray-900">{{ buyer.companyName }}</p>
-    <p v-if="buyer.vatNumber" class="text-gray-500">VAT: {{ buyer.vatNumber }}</p>
-    <p class="text-gray-500">{{ buyer.city }}{{ buyer.province ? ` (${buyer.province})` : '' }}</p>
-    <p v-if="buyer.email" class="text-gray-500">{{ buyer.email }}</p>
-  </div>
+  <EntityQuickInfo
+    :company-name="props.buyer.companyName"
+    :vat-number="props.buyer.vatNumber"
+    :city="props.buyer.city"
+    :province="props.buyer.province"
+    :email="props.buyer.email"
+  />
 </template>
